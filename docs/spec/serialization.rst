@@ -68,8 +68,6 @@ The predicate expression can be provided to the `predicates` keyword argument of
 
     All kartothek reading pipelines are exposing this `predicates` argument as well where it is not only used for predicate pushdown but also for partition pruning. See :doc:`efficient_querying` for details.
 
-    The kartothek cube interface, see :doc:`../guide/cube/kartothek_cubes`, exposes a similar mechanism via the :class:`~kartothek.core.cube.conditions.Condition` and :class:`~kartothek.core.cube.conditions.Conjunction` classes.
-
 
 Literals, operators and typing
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -93,7 +91,6 @@ See also
 * :class:`~kartothek.serialization.DataFrameSerializer`
 * :class:`~kartothek.serialization.ParquetSerializer`
 * :doc:`efficient_querying`
-* :doc:`../guide/cube/query_system`
 * :doc:`type_system`
 
 
