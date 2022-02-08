@@ -44,6 +44,7 @@ some data there with Kartothek.
     )
 
 .. ipython:: python
+    :okwarning:
 
     dm = store_dataframes_as_dataset(
         store=store_url, dataset_uuid="partitioned_dataset", dfs=[df], partition_on="B"
@@ -58,6 +59,7 @@ Now, we create ``another_df`` with the same schema as our intial dataframe
 ``df`` and update it using the ``eager`` backend by calling :func:`~kartothek.io.eager.update_dataset_from_dataframes`:
 
 .. ipython:: python
+    :okwarning:
 
     from kartothek.api.dataset import update_dataset_from_dataframes
 
@@ -106,6 +108,7 @@ operation, and it can also be used to remove data.
 To do so we use the ``delete_scope`` keyword argument as shown in the example below:
 
 .. ipython:: python
+    :okwarning:
 
     dm = update_dataset_from_dataframes(
         None,
@@ -141,6 +144,7 @@ list but have to be specified instead as individual dictionaries, i.e.
 ``[{"E": ["test", "train"]}]`` will not work but ``[{"E": "test"}, {"E": "train"}]`` will.
 
 .. ipython:: python
+    :okwarning:
 
     duplicate_df = df.copy()
     duplicate_df.F = "bar"
@@ -155,6 +159,7 @@ list but have to be specified instead as individual dictionaries, i.e.
 
 
 .. ipython:: python
+    :okwarning:
 
     dm = update_dataset_from_dataframes(
         None,
@@ -176,6 +181,7 @@ a ``delete_scope`` over the partition. The following example illustrates how bot
 with one update:
 
 .. ipython:: python
+    :okwarning:
 
     df  # Column B includes 2 values for '2013-01-02' and another 2 for '2013-01-03'
 
@@ -255,6 +261,7 @@ Mutating indexed datasets
 The mutating operation will update all indices that currently exist for the dataset. This even holds true in case the update function does not specify any or only partially the indices. Consider the following example
 
 .. ipython:: python
+    :okwarning:
 
     df = pd.DataFrame({"payload": range(10), "i1": 0, "i2": ["a"] * 5 + ["b"] * 5})
     dm = store_dataframes_as_dataset(
@@ -269,6 +276,7 @@ The mutating operation will update all indices that currently exist for the data
 If we do not specify anything, kartothek will infer the indices and update them correctly
 
 .. ipython:: python
+    :okwarning:
 
     dm = update_dataset_from_dataframes([new_df], store=store_url, dataset_uuid=dm.uuid)
 
@@ -280,6 +288,7 @@ If we do not specify anything, kartothek will infer the indices and update them 
 This is even true if only a subset is given
 
 .. ipython:: python
+    :okwarning:
 
     new_df = pd.DataFrame({"payload": range(10), "i1": 2, "i2": "d"})
     dm = update_dataset_from_dataframes(

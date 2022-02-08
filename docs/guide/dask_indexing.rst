@@ -36,6 +36,7 @@ Calculating a dask index is usually a very expensive operation which requires da
     )
 
 .. ipython:: python
+    :suppress:
     :okwarning:
 
     import dask.dataframe as dd

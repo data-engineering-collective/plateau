@@ -252,6 +252,7 @@ ranges. So, no normalization is implemented for timestamps.
 
   .. ipython:: python
     :suppress:
+    :okwarning:
 
     import pandas as pd
     from kartothek.api.serialization import ParquetSerializer
@@ -262,6 +263,7 @@ ranges. So, no normalization is implemented for timestamps.
 
   .. ipython:: python
     :okexcept:
+    :okwarning:
 
     df = pd.DataFrame({"nano": [pd.Timestamp("2021-01-01 00:00:00.0000001")]})
     # nanosecond resolution
@@ -270,6 +272,7 @@ ranges. So, no normalization is implemented for timestamps.
   One possibility to deal with this is to set the appropriate accuracy using `pandas.Timestamp.ceil`_ or `pandas.Timestamp.floor`_
 
   .. ipython:: python
+    :okwarning:
 
     df.nano = df.nano.dt.ceil("us")
     ser.restore_dataframe(store, ser.store(store, "key", df))

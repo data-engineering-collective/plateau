@@ -14,6 +14,7 @@ Setup a store
 
 
 .. ipython:: python
+    :okwarning:
 
     import pandas as pd
     from kartothek.api.dataset import read_table, store_dataframes_as_dataset
@@ -47,6 +48,7 @@ Write
 ~~~~~
 
 .. ipython:: python
+    :okwarning:
 
     import pandas as pd
     from kartothek.api.dataset import store_dataframes_as_dataset
@@ -102,6 +104,7 @@ Write
 ~~~~~
 
 .. ipython:: python
+    :okwarning:
 
     import pandas as pd
     from kartothek.api.dataset import store_dataframes_as_dataset__iter
@@ -126,6 +129,7 @@ Read
 ~~~~
 
 .. ipython:: python
+    :okwarning:
 
     import pandas as pd
     from kartothek.api.dataset import read_dataset_as_dataframes__iterator
@@ -153,6 +157,7 @@ Write
 ~~~~~
 
 .. ipython:: python
+    :okwarning:
 
     import pandas as pd
     from kartothek.api.dataset import store_delayed_as_dataset
