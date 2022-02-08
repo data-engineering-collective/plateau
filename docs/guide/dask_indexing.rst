@@ -36,6 +36,7 @@ Calculating a dask index is usually a very expensive operation which requires da
     )
 
 .. ipython:: python
+    :okwarning:
 
     import dask.dataframe as dd
     from kartothek.api.dataset import update_dataset_from_ddf, read_dataset_as_ddf
