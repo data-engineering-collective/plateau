@@ -1,6 +1,12 @@
 name: Documentation CI
 
-on: [push, pull_request]
+on:
+  pull_request:
+  push:
+    branches:
+      - 'main'
+    tags:
+      - '*'
 
 jobs:
   build:
@@ -12,8 +18,12 @@ jobs:
       - name: Setup Conda Environment
         uses: conda-incubator/setup-miniconda@v2
         with:
+          miniforge-variant: Mambaforge
+          miniforge-version: 4.11.0-0
+          use-mamba: true
           environment-file: docs/environment-docs.yml
           activate-environment: kartothek-docs
+          python-version: 3.8
 
       - name: List conda
         shell: bash -l {0}
