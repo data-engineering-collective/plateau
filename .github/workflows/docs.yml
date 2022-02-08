@@ -1,6 +1,12 @@
 name: Documentation CI
 
-on: [push, pull_request]
+on:
+  pull_request:
+  push:
+    branches:
+      - 'main'
+    tags:
+      - '*'
 
 jobs:
   build:

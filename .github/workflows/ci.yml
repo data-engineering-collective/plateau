@@ -7,7 +7,7 @@ on:
     branches:
       - 'main'
     tags:
-      - v*
+      - '*'
   schedule:
     # daily (`@daily` not supported, see
     # https://docs.github.com/en/actions/reference/events-that-trigger-workflows#scheduled-events )
