@@ -5,7 +5,7 @@ on:
   pull_request:
   push:
     branches:
-      - '*'
+      - 'main'
     tags:
       - v*
   schedule:
@@ -25,7 +25,7 @@ jobs:
         numfocus_nightly: [false]
         os: ["ubuntu-latest"]
         pyarrow: ["3.0.0", "4.0.1", "nightly"]
-        python: ["3.7", "3.8"]
+        python: ["3.8"]
         include:
           - numfocus_nightly: true
             os: "ubuntu-latest"
@@ -67,6 +67,9 @@ jobs:
           auto-update-conda: true
           channel-priority: strict
           channels: conda-forge
+          miniforge-variant: Mambaforge
+          miniforge-version: 4.11.0-0
+          use-mamba: true
           python-version: ${{ matrix.python }}
       - name: Conda Config
         run: |
@@ -75,20 +78,20 @@ jobs:
 
       # Installation into the `test` environment
       - name: Conda Install Pyarrow (non-nightly)
-        run: conda install pyarrow==${{ matrix.pyarrow }}
+        run: mamba install pyarrow==${{ matrix.pyarrow }}
         if: matrix.pyarrow != 'nightly'
       - name: Conda Install Pyarrow (nightly)
         # Install both arrow-cpp and pyarrow to make sure that we have the
         # latest nightly of both packages. It is sadly not guaranteed that the
         # nightlies and the latest release would otherwise work together.
-        run: conda install -c arrow-nightlies arrow-cpp pyarrow
+        run: mamba install -c arrow-nightlies arrow-cpp pyarrow
         if: matrix.pyarrow == 'nightly'
       - name: Conda Install conda-requirements.txt
         # run this AFTER pyarrow, since this is less restrictive (so conda doesn't spend too much time downgrading)
-        run: conda install --file=conda-requirements.txt
+        run: mamba install --file=conda-requirements.txt
       - name: Fix Pandas-Pyarrow Interaction
         # pandas >=1.2.0 requires newer pyarrow versions, so downgrade pandas
-        run: conda install 'pandas<1.2'
+        run: mamba install 'pandas<1.2'
         if: matrix.pyarrow == '0.17.1' && !matrix.numfocus_nightly
       - name: Pip Install kartothek
         run: pip install --no-deps .
@@ -108,7 +111,7 @@ jobs:
           python -c "import kartothek.serialization"
           python -c "import kartothek.utils"
       - name: Conda install test requirements
-        run: conda install
+        run: mamba install
               --file=conda-test-requirements.txt
               --freeze-installed
       - name: Pip Instal NumFOCUS nightly
