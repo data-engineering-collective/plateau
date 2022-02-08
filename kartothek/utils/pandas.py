@@ -352,7 +352,7 @@ def merge_dataframes_robust(df1, df2, how):
     df_joined: pd.DataFrame
         Joined DataFrame.
     """
-    dummy_column = "__ktk_cube_join_dummy"
+    dummy_column = "__ktk_join_dummy"
 
     columns2 = set(df2.columns)
     joined_columns = [c for c in df1.columns if c in columns2]

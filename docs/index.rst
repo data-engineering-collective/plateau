@@ -48,18 +48,6 @@ A Kartothek (or more modern: Zettelkasten/Katalogkasten) is a tool to organize
    Dask indexing <guide/dask_indexing>
    Examples <guide/examples>
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Cube Functionality
-   :hidden:
-
-   Kartothek Cubes <guide/cube/kartothek_cubes>
-   Examples <guide/cube/examples>
-   Query System <guide/cube/query_system>
-   Command Line Features <guide/cube/command_line_features>
-   Cube Design Features <guide/cube/cube_design_features>
-   Glossary <guide/cube/glossary.rst>
-
 
 .. toctree::
    :maxdepth: 2

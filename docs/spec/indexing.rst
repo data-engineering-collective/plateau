@@ -123,12 +123,6 @@ Supported data types for indices include
 * ``pd.Timestamp`` (with and without timezones)
 * ``datetime.date``
 
-.. important::
-
-    Nullable fields are not properly supported and depending on the used API, the behaviour may be slightly different.
-
-    In particular, the plain dataset API will usually drop nan/nulls silently while the Cube API will raise an exception.
-
 
 See also
 --------
