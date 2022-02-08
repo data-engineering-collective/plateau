@@ -78,21 +78,17 @@ jobs:
 
       # Installation into the `test` environment
       - name: Conda Install Pyarrow (non-nightly)
-        run: mamba install pyarrow==${{ matrix.pyarrow }}
+        run: mamba install -c conda-forge pyarrow==${{ matrix.pyarrow }}
         if: matrix.pyarrow != 'nightly'
       - name: Conda Install Pyarrow (nightly)
         # Install both arrow-cpp and pyarrow to make sure that we have the
         # latest nightly of both packages. It is sadly not guaranteed that the
         # nightlies and the latest release would otherwise work together.
-        run: mamba install -c arrow-nightlies arrow-cpp pyarrow
+        run: mamba install -c arrow-nightlies -c conda-forge arrow-cpp pyarrow
         if: matrix.pyarrow == 'nightly'
       - name: Conda Install conda-requirements.txt
         # run this AFTER pyarrow, since this is less restrictive (so conda doesn't spend too much time downgrading)
         run: mamba install --file=conda-requirements.txt
-      - name: Fix Pandas-Pyarrow Interaction
-        # pandas >=1.2.0 requires newer pyarrow versions, so downgrade pandas
-        run: mamba install 'pandas<1.2'
-        if: matrix.pyarrow == '0.17.1' && !matrix.numfocus_nightly
       - name: Pip Install kartothek
         run: pip install --no-deps .
       - name: Test import
@@ -112,6 +108,7 @@ jobs:
           python -c "import kartothek.utils"
       - name: Conda install test requirements
         run: mamba install
+              -c conda-forge
               --file=conda-test-requirements.txt
               --freeze-installed
       - name: Pip Instal NumFOCUS nightly
