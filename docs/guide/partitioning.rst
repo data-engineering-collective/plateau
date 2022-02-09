@@ -62,6 +62,7 @@ column all get written to the same partition. To do this, we use the
 ``partition_on`` keyword argument:
 
 .. ipython:: python
+    :okwarning:
 
     dm = store_dataframes_as_dataset(
         store_url, "partitioned_dataset", [df], partition_on="B"
@@ -83,6 +84,7 @@ Partitioning can also be performed on multiple columns; in this case, columns
 should be specified as a list:
 
 .. ipython:: python
+    :okwarning:
 
     duplicate_df = df.copy()
     duplicate_df.F = "bar"

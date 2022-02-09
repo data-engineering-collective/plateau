@@ -92,6 +92,7 @@ dataset. To do so, we will use :func:`~kartothek.io.eager.store_dataframes_as_da
 to store the ``DataFrame`` ``df`` that we already have in memory.
 
 .. ipython:: python
+    :okwarning:
 
     from kartothek.api.dataset import store_dataframes_as_dataset
 

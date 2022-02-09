@@ -52,6 +52,7 @@ The first index type kartothek offers is a partition index. The partition index 
     from kartothek.api.dataset import store_dataframes_as_dataset
 
 .. ipython:: python
+    :okwarning:
 
     df = pd.DataFrame(
         {

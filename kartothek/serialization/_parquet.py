@@ -126,6 +126,7 @@ class ParquetSerializer(DataFrameSerializer):
         See also :ref:`Dictionary Encoding`
 
         .. ipython:: python
+            :okwarning:
 
             ser = ParquetSerializer()
 
@@ -141,6 +142,7 @@ class ParquetSerializer(DataFrameSerializer):
         See also :ref:`timestamp`
 
         .. ipython:: python
+            :okwarning:
             :okexcept:
 
             import pyarrow as pa

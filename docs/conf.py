@@ -84,6 +84,7 @@ python_version = ".".join(map(str, sys.version_info[0:2]))
 
 nitpick_ignore = [
     ("py:class", "kartothek.core._mixins.CopyMixin"),
+    ("py:class", "kartothek.serialization.LiteralValue"),
     ("py:class", "dask.delayed.Delayed"),
     # Literals
     ("py:class", "exact"),
