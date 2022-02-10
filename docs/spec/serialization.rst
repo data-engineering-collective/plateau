@@ -52,8 +52,13 @@ You can provide a filter expression in a `DNF`_ in a format of a nested list whe
 .. code:: python
 
     prediactes = [
-        [("ColumnA", "==", 5),],
-        [("ColumnA", ">", 5), ("ColumnB", "<=", datetime.date(2021, 1, 1)),],
+        [
+            ("ColumnA", "==", 5),
+        ],
+        [
+            ("ColumnA", ">", 5),
+            ("ColumnB", "<=", datetime.date(2021, 1, 1)),
+        ],
     ]
 
 The above list of predicates can be interpreted as the following whereclause::

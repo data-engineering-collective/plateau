@@ -577,7 +577,9 @@ def test_update_infers_partition_on(store_factory, bound_update_dataset, df_not_
     # do not use partition_on since it should be interfered from the existing dataset
 
     updated_dataset = bound_update_dataset(
-        [df_not_nested], dataset_uuid=dataset_uuid, store=store_factory,
+        [df_not_nested],
+        dataset_uuid=dataset_uuid,
+        store=store_factory,
     )
 
     assert len(updated_dataset.partitions) == 2 * len(dataset.partitions)

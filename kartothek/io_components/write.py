@@ -51,7 +51,9 @@ def write_partition(
 
     # I don't have access to the group values
     mps = parse_input_to_metapartition(
-        partition_df, metadata_version=metadata_version, table_name=dataset_table_name,
+        partition_df,
+        metadata_version=metadata_version,
+        table_name=dataset_table_name,
     )
     if sort_partitions_by:
         mps = mps.apply(partial(sort_values_categorical, columns=sort_partitions_by))

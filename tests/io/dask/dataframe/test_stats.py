@@ -80,12 +80,18 @@ def test_collect_dataset_metadata_predicates_on_index(store_factory):
         data={"P": range(10), "L": ["a", "a", "a", "a", "a", "b", "b", "b", "b", "b"]}
     )
     store_dataframes_as_dataset(
-        store=store_factory, dataset_uuid="dataset_uuid", partition_on=["L"], dfs=[df],
+        store=store_factory,
+        dataset_uuid="dataset_uuid",
+        partition_on=["L"],
+        dfs=[df],
     )
     predicates = [[("L", "==", "b")]]
 
     df_stats = collect_dataset_metadata(
-        store=store_factory, dataset_uuid="dataset_uuid", predicates=predicates, frac=1,
+        store=store_factory,
+        dataset_uuid="dataset_uuid",
+        predicates=predicates,
+        frac=1,
     ).compute()
 
     assert "L=b" in df_stats["partition_label"].values[0]
@@ -129,7 +135,10 @@ def test_collect_dataset_metadata_predicates_row_group_size(store_factory):
     predicates = [[("L", "==", "a")]]
 
     df_stats = collect_dataset_metadata(
-        store=store_factory, dataset_uuid="dataset_uuid", predicates=predicates, frac=1,
+        store=store_factory,
+        dataset_uuid="dataset_uuid",
+        predicates=predicates,
+        frac=1,
     ).compute()
 
     for part_label in df_stats["partition_label"]:
@@ -160,7 +169,9 @@ def test_collect_dataset_metadata_predicates_row_group_size(store_factory):
 
 def test_collect_dataset_metadata_frac_smoke(store_session_factory, dataset):
     df_stats = collect_dataset_metadata(
-        store=store_session_factory, dataset_uuid="dataset_uuid", frac=0.8,
+        store=store_session_factory,
+        dataset_uuid="dataset_uuid",
+        frac=0.8,
     ).compute()
     columns = {
         "partition_label",
@@ -196,7 +207,8 @@ def test_collect_dataset_metadata_concat(store_factory):
         store=store_factory, dataset_uuid="dataset_uuid", dfs=[df], partition_on=["A"]
     )
     df_stats1 = collect_dataset_metadata(
-        store=store_factory, dataset_uuid="dataset_uuid",
+        store=store_factory,
+        dataset_uuid="dataset_uuid",
     ).compute()
 
     # Remove all partitions of the dataset
@@ -205,7 +217,8 @@ def test_collect_dataset_metadata_concat(store_factory):
     )
 
     df_stats2 = collect_dataset_metadata(
-        store=store_factory, dataset_uuid="dataset_uuid",
+        store=store_factory,
+        dataset_uuid="dataset_uuid",
     ).compute()
     pd.concat([df_stats1, df_stats2])
 
@@ -221,7 +234,8 @@ def test_collect_dataset_metadata_delete_dataset(store_factory):
     )
 
     df_stats = collect_dataset_metadata(
-        store=store_factory, dataset_uuid="dataset_uuid",
+        store=store_factory,
+        dataset_uuid="dataset_uuid",
     ).compute()
     expected = pd.DataFrame(columns=_METADATA_SCHEMA)
     expected = expected.astype(_METADATA_SCHEMA)
@@ -232,7 +246,10 @@ def test_collect_dataset_metadata_fraction_precision(store_factory):
     df = pd.DataFrame(data={"A": range(100), "B": range(100)})
 
     store_dataframes_as_dataset(
-        store=store_factory, dataset_uuid="dataset_uuid", dfs=[df], partition_on=["A"],
+        store=store_factory,
+        dataset_uuid="dataset_uuid",
+        dfs=[df],
+        partition_on=["A"],
     )  # Creates 100 partitions
 
     df_stats = collect_dataset_metadata(
@@ -248,7 +265,10 @@ def test_collect_dataset_metadata_at_least_one_partition(store_factory):
     df = pd.DataFrame(data={"A": range(100), "B": range(100)})
 
     store_dataframes_as_dataset(
-        store=store_factory, dataset_uuid="dataset_uuid", dfs=[df], partition_on=["A"],
+        store=store_factory,
+        dataset_uuid="dataset_uuid",
+        dfs=[df],
+        partition_on=["A"],
     )  # Creates 100 partitions
 
     df_stats = collect_dataset_metadata(
@@ -260,10 +280,14 @@ def test_collect_dataset_metadata_at_least_one_partition(store_factory):
 def test_collect_dataset_metadata_invalid_frac(store_session_factory, dataset):
     with pytest.raises(ValueError, match="Invalid value for parameter `frac`"):
         collect_dataset_metadata(
-            store=store_session_factory, dataset_uuid="dataset_uuid", frac=1.1,
+            store=store_session_factory,
+            dataset_uuid="dataset_uuid",
+            frac=1.1,
         )
 
     with pytest.raises(ValueError, match="Invalid value for parameter `frac`"):
         collect_dataset_metadata(
-            store=store_session_factory, dataset_uuid="dataset_uuid", frac=0.0,
+            store=store_session_factory,
+            dataset_uuid="dataset_uuid",
+            frac=0.0,
         )

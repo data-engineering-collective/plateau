@@ -158,7 +158,11 @@ partitioning values of A to be fused into a single file.
     :okwarning:
 
     dm = update_dataset_from_ddf(
-        ddf, dataset_uuid="with_shuffle", store=store_url, partition_on="A", shuffle=True,
+        ddf,
+        dataset_uuid="with_shuffle",
+        store=store_url,
+        partition_on="A",
+        shuffle=True,
     ).compute()
     sorted(dm.partitions.keys())
 

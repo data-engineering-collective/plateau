@@ -229,7 +229,9 @@ def test_read_dataset_as_dataframes_predicate(
     if output_type != "dataframe":
         pytest.skip()
     result = bound_load_dataframes(
-        dataset_uuid=dataset.uuid, store=store_session_factory, predicates=predicates,
+        dataset_uuid=dataset.uuid,
+        store=store_session_factory,
+        predicates=predicates,
     )
     core_result = pd.concat(result)
 
@@ -278,7 +280,10 @@ def test_read_dataset_as_dataframes_predicate_with_partition_keys(
 
 
 def test_read_dataset_as_dataframes_predicate_empty(
-    dataset_partition_keys, store_session_factory, output_type, bound_load_dataframes,
+    dataset_partition_keys,
+    store_session_factory,
+    output_type,
+    bound_load_dataframes,
 ):
     if output_type != "dataframe":
         pytest.skip()
@@ -493,7 +498,9 @@ def test_read_dataset_as_dataframes_columns_projection(
     )
 
     result = bound_load_dataframes(
-        dataset_uuid=dataset_uuid, store=store_factory, columns=["a", "b", "c"],
+        dataset_uuid=dataset_uuid,
+        store=store_factory,
+        columns=["a", "b", "c"],
     )
     probe = result[0]
 

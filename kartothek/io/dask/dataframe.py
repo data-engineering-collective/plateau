@@ -97,7 +97,9 @@ def read_dataset_as_ddf(
         )
 
     ds_factory = _ensure_factory(
-        dataset_uuid=dataset_uuid, store=store, factory=factory,
+        dataset_uuid=dataset_uuid,
+        store=store,
+        factory=factory,
     )
 
     if isinstance(columns, dict):
@@ -244,12 +246,18 @@ def _id(x):
 
 def _commit_update_from_reduction(df_mps, **kwargs):
     partitions = pd.Series(df_mps.values.flatten()).dropna()
-    return update_dataset_from_partitions(partition_list=partitions, **kwargs,)
+    return update_dataset_from_partitions(
+        partition_list=partitions,
+        **kwargs,
+    )
 
 
 def _commit_store_from_reduction(df_mps, **kwargs):
     partitions = pd.Series(df_mps.values.flatten()).dropna()
-    return store_dataset_from_partitions(partition_list=partitions, **kwargs,)
+    return store_dataset_from_partitions(
+        partition_list=partitions,
+        **kwargs,
+    )
 
 
 @default_docs
@@ -344,7 +352,9 @@ def _write_dataframe_partitions(
             pd.Series(
                 [
                     parse_input_to_metapartition(
-                        None, metadata_version=metadata_version, table_name=table,
+                        None,
+                        metadata_version=metadata_version,
+                        table_name=table,
                     )
                 ]
             ),
@@ -519,7 +529,9 @@ def collect_dataset_metadata(
             "Please make sure to provide a value larger than 0.0 and smaller than or equal to 1.0 ."
         )
     dataset_factory = _ensure_factory(
-        dataset_uuid=dataset_uuid, store=store, factory=factory,
+        dataset_uuid=dataset_uuid,
+        store=store,
+        factory=factory,
     )
 
     mps = list(
@@ -595,7 +607,9 @@ def hash_dataset(
         If provided, calculate hash per group instead of per partition
     """
     dataset_factory = _ensure_factory(
-        dataset_uuid=dataset_uuid, store=store, factory=factory,
+        dataset_uuid=dataset_uuid,
+        store=store,
+        factory=factory,
     )
 
     columns = subset
