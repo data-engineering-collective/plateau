@@ -116,7 +116,7 @@ jobs:
 
       # Tests
       - name: Pytest
-        run: pytest --cov --cov-report xml
+        run: pytest -n auto --dist loadscope --cov --cov-report xml
 
       - name: Running benchmarks
         run: |

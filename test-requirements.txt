@@ -9,6 +9,7 @@ hypothesis
 pytest>=4.5.0
 pytest-cov
 pytest-mock
+pytest-xdist
 setuptools-scm
 
 # Formatting / Checking
