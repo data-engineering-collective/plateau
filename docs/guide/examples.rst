@@ -92,7 +92,10 @@ Read
     # In case you were using the dataset created in the Write example
     for d1, d2 in zip(
         list_of_partitions,
-        [pd.DataFrame({"A": range(10)}), pd.DataFrame({"A": range(10, 20)}),],
+        [
+            pd.DataFrame({"A": range(10)}),
+            pd.DataFrame({"A": range(10, 20)}),
+        ],
     ):
         for k1, k2 in zip(d1, d2):
             assert k1 == k2
@@ -145,7 +148,10 @@ Read
     # In case you were using the dataset created in the Write example
     for d1, d2 in zip(
         list_of_partitions,
-        [pd.DataFrame({"A": range(10)}), pd.DataFrame({"A": range(10, 20)}),],
+        [
+            pd.DataFrame({"A": range(10)}),
+            pd.DataFrame({"A": range(10, 20)}),
+        ],
     ):
         for k1, k2 in zip(d1, d2):
             assert k1 == k2

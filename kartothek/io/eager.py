@@ -70,7 +70,10 @@ def delete_dataset(dataset_uuid=None, store=None, factory=None):
     """
 
     ds_factory = _ensure_factory(
-        dataset_uuid=dataset_uuid, load_schema=False, store=store, factory=factory,
+        dataset_uuid=dataset_uuid,
+        load_schema=False,
+        store=store,
+        factory=factory,
     )
 
     # Remove possibly unreferenced files
@@ -131,7 +134,9 @@ def read_dataset_as_dataframes(
     """
 
     ds_factory = _ensure_factory(
-        dataset_uuid=dataset_uuid, store=store, factory=factory,
+        dataset_uuid=dataset_uuid,
+        store=store,
+        factory=factory,
     )
 
     mps = read_dataset_as_metapartitions(
@@ -187,7 +192,9 @@ def read_dataset_as_metapartitions(
     """
 
     ds_factory = _ensure_factory(
-        dataset_uuid=dataset_uuid, store=store, factory=factory,
+        dataset_uuid=dataset_uuid,
+        store=store,
+        factory=factory,
     )
 
     from .iter import read_dataset_as_metapartitions__iterator
@@ -245,7 +252,9 @@ def read_table(
     """
 
     ds_factory = _ensure_factory(
-        dataset_uuid=dataset_uuid, store=store, factory=factory,
+        dataset_uuid=dataset_uuid,
+        store=store,
+        factory=factory,
     )
     partitions = read_dataset_as_dataframes(
         columns=columns,
@@ -256,7 +265,10 @@ def read_table(
         factory=ds_factory,
     )
 
-    empty_df = empty_dataframe_from_schema(schema=ds_factory.schema, columns=columns,)
+    empty_df = empty_dataframe_from_schema(
+        schema=ds_factory.schema,
+        columns=columns,
+    )
     if categoricals:
         empty_df = empty_df.astype({col: "category" for col in categoricals})
     dfs = [partition_data for partition_data in partitions] + [empty_df]
@@ -507,7 +519,10 @@ def create_empty_dataset_header(
 
     schema = make_meta(schema, origin=table_name, partition_keys=partition_on)
     store_schema_metadata(
-        schema=schema, dataset_uuid=dataset_uuid, store=store, table=table_name,
+        schema=schema,
+        dataset_uuid=dataset_uuid,
+        store=store,
+        table=table_name,
     )
     dataset_builder = DatasetMetadataBuilder(
         uuid=dataset_uuid,
@@ -656,7 +671,9 @@ def update_dataset_from_dataframes(
     del secondary_indices
 
     mp = parse_input_to_metapartition(
-        df_list, metadata_version=metadata_version, table_name=table_name,
+        df_list,
+        metadata_version=metadata_version,
+        table_name=table_name,
     )
 
     if sort_partitions_by:
@@ -696,14 +713,19 @@ def build_dataset_indices(store, dataset_uuid, columns, factory=None):
     ----------
     """
     ds_factory = _ensure_factory(
-        dataset_uuid=dataset_uuid, store=store, factory=factory,
+        dataset_uuid=dataset_uuid,
+        store=store,
+        factory=factory,
     )
 
     cols_to_load = set(columns) & set(ds_factory.schema.names)
 
     new_partitions = []
     for mp in dispatch_metapartitions_from_factory(ds_factory):
-        mp = mp.load_dataframes(store=ds_factory.store, columns=cols_to_load,)
+        mp = mp.load_dataframes(
+            store=ds_factory.store,
+            columns=cols_to_load,
+        )
         mp = mp.build_indices(columns=columns)
         mp = mp.remove_dataframes()  # Remove dataframe from memory
         new_partitions.append(mp)
@@ -728,7 +750,9 @@ def garbage_collect_dataset(dataset_uuid=None, store=None, factory=None):
     """
 
     ds_factory = _ensure_factory(
-        dataset_uuid=dataset_uuid, store=store, factory=factory,
+        dataset_uuid=dataset_uuid,
+        store=store,
+        factory=factory,
     )
 
     nested_files = dispatch_files_to_gc(

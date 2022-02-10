@@ -72,12 +72,16 @@ def read_dataset_as_metapartitions_bag(
         A dask.bag object containing the metapartions.
     """
     ds_factory = _ensure_factory(
-        dataset_uuid=dataset_uuid, store=store, factory=factory,
+        dataset_uuid=dataset_uuid,
+        store=store,
+        factory=factory,
     )
 
     store = ds_factory.store_factory
     mps = dispatch_metapartitions_from_factory(
-        dataset_factory=ds_factory, predicates=predicates, dispatch_by=dispatch_by,
+        dataset_factory=ds_factory,
+        predicates=predicates,
+        dispatch_by=dispatch_by,
     )
     mp_bag = db.from_sequence(mps, partition_size=partition_size)
 
@@ -247,7 +251,9 @@ def build_dataset_indices__bag(
 
     """
     ds_factory = _ensure_factory(
-        dataset_uuid=dataset_uuid, store=store, factory=factory,
+        dataset_uuid=dataset_uuid,
+        store=store,
+        factory=factory,
     )
 
     assert ds_factory.schema is not None

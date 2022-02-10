@@ -102,7 +102,10 @@ def test_commit_dataset_from_nested_metapartition(store):
     for x in range(2):
         partitions.append(
             write_single_partition(
-                store=store, dataset_uuid="uuid", data=df, partition_on=["a"],
+                store=store,
+                dataset_uuid="uuid",
+                data=df,
+                partition_on=["a"],
             )
         )
 

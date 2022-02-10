@@ -110,7 +110,8 @@ def _combine_metadata(dataset_metadata, append_to_list):
 
 
 def _ensure_compatible_indices(
-    dataset: Optional[DatasetMetadataBase], secondary_indices: Iterable[str],
+    dataset: Optional[DatasetMetadataBase],
+    secondary_indices: Iterable[str],
 ) -> List[str]:
     if dataset:
         ds_secondary_indices = sorted(dataset.secondary_indices.keys())
@@ -129,11 +130,17 @@ def _ensure_compatible_indices(
 
 
 def validate_partition_keys(
-    dataset_uuid, store, ds_factory, default_metadata_version, partition_on,
+    dataset_uuid,
+    store,
+    ds_factory,
+    default_metadata_version,
+    partition_on,
 ):
     if ds_factory or DatasetMetadata.exists(dataset_uuid, ensure_store(store)):
         ds_factory = _ensure_factory(
-            dataset_uuid=dataset_uuid, store=store, factory=ds_factory,
+            dataset_uuid=dataset_uuid,
+            store=store,
+            factory=ds_factory,
         )
 
         ds_metadata_version = ds_factory.metadata_version

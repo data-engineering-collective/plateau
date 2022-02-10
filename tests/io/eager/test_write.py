@@ -181,7 +181,11 @@ def test_store_dataframes_as_dataset_mp(metadata_version, store):
         {"P": np.arange(0, 10), "L": np.arange(0, 10), "TARGET": np.arange(10, 20)}
     )
 
-    mp = MetaPartition(label=gen_uuid(), data=df, metadata_version=metadata_version,)
+    mp = MetaPartition(
+        label=gen_uuid(),
+        data=df,
+        metadata_version=metadata_version,
+    )
 
     dataset = store_dataframes_as_dataset(
         store=store,

@@ -62,12 +62,16 @@ def read_dataset_as_metapartitions__iterator(
     """
 
     ds_factory = _ensure_factory(
-        dataset_uuid=dataset_uuid, store=store, factory=factory,
+        dataset_uuid=dataset_uuid,
+        store=store,
+        factory=factory,
     )
 
     store = ds_factory.store
     mps = dispatch_metapartitions_from_factory(
-        ds_factory, predicates=predicates, dispatch_by=dispatch_by,
+        ds_factory,
+        predicates=predicates,
+        dispatch_by=dispatch_by,
     )
 
     for mp in mps:
@@ -215,7 +219,9 @@ def update_dataset_from_dataframes__iter(
     new_partitions = []
     for df in df_generator:
         mp = parse_input_to_metapartition(
-            df, metadata_version=metadata_version, table_name=table_name,
+            df,
+            metadata_version=metadata_version,
+            table_name=table_name,
         )
 
         if sort_partitions_by:

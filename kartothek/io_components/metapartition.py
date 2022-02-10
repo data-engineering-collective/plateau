@@ -434,7 +434,9 @@ class MetaPartition(Iterable):
         )
 
     def add_metapartition(
-        self, metapartition: "MetaPartition", schema_validation: bool = True,
+        self,
+        metapartition: "MetaPartition",
+        schema_validation: bool = True,
     ):
         """
         Adds a metapartition to the internal list structure to enable batch processing.
@@ -897,7 +899,11 @@ class MetaPartition(Iterable):
             return self
 
     @_apply_to_list
-    def apply(self, func: Callable, type_safe: bool = False,) -> "MetaPartition":
+    def apply(
+        self,
+        func: Callable,
+        type_safe: bool = False,
+    ) -> "MetaPartition":
         """
         Applies a given function to all dataframes of the MetaPartition.
 
@@ -918,7 +924,9 @@ class MetaPartition(Iterable):
             new_schema = self.schema
         else:
             new_schema = make_meta(
-                new_data, origin=self.label, partition_keys=self.partition_keys,
+                new_data,
+                origin=self.label,
+                partition_keys=self.partition_keys,
             )
         return self.copy(data=new_data, schema=new_schema)
 
@@ -1376,12 +1384,16 @@ def parse_input_to_metapartition(
             return MetaPartition(label=None, metadata_version=metadata_version)
         first_element = obj[0]
         mp = parse_input_to_metapartition(
-            obj=first_element, metadata_version=metadata_version, table_name=table_name,
+            obj=first_element,
+            metadata_version=metadata_version,
+            table_name=table_name,
         )
         for mp_in in obj[1:]:
             mp = mp.add_metapartition(
                 parse_input_to_metapartition(
-                    obj=mp_in, metadata_version=metadata_version, table_name=table_name,
+                    obj=mp_in,
+                    metadata_version=metadata_version,
+                    table_name=table_name,
                 )
             )
     elif isinstance(obj, pd.DataFrame):

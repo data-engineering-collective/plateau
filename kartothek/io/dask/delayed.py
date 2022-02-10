@@ -75,7 +75,10 @@ def delete_dataset__delayed(dataset_uuid=None, store=None, factory=None):
     ----------
     """
     dataset_factory = _ensure_factory(
-        dataset_uuid=dataset_uuid, store=store, factory=factory, load_schema=False,
+        dataset_uuid=dataset_uuid,
+        store=store,
+        factory=factory,
+        load_schema=False,
     )
 
     gc = garbage_collect_dataset__delayed(factory=dataset_factory)
@@ -118,7 +121,9 @@ def garbage_collect_dataset__delayed(
     """
 
     ds_factory = _ensure_factory(
-        dataset_uuid=dataset_uuid, store=store, factory=factory,
+        dataset_uuid=dataset_uuid,
+        store=store,
+        factory=factory,
     )
 
     nested_files = dispatch_files_to_gc(
@@ -167,12 +172,16 @@ def read_dataset_as_delayed_metapartitions(
 
     """
     ds_factory = _ensure_factory(
-        dataset_uuid=dataset_uuid, store=store, factory=factory,
+        dataset_uuid=dataset_uuid,
+        store=store,
+        factory=factory,
     )
 
     store = ds_factory.store_factory
     mps = dispatch_metapartitions_from_factory(
-        dataset_factory=ds_factory, predicates=predicates, dispatch_by=dispatch_by,
+        dataset_factory=ds_factory,
+        predicates=predicates,
+        dispatch_by=dispatch_by,
     )
 
     if dispatch_by is not None:

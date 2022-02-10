@@ -14,7 +14,8 @@ from kartothek.io.testing.read import *  # noqa
 
 
 @pytest.fixture(
-    params=["dataframe", "table"], ids=["dataframe", "table"],
+    params=["dataframe", "table"],
+    ids=["dataframe", "table"],
 )
 def output_type(request):
     # TODO: get rid of this parametrization and split properly into two functions
@@ -60,7 +61,9 @@ def test_read_table_eager(dataset, store_session, use_categoricals):
         categories = None
 
     df = read_table(
-        store=store_session, dataset_uuid="dataset_uuid", categoricals=categories,
+        store=store_session,
+        dataset_uuid="dataset_uuid",
+        categoricals=categories,
     )
     expected_df = pd.DataFrame(
         {
@@ -81,7 +84,9 @@ def test_read_table_eager(dataset, store_session, use_categoricals):
 
 def test_read_table_with_columns(dataset, store_session):
     df = read_table(
-        store=store_session, dataset_uuid="dataset_uuid", columns=["P", "L"],
+        store=store_session,
+        dataset_uuid="dataset_uuid",
+        columns=["P", "L"],
     )
 
     expected_df = pd.DataFrame({"P": [1, 2], "L": [1, 2]})

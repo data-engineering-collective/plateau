@@ -422,7 +422,9 @@ class DatasetMetadataBase(CopyMixin):
             )
         else:
             df = dm._evaluate_conjunction(
-                columns=columns, predicates=None, date_as_object=date_as_object,
+                columns=columns,
+                predicates=None,
+                date_as_object=date_as_object,
             )
         return df
 
@@ -700,7 +702,9 @@ class DatasetMetadata(DatasetMetadataBase):
 
 
 def _get_type_from_meta(
-    schema: Optional[SchemaWrapper], column: str, default: Optional[pa.DataType],
+    schema: Optional[SchemaWrapper],
+    column: str,
+    default: Optional[pa.DataType],
 ) -> pa.DataType:
     # use first schema that provides type information, since write path should ensure that types are normalized and
     # equal

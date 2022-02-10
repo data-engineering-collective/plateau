@@ -24,7 +24,9 @@ def dispatch_metapartitions_from_factory(
 
 @overload
 def dispatch_metapartitions_from_factory(
-    dataset_factory: DatasetFactory, predicates: PredicatesType, dispatch_by: List[str],
+    dataset_factory: DatasetFactory,
+    predicates: PredicatesType,
+    dispatch_by: List[str],
 ) -> Iterator[List[MetaPartition]]:
     ...
 
@@ -122,5 +124,7 @@ def dispatch_metapartitions(
     )
 
     return dispatch_metapartitions_from_factory(
-        dataset_factory=dataset_factory, predicates=predicates, dispatch_by=dispatch_by,
+        dataset_factory=dataset_factory,
+        predicates=predicates,
+        dispatch_by=dispatch_by,
     )
