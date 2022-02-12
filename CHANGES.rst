@@ -2,9 +2,14 @@
 Changelog
 =========
 
+plateau 4.0.4 (2022-02-XX)
+==========================
+
+* Fork and rename the project as `plateau` (flat files, flat land).
 
 Kartothek 4.0.3 (2021-06-10)
 ============================
+
 * Pin dask to not use 2021.5.1 and 2020.6.0 (#475)
 
 Kartothek 4.0.2 (2021-06-07)
