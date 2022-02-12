@@ -3,8 +3,8 @@ import pickle
 import dask.bag as db
 import pytest
 
-from kartothek.io.dask.bag import store_bag_as_dataset
-from kartothek.io.testing.write import *  # noqa
+from plateau.io.dask.bag import store_bag_as_dataset
+from plateau.io.testing.write import *  # noqa
 
 
 def _store_dataframes(df_list, *args, **kwargs):

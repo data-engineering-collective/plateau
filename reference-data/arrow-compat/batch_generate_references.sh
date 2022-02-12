@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Note: this assumes you have kartothek installed in your current environment and you are using conda
+# Note: this assumes you have plateau installed in your current environment and you are using conda
 
 PYARROW_VERSIONS="0.14.1 0.15.0 0.16.0 0.17.1 1.0.1 2.0.0 3.0.0"
 

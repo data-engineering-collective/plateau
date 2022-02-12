@@ -2,11 +2,11 @@ from functools import partial
 
 import pytest
 
-from kartothek.io.iter import (
+from plateau.io.iter import (
     read_dataset_as_dataframes__iterator,
     read_dataset_as_metapartitions__iterator,
 )
-from kartothek.io.testing.read import *  # noqa
+from plateau.io.testing.read import *  # noqa
 
 
 @pytest.fixture(params=["dataframe"])

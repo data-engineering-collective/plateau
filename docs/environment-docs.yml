@@ -1,4 +1,4 @@
-name: kartothek-docs
+name: plateau-docs
 channels:
   - conda-forge
 dependencies:

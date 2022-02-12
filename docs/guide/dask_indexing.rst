@@ -13,7 +13,7 @@ Calculating a dask index is usually a very expensive operation which requires da
     import pandas as pd
     from tempfile import TemporaryDirectory
 
-    from kartothek.api.dataset import store_dataframes_as_dataset
+    from plateau.api.dataset import store_dataframes_as_dataset
 
     dataset_dir = TemporaryDirectory()
 
@@ -40,7 +40,7 @@ Calculating a dask index is usually a very expensive operation which requires da
     :okwarning:
 
     import dask.dataframe as dd
-    from kartothek.api.dataset import update_dataset_from_ddf, read_dataset_as_ddf
+    from plateau.api.dataset import update_dataset_from_ddf, read_dataset_as_ddf
 
     df
 
@@ -48,7 +48,7 @@ Calculating a dask index is usually a very expensive operation which requires da
     ddf_indexed = ddf.set_index("B")
 
     dm = update_dataset_from_ddf(
-        # The key is to reset the index first and let kartothek do the rest
+        # The key is to reset the index first and let plateau do the rest
         ddf_indexed.reset_index(),
         table="table",
         dataset_uuid="dataset_ddf_with_index",

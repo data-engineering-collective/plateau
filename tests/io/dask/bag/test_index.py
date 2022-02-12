@@ -3,8 +3,8 @@ import pickle
 
 import pytest
 
-from kartothek.io.dask.bag import build_dataset_indices__bag
-from kartothek.io.testing.index import *  # noqa: F4
+from plateau.io.dask.bag import build_dataset_indices__bag
+from plateau.io.testing.index import *  # noqa: F4
 
 
 def _build_indices(*args, **kwargs):

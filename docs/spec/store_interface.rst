@@ -17,13 +17,13 @@ or network nodes sensibly. A prime Example is the ``simplekv.memory.DictStore``
 which uses a simple python dictionary as a backend store. It is technically
 possible to (de-)serialize the store but once it is deserialized in another
 process, or another node, the store looses its meaning since the stores are
-isolated per process, node, etc. Kartothek does not verify semantics of a given
+isolated per process, node, etc. plateau does not verify semantics of a given
 store but only verifies whether or not the store implements the pickle protocol.
 
 For all cases where the ``KeyValueStore`` does not implement the pickle
-protocol, or some more complex logic is required to initialize it, kartothek
+protocol, or some more complex logic is required to initialize it, plateau
 also accepts _factories_ which must be a callable returning a ``KeyValueStore``
-(see also ``kartothek.core.typing.StoreFactory``).
+(see also ``plateau.core.typing.StoreFactory``).
 
 For convenience we also offer a `storefact`_ integration and accept store urls
 which proves another easy level of access and is well suited for ad-hoc

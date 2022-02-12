@@ -4,9 +4,9 @@ from functools import partial
 import dask.bag as db
 import pytest
 
-from kartothek.io.dask.bag import store_bag_as_dataset
-from kartothek.io.dask.delayed import store_delayed_as_dataset
-from kartothek.io.testing.write import *  # noqa
+from plateau.io.dask.bag import store_bag_as_dataset
+from plateau.io.dask.delayed import store_delayed_as_dataset
+from plateau.io.testing.write import *  # noqa
 
 
 def _store_dataframes(execution_mode, df_list, *args, **kwargs):

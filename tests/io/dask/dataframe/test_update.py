@@ -5,8 +5,8 @@ import dask.dataframe as dd
 import pandas as pd
 import pytest
 
-from kartothek.io.dask.dataframe import update_dataset_from_ddf
-from kartothek.io.testing.update import *  # noqa
+from plateau.io.dask.dataframe import update_dataset_from_ddf
+from plateau.io.testing.update import *  # noqa
 
 
 @pytest.fixture

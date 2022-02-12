@@ -6,9 +6,9 @@ import sys
 
 from sphinx.ext import apidoc
 
-from kartothek import __version__ as version
+from plateau import __version__ as version
 
-package = "kartothek"
+package = "plateau"
 
 nitpicky = True
 
@@ -56,7 +56,7 @@ source_suffix = ".rst"
 master_doc = "index"
 
 # General information about the project.
-project = "kartothek"
+project = "plateau"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -76,15 +76,15 @@ release = version
 html_static_path = ["_static"]
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = "kartothek-doc"
+htmlhelp_basename = "plateau-doc"
 
 
 # -- External mapping ------------------------------------------------------------
 python_version = ".".join(map(str, sys.version_info[0:2]))
 
 nitpick_ignore = [
-    ("py:class", "kartothek.core._mixins.CopyMixin"),
-    ("py:class", "kartothek.serialization.LiteralValue"),
+    ("py:class", "plateau.core._mixins.CopyMixin"),
+    ("py:class", "plateau.serialization.LiteralValue"),
     ("py:class", "dask.delayed.Delayed"),
     # Literals
     ("py:class", "exact"),
@@ -126,6 +126,6 @@ reftarget_replace = {
     "dask.dataframe.core.DataFrame": "dask.dataframe.DataFrame",
     "dask.dataframe.core.Series": "dask.dataframe.Series",
     "dask.bag.core.Bag": "dask.bag.Bag",
-    "kartothek.serialization._generic": "kartothek.serialization",
-    "kartothek.serialization._parquet": "kartothek.serialization",
+    "plateau.serialization._generic": "plateau.serialization",
+    "plateau.serialization._parquet": "plateau.serialization",
 }

@@ -10,12 +10,12 @@ Serialisation to bytes
 ----------------------
 
 For the serialsation, we need to pick a format serializer, you either use
-:func:`~kartothek.serialization.default_serializer` or explicitly select a serializer,
-e.g. :class:`~kartothek.serialization.ParquetSerializer`.
+:func:`~plateau.serialization.default_serializer` or explicitly select a serializer,
+e.g. :class:`~plateau.serialization.ParquetSerializer`.
 
 .. code:: python
 
-    from kartothek.api.serialization import ParquetSerializer
+    from plateau.api.serialization import ParquetSerializer
 
     serializer = ParquetSerializer()
     df = ...
@@ -30,7 +30,7 @@ one is determined from the filename.
 
 .. code:: python
 
-    from kartothek.api.serialization import DataFrameSerializer
+    from plateau.api.serialization import DataFrameSerializer
 
     df = DataFrameSerializer.restore_dataframe(store, "file.parquet")
 
@@ -38,7 +38,7 @@ one is determined from the filename.
 Supported data types
 --------------------
 
-Kartothek generally does not impose any restrictions on the data types to be used as long as they are compatible and in alignment with the :doc:`pyarrow pandas integration<python/pandas>`.
+plateau generally does not impose any restrictions on the data types to be used as long as they are compatible and in alignment with the :doc:`pyarrow pandas integration<python/pandas>`.
 
 For a detailed explanation about how types are handled, please consult :doc:`type_system`.
 
@@ -71,7 +71,7 @@ The predicate expression can be provided to the `predicates` keyword argument of
 
 .. note::
 
-    All kartothek reading pipelines are exposing this `predicates` argument as well where it is not only used for predicate pushdown but also for partition pruning. See :doc:`efficient_querying` for details.
+    All plateau reading pipelines are exposing this `predicates` argument as well where it is not only used for predicate pushdown but also for partition pruning. See :doc:`efficient_querying` for details.
 
 
 Literals, operators and typing
@@ -93,8 +93,8 @@ Filtering for missing values / nulls is supported with operators `==`, `!=` and 
 
 See also
 --------
-* :class:`~kartothek.serialization.DataFrameSerializer`
-* :class:`~kartothek.serialization.ParquetSerializer`
+* :class:`~plateau.serialization.DataFrameSerializer`
+* :class:`~plateau.serialization.ParquetSerializer`
 * :doc:`efficient_querying`
 * :doc:`type_system`
 

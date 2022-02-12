@@ -2,8 +2,8 @@
 
 import pytest
 
-from kartothek.io.eager import build_dataset_indices
-from kartothek.io.testing.index import *  # noqa: F4
+from plateau.io.eager import build_dataset_indices
+from plateau.io.testing.index import *  # noqa: F4
 
 
 @pytest.fixture()

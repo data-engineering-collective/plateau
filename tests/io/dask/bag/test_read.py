@@ -4,12 +4,12 @@ from functools import partial
 import pandas as pd
 import pytest
 
-from kartothek.io.dask.bag import (
+from plateau.io.dask.bag import (
     read_dataset_as_dataframe_bag,
     read_dataset_as_metapartitions_bag,
 )
-from kartothek.io.iter import store_dataframes_as_dataset__iter
-from kartothek.io.testing.read import *  # noqa
+from plateau.io.iter import store_dataframes_as_dataset__iter
+from plateau.io.testing.read import *  # noqa
 
 
 @pytest.fixture(params=["dataframe"])

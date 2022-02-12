@@ -5,12 +5,12 @@ import pandas as pd
 import pandas.testing as pdt
 import pytest
 
-from kartothek.io.eager import (
+from plateau.io.eager import (
     read_dataset_as_dataframes,
     read_table,
     store_dataframes_as_dataset,
 )
-from kartothek.io.testing.read import *  # noqa
+from plateau.io.testing.read import *  # noqa
 
 
 @pytest.fixture(
@@ -131,7 +131,7 @@ def test_write_and_read_default_table_name(store_session):
 
 @pytest.mark.parametrize("partition_on", [None, ["A", "B"]])
 def test_read_or_predicates(store_factory, partition_on):
-    # https://github.com/JDASoftwareGroup/kartothek/issues/295
+    # https://github.com/JDASoftwareGroup/plateau/issues/295
     dataset_uuid = "test"
     df = pd.DataFrame({"A": range(10), "B": ["A", "B"] * 5, "C": range(-10, 0)})
 

@@ -2,7 +2,7 @@
 
 import pytest
 
-from kartothek.core.partition import Partition
+from plateau.core.partition import Partition
 
 
 def test_roundtrip():

@@ -18,8 +18,8 @@ trigger an increase of the *major* version number.
 Library API
 -----------
 
-Kartothek exposes a dedicated module to highlight which functions, classes, etc. are considered stable API and are publicly available. We intend to apply [semantic
-versioning](https://semver.org) to the best of our ability for the API exposed in :mod:`kartothek.api`. See also :doc:`api`.
+plateau exposes a dedicated module to highlight which functions, classes, etc. are considered stable API and are publicly available. We intend to apply [semantic
+versioning](https://semver.org) to the best of our ability for the API exposed in :mod:`plateau.api`. See also :doc:`api`.
 
 We are aware that the API not only consists of the signatures of functions and
 types of objects exposed by a library but as well by its behaviour. Many changes

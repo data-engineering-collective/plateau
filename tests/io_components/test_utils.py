@@ -8,7 +8,7 @@ import pyarrow as pa
 import pytest
 from storefact import get_store_from_url
 
-from kartothek.io_components.utils import (
+from plateau.io_components.utils import (
     align_categories,
     combine_metadata,
     extract_duplicates,

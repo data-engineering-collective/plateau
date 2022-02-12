@@ -2,8 +2,8 @@
 
 import pytest
 
-from kartothek.io.iter import store_dataframes_as_dataset__iter
-from kartothek.io.testing.write import *  # noqa
+from plateau.io.iter import store_dataframes_as_dataset__iter
+from plateau.io.testing.write import *  # noqa
 
 
 def _store_dataframes(df_list, *args, **kwargs):

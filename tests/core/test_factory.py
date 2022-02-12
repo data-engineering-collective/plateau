@@ -1,4 +1,4 @@
-from kartothek.core.factory import DatasetFactory
+from plateau.core.factory import DatasetFactory
 
 
 def test_repr(store_factory):

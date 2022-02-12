@@ -1,13 +1,13 @@
 import pandas as pd
 import pytest
 
-from kartothek.io.dask.dataframe import collect_dataset_metadata
-from kartothek.io.eager import (
+from plateau.io.dask.dataframe import collect_dataset_metadata
+from plateau.io.eager import (
     store_dataframes_as_dataset,
     update_dataset_from_dataframes,
 )
-from kartothek.io_components.metapartition import _METADATA_SCHEMA
-from kartothek.serialization import ParquetSerializer
+from plateau.io_components.metapartition import _METADATA_SCHEMA
+from plateau.serialization import ParquetSerializer
 
 
 def test_collect_dataset_metadata(store_session_factory, dataset):

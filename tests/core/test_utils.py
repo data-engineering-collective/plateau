@@ -5,7 +5,7 @@ from simplekv import KeyValueStore
 from simplekv.decorator import PrefixDecorator
 from storefact import get_store_from_url
 
-from kartothek.core.utils import ensure_store, lazy_store
+from plateau.core.utils import ensure_store, lazy_store
 
 
 class NoPickle:

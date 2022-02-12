@@ -3,26 +3,26 @@ from collections import defaultdict
 
 import pytest
 
-from kartothek.core.docs import _PARAMETER_MAPPING, default_docs
-from kartothek.io.dask.bag import (
+from plateau.core.docs import _PARAMETER_MAPPING, default_docs
+from plateau.io.dask.bag import (
     build_dataset_indices__bag,
     read_dataset_as_dataframe_bag,
     read_dataset_as_metapartitions_bag,
     store_bag_as_dataset,
 )
-from kartothek.io.dask.dataframe import (
+from plateau.io.dask.dataframe import (
     read_dataset_as_ddf,
     store_dataset_from_ddf,
     update_dataset_from_ddf,
 )
-from kartothek.io.dask.delayed import (
+from plateau.io.dask.delayed import (
     delete_dataset__delayed,
     read_dataset_as_delayed,
     read_dataset_as_delayed_metapartitions,
     store_delayed_as_dataset,
     update_dataset_from_delayed,
 )
-from kartothek.io.eager import (
+from plateau.io.eager import (
     build_dataset_indices,
     commit_dataset,
     create_empty_dataset_header,
@@ -35,7 +35,7 @@ from kartothek.io.eager import (
     update_dataset_from_dataframes,
     write_single_partition,
 )
-from kartothek.io.iter import (
+from plateau.io.iter import (
     read_dataset_as_dataframes__iterator,
     read_dataset_as_metapartitions__iterator,
     store_dataframes_as_dataset__iter,

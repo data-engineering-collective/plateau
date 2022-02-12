@@ -3,8 +3,8 @@ import pickle
 import dask
 import pytest
 
-from kartothek.io.dask.delayed import garbage_collect_dataset__delayed
-from kartothek.io.testing.gc import *  # noqa
+from plateau.io.dask.delayed import garbage_collect_dataset__delayed
+from plateau.io.testing.gc import *  # noqa
 
 
 def _run_garbage_collect(*args, **kwargs):

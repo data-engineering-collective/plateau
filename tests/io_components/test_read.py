@@ -5,9 +5,9 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from kartothek.io.eager import store_dataframes_as_dataset
-from kartothek.io_components.metapartition import SINGLE_TABLE, MetaPartition
-from kartothek.io_components.read import dispatch_metapartitions
+from plateau.io.eager import store_dataframes_as_dataset
+from plateau.io_components.metapartition import SINGLE_TABLE, MetaPartition
+from plateau.io_components.read import dispatch_metapartitions
 
 
 def test_dispatch_metapartitions(dataset, store_session):

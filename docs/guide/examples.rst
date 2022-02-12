@@ -17,7 +17,7 @@ Setup a store
     :okwarning:
 
     import pandas as pd
-    from kartothek.api.dataset import read_table, store_dataframes_as_dataset
+    from plateau.api.dataset import read_table, store_dataframes_as_dataset
 
     df = pd.DataFrame({"Name": ["Paul", "Lisa"], "Age": [32, 29]})
 
@@ -51,7 +51,7 @@ Write
     :okwarning:
 
     import pandas as pd
-    from kartothek.api.dataset import store_dataframes_as_dataset
+    from plateau.api.dataset import store_dataframes_as_dataset
 
     #  Now, define the actual partitions. This list will, most of the time,
     # be the intermediate result of a previously executed pipeline which e.g. pulls
@@ -64,7 +64,7 @@ Write
         pd.DataFrame({"A": range(10, 20)}),
     ]
 
-    # The pipeline will return a :class:`~kartothek.core.dataset.DatasetMetadata` object
+    # The pipeline will return a :class:`~plateau.core.dataset.DatasetMetadata` object
     #  which refers to the created dataset
     dataset = store_dataframes_as_dataset(
         dfs=input_list_of_partitions,
@@ -82,7 +82,7 @@ Read
 .. ipython:: python
 
     import pandas as pd
-    from kartothek.api.dataset import read_dataset_as_dataframes
+    from plateau.api.dataset import read_dataset_as_dataframes
 
     #  Create the pipeline with a minimal set of configs
     list_of_partitions = read_dataset_as_dataframes(
@@ -110,14 +110,14 @@ Write
     :okwarning:
 
     import pandas as pd
-    from kartothek.api.dataset import store_dataframes_as_dataset__iter
+    from plateau.api.dataset import store_dataframes_as_dataset__iter
 
     input_list_of_partitions = [
         pd.DataFrame({"A": range(10)}),
         pd.DataFrame({"A": range(10, 20)}),
     ]
 
-    # The pipeline will return a :class:`~kartothek.core.dataset.DatasetMetadata` object
+    # The pipeline will return a :class:`~plateau.core.dataset.DatasetMetadata` object
     #  which refers to the created dataset
     dataset = store_dataframes_as_dataset__iter(
         input_list_of_partitions,
@@ -135,7 +135,7 @@ Read
     :okwarning:
 
     import pandas as pd
-    from kartothek.api.dataset import read_dataset_as_dataframes__iterator
+    from plateau.api.dataset import read_dataset_as_dataframes__iterator
 
     #  Create the pipeline with a minimal set of configs
     list_of_partitions = read_dataset_as_dataframes__iterator(
@@ -166,7 +166,7 @@ Write
     :okwarning:
 
     import pandas as pd
-    from kartothek.api.dataset import store_delayed_as_dataset
+    from plateau.api.dataset import store_delayed_as_dataset
 
     input_list_of_partitions = [
         pd.DataFrame({"A": range(10)}),
@@ -197,7 +197,7 @@ Read
 
     import dask
     import pandas as pd
-    from kartothek.api.dataset import read_dataset_as_delayed
+    from plateau.api.dataset import read_dataset_as_delayed
 
     tasks = read_dataset_as_delayed(dataset_uuid="MyFirstDatasetDask", store=store_url)
     tasks

@@ -95,7 +95,7 @@ components that are separated by a single dot each:
 
  * The UUID of the dataset. This should be a string that hasn't been used yet
    for prefixing any other file in the storage location. One may use the
-   Python function :func:`~kartothek.core.uuid.gen_uuid()` (UUID type 4) to generate
+   Python function :func:`~plateau.core.uuid.gen_uuid()` (UUID type 4) to generate
    such a UUID but the only requirement here is that there is no other file in
    the target location that has the same prefix.
  * The identifier ``by-dataset-metadata``. The character sequence
@@ -103,7 +103,7 @@ components that are separated by a single dot each:
    than main metadata files for datasets.
  * The suffix json or msgpack.zstd to describe the file format
    (msgpack.zstd denotes a zstd compressed msgpack file in a
-   Kartothek dataset).
+   plateau dataset).
 
 Example:
 ::
@@ -121,7 +121,7 @@ The table schema information consists of thee components:
 
  * The UUID of the dataset. This should be a string that hasn't been used yet
    for prefixing any other file in the storage location. One may use the
-   :func:`~kartothek.core.uuid.gen_uuid()` (UUID type 4) to generate such a UUID.
+   :func:`~plateau.core.uuid.gen_uuid()` (UUID type 4) to generate such a UUID.
  * The table identifier
  * The string _common_metadata
 
@@ -141,7 +141,7 @@ These files must consist of the following forward-slash separated components:
 
  * The UUID of the dataset. This should be a string that hasn't been used yet
    for prefixing any other file in the storage location. One may use the
-   :func:`~kartothek.core.uuid.gen_uuid()` (UUID type 4) to generate such a UUID.
+   :func:`~plateau.core.uuid.gen_uuid()` (UUID type 4) to generate such a UUID.
  * The table identifier
  * (optional) partition content encoding
  * The partition identifier.
@@ -176,7 +176,7 @@ These files must consist of the following dot-separated components:
 
  * The UUID of the dataset. This should be a string that hasn't been used yet
    for prefixing any other file in the storage location. One may use the
-   :func:`~kartothek.core.uuid.gen_uuid()` (UUID type 4) to generate such a UUID.
+   :func:`~plateau.core.uuid.gen_uuid()` (UUID type 4) to generate such a UUID.
  * A hard coded identifier ``indices``
  * The name of the field used in the index
  * A url encoded ISO 8601 timestamp (format ``YYYY-MM-DDTHH:MM:SS.ffffff``)

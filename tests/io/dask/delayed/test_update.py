@@ -3,8 +3,8 @@ import pickle
 import dask
 import pytest
 
-from kartothek.io.dask.delayed import update_dataset_from_delayed
-from kartothek.io.testing.update import *  # noqa
+from plateau.io.dask.delayed import update_dataset_from_delayed
+from plateau.io.testing.update import *  # noqa
 
 
 @pytest.fixture

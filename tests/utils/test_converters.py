@@ -2,7 +2,7 @@ import pandas as pd
 import pyarrow as pa
 import pytest
 
-from kartothek.utils.converters import (
+from plateau.utils.converters import (
     converter_str,
     converter_str_set,
     converter_str_set_optional,

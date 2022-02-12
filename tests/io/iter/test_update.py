@@ -3,8 +3,8 @@
 import pandas as pd
 import pytest
 
-from kartothek.io.iter import update_dataset_from_dataframes__iter
-from kartothek.io.testing.update import *  # noqa
+from plateau.io.iter import update_dataset_from_dataframes__iter
+from plateau.io.testing.update import *  # noqa
 
 
 @pytest.fixture()

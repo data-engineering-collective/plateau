@@ -14,7 +14,7 @@ import simplejson
 from dask.dataframe.utils import make_meta as dask_make_meta
 from packaging.version import parse as parse_version
 
-from kartothek.core.common_metadata import (
+from plateau.core.common_metadata import (
     SchemaWrapper,
     _diff_schemas,
     _get_common_metadata_key,
@@ -25,7 +25,7 @@ from kartothek.core.common_metadata import (
     validate_compatible,
     validate_shared_columns,
 )
-from kartothek.serialization import ParquetSerializer
+from plateau.serialization import ParquetSerializer
 
 try:
     arrow_version = parse_version(pa.__version__)
@@ -533,7 +533,7 @@ def test_make_meta_column_normalization_pyarrow_schema():
     # GH228
     df = pd.DataFrame(
         [{"part": 1, "id": 1, "col1": "abc"}, {"part": 2, "id": 2, "col1": np.nan}],
-        # Kartothek normalizes field order s.t. partition keys are first and the
+        # plateau normalizes field order s.t. partition keys are first and the
         # rest is alphabetically. This is reverse.
         columns=["col1", "id", "part"],
     )

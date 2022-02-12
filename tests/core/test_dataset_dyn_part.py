@@ -8,13 +8,13 @@ import pandas as pd
 import simplejson
 import storefact
 
-from kartothek.core.common_metadata import (
+from plateau.core.common_metadata import (
     _get_common_metadata_key,
     make_meta,
     store_schema_metadata,
 )
-from kartothek.core.dataset import DatasetMetadata, create_partition_key, naming
-from kartothek.core.urlencode import quote_indices, unquote_indices
+from plateau.core.dataset import DatasetMetadata, create_partition_key, naming
+from plateau.core.urlencode import quote_indices, unquote_indices
 
 
 def test_create_partition_key():
@@ -308,7 +308,7 @@ def test_dynamic_partitions_quote(store, metadata_version):
 def test_dask_partitions(metadata_version):
     """
     Create partitions for one table with dask
-    and check that it can be read with kartothek
+    and check that it can be read with plateau
     """
     import dask.dataframe
 

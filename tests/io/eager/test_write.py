@@ -5,16 +5,16 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from kartothek.core.common_metadata import make_meta, read_schema_metadata
-from kartothek.core.dataset import DatasetMetadata
-from kartothek.core.uuid import gen_uuid
-from kartothek.io.eager import (
+from plateau.core.common_metadata import make_meta, read_schema_metadata
+from plateau.core.dataset import DatasetMetadata
+from plateau.core.uuid import gen_uuid
+from plateau.io.eager import (
     create_empty_dataset_header,
     store_dataframes_as_dataset,
     write_single_partition,
 )
-from kartothek.io.testing.write import *  # noqa: F40
-from kartothek.io_components.metapartition import MetaPartition
+from plateau.io.testing.write import *  # noqa: F40
+from plateau.io_components.metapartition import MetaPartition
 
 
 def _store_dataframes(dfs, **kwargs):

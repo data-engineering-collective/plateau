@@ -3,7 +3,7 @@ import io
 import numpy as np
 import pytest
 
-from kartothek.serialization.testing import BINARY_COLUMNS, get_dataframe_not_nested
+from plateau.serialization.testing import BINARY_COLUMNS, get_dataframe_not_nested
 
 
 class FakeStore:

@@ -5,9 +5,9 @@ import pandas as pd
 import pytest
 from pandas.testing import assert_frame_equal
 
-from kartothek.core.common_metadata import make_meta
-from kartothek.core.dataset import DatasetMetadata
-from kartothek.io.eager import (
+from plateau.core.common_metadata import make_meta
+from plateau.core.dataset import DatasetMetadata
+from plateau.io.eager import (
     commit_dataset,
     create_empty_dataset_header,
     read_table,
@@ -86,7 +86,7 @@ def test_commit_dataset_from_metapartition(dataset_function, store):
 def test_commit_dataset_from_nested_metapartition(store):
     """
     Check it is possible to use `commit_dataset` with nested metapartitions as input.
-    Original issue: https://github.com/JDASoftwareGroup/kartothek/issues/40
+    Original issue: https://github.com/JDASoftwareGroup/plateau/issues/40
     """
 
     df = pd.DataFrame({"a": [1, 1, 2, 2], "b": [3, 4, 5, 6]})

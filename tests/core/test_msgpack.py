@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
-from kartothek.core._zmsgpack import packb, unpackb
+from plateau.core._zmsgpack import packb, unpackb
 
 
 def test_msgpack():

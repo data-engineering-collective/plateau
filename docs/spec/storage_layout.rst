@@ -4,18 +4,18 @@
 Storage Layout
 ==============
 
-Kartothek structures your data using these concepts:
+plateau structures your data using these concepts:
 
-- One whole unit of data that Kartothek manages is called a *dataset*.
+- One whole unit of data that plateau manages is called a *dataset*.
 - A dataset consists of one or more *tables* that each have a *schema*. 
 - Table rows are partitioned by any number of columns: Rows having the same combination
   of values in these columns are grouped together.
 - A partition consists of one or more Parquet files, which contain a chunk of rows that
   were written at a time.
-- Kartothek can also generate an index for any number of columns, which speeds up finding
+- plateau can also generate an index for any number of columns, which speeds up finding
   the relevant Parquet files for specific values for the indexed column.
 
-A general Kartothek storage layout thus looks as follows::
+A general plateau storage layout thus looks as follows::
 
   ─ <dataset_uuid>.by-dataset-metadata.json
   ─ <dataset_uuid>/
