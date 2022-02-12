@@ -13,10 +13,7 @@ from plateau.api.dataset import read_dataset_as_ddf
 from plateau.core.dataset import DatasetMetadata
 from plateau.core.naming import DEFAULT_METADATA_VERSION
 from plateau.core.testing import TIME_TO_FREEZE_ISO
-from plateau.io.eager import (
-    read_dataset_as_metapartitions,
-    store_dataframes_as_dataset,
-)
+from plateau.io.eager import read_dataset_as_metapartitions, store_dataframes_as_dataset
 from plateau.io.iter import read_dataset_as_dataframes__iterator
 
 

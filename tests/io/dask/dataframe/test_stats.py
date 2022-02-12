@@ -2,10 +2,7 @@ import pandas as pd
 import pytest
 
 from plateau.io.dask.dataframe import collect_dataset_metadata
-from plateau.io.eager import (
-    store_dataframes_as_dataset,
-    update_dataset_from_dataframes,
-)
+from plateau.io.eager import store_dataframes_as_dataset, update_dataset_from_dataframes
 from plateau.io_components.metapartition import _METADATA_SCHEMA
 from plateau.serialization import ParquetSerializer
 

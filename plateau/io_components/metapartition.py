@@ -41,11 +41,7 @@ from plateau.core.naming import get_partition_file_prefix
 from plateau.core.partition import Partition
 from plateau.core.typing import StoreInput
 from plateau.core.urlencode import decode_key, quote_indices
-from plateau.core.utils import (
-    ensure_store,
-    ensure_string_type,
-    verify_metadata_version,
-)
+from plateau.core.utils import ensure_store, ensure_string_type, verify_metadata_version
 from plateau.core.uuid import gen_uuid
 from plateau.io_components.utils import align_categories
 from plateau.serialization import (

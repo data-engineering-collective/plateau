@@ -21,11 +21,7 @@ from plateau.core.index import (
     PartitionIndex,
     filter_indices,
 )
-from plateau.core.naming import (
-    EXTERNAL_INDEX_SUFFIX,
-    PARQUET_FILE_SUFFIX,
-    SINGLE_TABLE,
-)
+from plateau.core.naming import EXTERNAL_INDEX_SUFFIX, PARQUET_FILE_SUFFIX, SINGLE_TABLE
 from plateau.core.partition import Partition
 from plateau.core.typing import StoreInput
 from plateau.core.urlencode import decode_key, quote_indices
