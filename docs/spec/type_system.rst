@@ -4,24 +4,24 @@
 Table type system
 =================
 
-This document explains the type system of Kartothek.
+This document explains the type system of plateau.
 
 
 Motivation
 ----------
-To understand why and how the type system was designed, we illustrate the requirements and use cases Kartothek should
+To understand why and how the type system was designed, we illustrate the requirements and use cases plateau should
 cover:
 
-- **simplicity:** For the average programmer, it should be possible to understand the semantics of Kartothek quickly.
+- **simplicity:** For the average programmer, it should be possible to understand the semantics of plateau quickly.
 - **optimized data representation:** Data providers (humans and software) should be able to pick a memory representation
   that is sufficient to hold the data in question (e.g. pick an 8-bit unsigned integer if you only have integer up to
   255).
 - **lifecycle management:** A dataset may be used for many months and can be extended over this time. Also, the
   software used with the dataset might change.
 - **efficiency:** Data written once should not be altered if not really necessary.
-- **stability:** Kartothek is made for production use. It should provide stable, predicable outputs and must not crash
+- **stability:** plateau is made for production use. It should provide stable, predicable outputs and must not crash
   or lead other libraries to behave in an expected way.
-- **compatibility:** Kartothek is not the only software in the stack and must play nicely with others (also see `Related
+- **compatibility:** plateau is not the only software in the stack and must play nicely with others (also see `Related
   Type Systems`_).
 
 
@@ -39,7 +39,7 @@ used when interacting with other languages like `R`_, `Julia`_ and `Java`_.
 
 .. note::
 
-   Most user interaction with Kartothek are likely done by using `Pandas`_ DataFrames. Please consolidate the pyarrow
+   Most user interaction with plateau are likely done by using `Pandas`_ DataFrames. Please consolidate the pyarrow
    documentation on `Type differences <https://arrow.apache.org/docs/python/pandas.html#type-differences>`_ to see how
    different `Pandas`_ constructs map to `Apache Arrow`_.
 
@@ -187,7 +187,7 @@ We currently do not implement a normalization. This might change in future metad
 .. warning::
 
    Because no normalization is implemented for different decimal precisions, we strongly advice against using them in
-   Kartothek.
+   plateau.
 
 Date
 ~~~~
@@ -221,7 +221,7 @@ metadata version.
      data and arithmetics. Use "midn" as a time (e.g. ``2019-05-21 00:00:00``) and most features including `Pandas`_
      support work as expected.
    - **extension types:** Using `Extension Types`_ would make it possible to have proper, fast date types in `Pandas`_.
-     Note that this would also require to either convert them back and forth before/after the Kartothek interaction or
+     Note that this would also require to either convert them back and forth before/after the plateau interaction or
      to teach pyarrow about them.
 
 Time
@@ -248,15 +248,15 @@ ranges. So, no normalization is implemented for timestamps.
 
 .. note::
 
-  For compatibility reasons, `kartothek` coerces timestamps to `us` accuracy, effectively truncating the timestamp. If the timestamp actually has a higher accuracy, arrow raises an exception, rejecting it
+  For compatibility reasons, `plateau` coerces timestamps to `us` accuracy, effectively truncating the timestamp. If the timestamp actually has a higher accuracy, arrow raises an exception, rejecting it
 
   .. ipython:: python
     :suppress:
     :okwarning:
 
     import pandas as pd
-    from kartothek.api.serialization import ParquetSerializer
-    from kartothek.api.dataset import ensure_store
+    from plateau.api.serialization import ParquetSerializer
+    from plateau.api.dataset import ensure_store
 
     store = ensure_store("memory://")
     ser = ParquetSerializer()
@@ -541,7 +541,7 @@ Python programmers can encounter different types systems, some examples are:
 
   - `Format - Logical Types <https://github.com/apache/parquet-format/blob/master/LogicalTypes.md>`_
 
-Kartothek aims to be as compatible as possible with them.
+plateau aims to be as compatible as possible with them.
 
 
 .. _Apache Arrow: https://arrow.apache.org/

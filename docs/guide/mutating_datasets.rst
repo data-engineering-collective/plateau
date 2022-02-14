@@ -4,13 +4,13 @@ Mutating Datasets
 =================
 
 It's possible to update existing data
-by adding new physical partitions to them and deleting or replacing old partitions. Kartothek
+by adding new physical partitions to them and deleting or replacing old partitions. plateau
 provides update functions that generally have the prefix `update_dataset` in their names.
-For example, :func:`~kartothek.io.eager.update_dataset_from_dataframes` is the update
+For example, :func:`~plateau.io.eager.update_dataset_from_dataframes` is the update
 function for the ``eager`` backend.
 
 To see updating in action, let's first set up a storage location and store
-some data there with Kartothek.
+some data there with plateau.
 
 .. ipython:: python
     :suppress:
@@ -21,7 +21,7 @@ some data there with Kartothek.
     from tempfile import TemporaryDirectory
     from storefact import get_store_from_url
 
-    from kartothek.api.dataset import store_dataframes_as_dataset
+    from plateau.api.dataset import store_dataframes_as_dataset
 
     dataset_dir = TemporaryDirectory()
 
@@ -56,12 +56,12 @@ Appending Data
 --------------
 
 Now, we create ``another_df`` with the same schema as our intial dataframe
-``df`` and update it using the ``eager`` backend by calling :func:`~kartothek.io.eager.update_dataset_from_dataframes`:
+``df`` and update it using the ``eager`` backend by calling :func:`~plateau.io.eager.update_dataset_from_dataframes`:
 
 .. ipython:: python
     :okwarning:
 
-    from kartothek.api.dataset import update_dataset_from_dataframes
+    from plateau.api.dataset import update_dataset_from_dataframes
 
     another_df = pd.DataFrame(
         {
@@ -91,7 +91,7 @@ previous contents.
 
 .. ipython:: python
 
-    from kartothek.api.dataset import read_table
+    from plateau.api.dataset import read_table
 
     updated_df = read_table(dataset_uuid=dm.uuid, store=store_url)
     updated_df
@@ -135,7 +135,7 @@ the partition ``B=2013-01-02[...]`` has in fact been removed.
     on any column(s); however this is **not at all advised** since the effect will simply be to
     remove **all** previous partitions and replace them with the ones in the update.
 
-    If the intention of the user is to delete the entire dataset, using :func:`kartothek.io.eager.delete_dataset`
+    If the intention of the user is to delete the entire dataset, using :func:`plateau.io.eager.delete_dataset`
     would be a much better, cleaner and safer way to go about doing so.
 
 
@@ -208,7 +208,7 @@ with one update:
     read_table(dm.uuid, store_url)
 
 
-As can be seen in the example above, the resultant dataframe from :func:`~kartothek.io.eager.read_table`
+As can be seen in the example above, the resultant dataframe from :func:`~plateau.io.eager.read_table`
 consists of two rows corresponding to ``B=2013-01-02`` (from ``df``) and four rows corresponding to ``B=2013-01-03`` from ``modified_df``.
 Thus, the original partition with the two rows corresponding to ``B=2013-01-03`` from ``df``
 has been completely replaced.
@@ -218,17 +218,17 @@ has been completely replaced.
 Garbage collection
 ------------------
 
-When Kartothek is executing an operation, it makes sure to not
+When plateau is executing an operation, it makes sure to not
 commit changes to the dataset until the operation has been succesfully completed. If a
 write operation does not succeed for any reason, although there may be new files written
 to storage, those files will not be used by the dataset as they will not be referenced in
-the Kartothek metadata. Thus, when the user reads the dataset, no new data will
+the plateau metadata. Thus, when the user reads the dataset, no new data will
 appear in the output.
 
-Similarly, when deleting a partition, Kartothek only removes the reference of that file
+Similarly, when deleting a partition, plateau only removes the reference of that file
 from the metadata.
 
-These temporary files will remain in storage until a Kartothek  garbage collection
+These temporary files will remain in storage until a plateau  garbage collection
 function is called on the dataset.
 If a dataset is updated on a regular basis, it may be useful to run garbage collection
 periodically to decrease unnecessary storage use.
@@ -236,12 +236,12 @@ periodically to decrease unnecessary storage use.
 An example of garbage collection is shown below.
 A little above, near the end of the delete section,
 we removed two partitions for the dataset with uuid `replace_partition`.
-The removed files remain in storage but are untracked by Kartothek.
+The removed files remain in storage but are untracked by plateau.
 When garbage collection is called, the files are removed.
 
 .. ipython:: python
 
-    from kartothek.api.dataset import garbage_collect_dataset
+    from plateau.api.dataset import garbage_collect_dataset
     from storefact import get_store_from_url
 
     store = get_store_from_url(store_url)
@@ -273,7 +273,7 @@ The mutating operation will update all indices that currently exist for the data
 
     new_df = pd.DataFrame({"payload": range(10), "i1": 1, "i2": "c"})
 
-If we do not specify anything, kartothek will infer the indices and update them correctly
+If we do not specify anything, plateau will infer the indices and update them correctly
 
 .. ipython:: python
     :okwarning:

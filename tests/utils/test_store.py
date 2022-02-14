@@ -5,7 +5,7 @@ import hashlib
 import pytest
 import storefact
 
-from kartothek.utils.store import (
+from plateau.utils.store import (
     _azure_bbs_content_md5,
     _azure_cc_content_md5,
     _has_azure_bbs,

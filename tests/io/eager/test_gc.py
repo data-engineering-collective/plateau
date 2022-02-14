@@ -2,8 +2,8 @@
 
 import pytest
 
-from kartothek.io.eager import garbage_collect_dataset
-from kartothek.io.testing.gc import *  # noqa: F4
+from plateau.io.eager import garbage_collect_dataset
+from plateau.io.testing.gc import *  # noqa: F4
 
 
 @pytest.fixture()

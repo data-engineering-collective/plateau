@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-from kartothek.serialization._util import ensure_unicode_string_type
+from plateau.serialization._util import ensure_unicode_string_type
 
 
 @pytest.mark.parametrize(

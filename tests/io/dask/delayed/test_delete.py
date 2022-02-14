@@ -3,8 +3,8 @@ import pickle
 import dask
 import pytest
 
-from kartothek.io.dask.delayed import delete_dataset__delayed
-from kartothek.io.testing.delete import *  # noqa
+from plateau.io.dask.delayed import delete_dataset__delayed
+from plateau.io.testing.delete import *  # noqa
 
 
 def _delete(*args, **kwargs):

@@ -11,13 +11,13 @@ import pyarrow as pa
 import pytest
 from pyarrow.parquet import ParquetFile
 
-from kartothek.serialization import (
+from plateau.serialization import (
     CsvSerializer,
     DataFrameSerializer,
     ParquetSerializer,
     default_serializer,
 )
-from kartothek.serialization._util import ensure_unicode_string_type
+from plateau.serialization._util import ensure_unicode_string_type
 
 TYPE_STABLE_SERIALISERS = [ParquetSerializer()]
 

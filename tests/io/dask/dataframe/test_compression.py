@@ -3,7 +3,7 @@ import pandas as pd
 import pandas.testing as pdt
 import pytest
 
-from kartothek.io.dask.compression import (
+from plateau.io.dask.compression import (
     pack_payload,
     pack_payload_pandas,
     unpack_payload,

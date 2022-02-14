@@ -6,10 +6,10 @@ import pandas as pd
 import pandas.testing as pdt
 import pytest
 
-from kartothek.core.factory import DatasetFactory
-from kartothek.io.dask._shuffle import _KTK_HASH_BUCKET, _hash_bucket
-from kartothek.io.dask.dataframe import store_dataset_from_ddf, update_dataset_from_ddf
-from kartothek.io.iter import read_dataset_as_dataframes__iterator
+from plateau.core.factory import DatasetFactory
+from plateau.io.dask._shuffle import _KTK_HASH_BUCKET, _hash_bucket
+from plateau.io.dask.dataframe import store_dataset_from_ddf, update_dataset_from_ddf
+from plateau.io.iter import read_dataset_as_dataframes__iterator
 
 
 @pytest.mark.parametrize("col", ["range", "range_duplicated", "random"])

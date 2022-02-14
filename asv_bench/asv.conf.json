@@ -1,8 +1,8 @@
 {
     "version": 1,
-    "project": "kartothek",
+    "project": "plateau",
     
-    "project_url": "https://github.com/JDASoftwareGroup/kartothek",
+    "project_url": "https://github.com/data-engineering-collective/plateau",
     "repo": ".",
     "environment_type": "virtualenv",
     "env_dir": ".asv/env",

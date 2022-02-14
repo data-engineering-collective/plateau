@@ -3,7 +3,7 @@
 
 import pandas as pd
 
-from kartothek.core.testing import get_dataframe_alltypes
+from plateau.core.testing import get_dataframe_alltypes
 
 
 def test_get_dataframe_alltypes():

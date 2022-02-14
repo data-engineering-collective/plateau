@@ -1,7 +1,7 @@
 from storefact import get_store_from_url
 
-from kartothek.serialization import ParquetSerializer
-from kartothek.serialization.testing import get_dataframe_not_nested
+from plateau.serialization import ParquetSerializer
+from plateau.serialization.testing import get_dataframe_not_nested
 
 
 class TimeRestore:

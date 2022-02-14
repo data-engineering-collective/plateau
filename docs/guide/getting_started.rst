@@ -5,7 +5,7 @@ Getting Started
 ===============
 
 
-When working with Kartothek tables as a Python user, we will use :class:`~pandas.DataFrame`
+When working with plateau tables as a Python user, we will use :class:`~pandas.DataFrame`
 as the user-facing type.
 
 We typically expect that the contents of a dataset are
@@ -63,7 +63,7 @@ what follows is the filepath).
 
 .. admonition:: Storage locations
 
-    `storefact`_ offers support for several stores in Kartothek, these can be created using the
+    `storefact`_ offers support for several stores in plateau, these can be created using the
     function `storefact.get_store_from_url` with one of the following prefixes:
 
     - ``hfs``: Local filesystem
@@ -73,7 +73,7 @@ what follows is the filepath).
 Interface
 ---------
 
-Kartothek can write to any location that
+plateau can write to any location that
 fulfills the `simplekv.KeyValueStore interface
 <https://simplekv.readthedocs.io/en/latest/#simplekv.KeyValueStore>`_  as long as they
 support `ExtendedKeyspaceMixin
@@ -88,13 +88,13 @@ Writing data to storage
 =======================
 
 Now that we have some data and a location to store it in, we can persist it as a
-dataset. To do so, we will use :func:`~kartothek.io.eager.store_dataframes_as_dataset`
+dataset. To do so, we will use :func:`~plateau.io.eager.store_dataframes_as_dataset`
 to store the ``DataFrame`` ``df`` that we already have in memory.
 
 .. ipython:: python
     :okwarning:
 
-    from kartothek.api.dataset import store_dataframes_as_dataset
+    from plateau.api.dataset import store_dataframes_as_dataset
 
     df.dtypes.equals(another_df.dtypes)  # both have the same schema
 
@@ -106,11 +106,11 @@ to store the ``DataFrame`` ``df`` that we already have in memory.
 .. admonition:: Scheduling backends
 
     The import path of this function already gives us a hint about the general
-    structuring of the Kartothek modules. In :mod:`kartothek.io` we have all
+    structuring of the plateau modules. In :mod:`plateau.io` we have all
     the building blocks to build data pipelines that read and write from/to storages.
     The next module level (e.g. ``eager``) describes the scheduling backend.
 
-    The scheduling backends `currently supported` by Kartothek are:
+    The scheduling backends `currently supported` by plateau are:
 
     - ``eager`` runs all execution immediately and on the local machine.
     - ``iter`` executes operations on the dataset using a generator/iterator interface.
@@ -122,8 +122,8 @@ to store the ``DataFrame`` ``df`` that we already have in memory.
       for the respective `dask`_ collections.
 
 
-After calling :func:`~kartothek.io.eager.store_dataframes_as_dataset`,
-a :class:`~kartothek.core.dataset.DatasetMetadata` object is returned.
+After calling :func:`~plateau.io.eager.store_dataframes_as_dataset`,
+a :class:`~plateau.core.dataset.DatasetMetadata` object is returned.
 This class holds information about the structure and schema of the dataset.
 
 .. ipython:: python
@@ -144,7 +144,7 @@ See :ref:`type_system` for more information.
 To store multiple dataframes into a dataset, it is possible to pass a collection of
 dataframes; the exact format will depend on the I/O backend used.
 
-Kartothek assumes these dataframes are different chunks of the same table and
+plateau assumes these dataframes are different chunks of the same table and
 will therefore be required to have the same schema. A ``ValueError`` will be
 thrown otherwise.
 For example,
@@ -187,22 +187,22 @@ Reading data from storage
 =========================
 
 After we have written the data, we may want to read it back in again. For this we can
-use :func:`~kartothek.io.eager.read_table`. This method returns the complete
+use :func:`~plateau.io.eager.read_table`. This method returns the complete
 table of the dataset as a pandas DataFrame.
 
 .. ipython:: python
 
-    from kartothek.api.dataset import read_table
+    from plateau.api.dataset import read_table
 
     read_table("a_unique_dataset_identifier", store_url)
 
 
 We can also read a dataframe iteratively, using
-:func:`~kartothek.io.iter.read_dataset_as_dataframes__iterator`. This will return a generator of :class:`pandas.DataFrame` where every element represents one file. For example,
+:func:`~plateau.io.iter.read_dataset_as_dataframes__iterator`. This will return a generator of :class:`pandas.DataFrame` where every element represents one file. For example,
 
 .. ipython:: python
 
-    from kartothek.api.dataset import read_dataset_as_dataframes__iterator
+    from plateau.api.dataset import read_dataset_as_dataframes__iterator
 
     for partition_index, df in enumerate(
         read_dataset_as_dataframes__iterator(
@@ -214,18 +214,18 @@ We can also read a dataframe iteratively, using
         print(f"Data: \n{df}")
 
 Respectively, the ``dask.delayed`` back-end provides the function
-:func:`~kartothek.io.dask.delayed.read_dataset_as_delayed`, which has a very similar
-interface to the :func:`~kartothek.io.iter.read_dataset_as_dataframes__iterator`
+:func:`~plateau.io.dask.delayed.read_dataset_as_delayed`, which has a very similar
+interface to the :func:`~plateau.io.iter.read_dataset_as_dataframes__iterator`
 function but returns a collection of ``dask.delayed`` objects.
 
 
 .. admonition:: Filtering using predicates
 
     It is possible to filter data during reads using simple predicates by using
-    the ``predicates`` argument. Technically speaking, Kartothek supports predicates
+    the ``predicates`` argument. Technically speaking, plateau supports predicates
     in `disjunctive normal form <https://en.wikipedia.org/wiki/Disjunctive_normal_form>`_.
 
-    When this argument is defined, Kartothek uses the Apache Parquet metadata
+    When this argument is defined, plateau uses the Apache Parquet metadata
     as well as indices and partition information to speed up queries when possible.
     How this works is a complex topic, see :ref:`efficient_querying`.
 

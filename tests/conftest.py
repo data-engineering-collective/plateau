@@ -12,25 +12,25 @@ import pytest
 import storefact
 
 # fmt: off
-pytest.register_assert_rewrite("kartothek.io.testing")
+pytest.register_assert_rewrite("plateau.io.testing")
 # fmt: on
 
-from kartothek.core.common_metadata import make_meta  # noqa: E402
-from kartothek.core.factory import DatasetFactory  # noqa: E402
-from kartothek.core.testing import (  # noqa: E402
+from plateau.core.common_metadata import make_meta  # noqa: E402
+from plateau.core.factory import DatasetFactory  # noqa: E402
+from plateau.core.testing import (  # noqa: E402
     TIME_TO_FREEZE,
     cm_frozen_time,
     get_dataframe_alltypes,
     get_dataframe_not_nested,
 )
-from kartothek.io_components.metapartition import (  # noqa: E402
+from plateau.io_components.metapartition import (  # noqa: E402
     MetaPartition,
     gen_uuid,
     parse_input_to_metapartition,
 )
-from kartothek.core.utils import lazy_store  # noqa: E402
-from kartothek.io_components.write import store_dataset_from_partitions  # noqa: E402
-from kartothek.serialization import ParquetSerializer  # noqa: E402
+from plateau.core.utils import lazy_store  # noqa: E402
+from plateau.io_components.write import store_dataset_from_partitions  # noqa: E402
+from plateau.serialization import ParquetSerializer  # noqa: E402
 
 
 pd.options.mode.chained_assignment = "raise"
@@ -40,7 +40,7 @@ pd.options.mode.chained_assignment = "raise"
 def frozen_time():
     """
     Depend on this fixture to set the time to TIME_TO_FREEZE
-    by patching kartothek.core._time.* with mock objects.
+    by patching plateau.core._time.* with mock objects.
 
     Note: you only need one of the fixtures `frozen_time`,
     `distributed_frozen_time`, or `frozen_time_em`:
@@ -162,7 +162,7 @@ def azure_store_cfg_factory(caplog):
             pytest.skip("{} not provided".format(env_name))
 
         container = "tests-{component}-{py_major}-{py_minor}-{suffix}".format(
-            component="kartothek",
+            component="plateau",
             py_major=sys.version_info.major,
             py_minor=sys.version_info.minor,
             suffix=suffix,
@@ -186,7 +186,7 @@ def module_store(tmpdir_factory):
 
 @pytest.fixture
 def mock_uuid(mocker):
-    uuid = mocker.patch("kartothek.core.uuid._uuid_hook_str")
+    uuid = mocker.patch("plateau.core.uuid._uuid_hook_str")
     uuid.return_value = "auto_dataset_uuid"
     return uuid
 
@@ -195,16 +195,16 @@ def mock_uuid(mocker):
 def mock_default_metadata_version(mocker, backend_identifier):
     mock_metadata_version = 1
 
-    # Mock `kartothek.core.utils.verify_metadata_version`
+    # Mock `plateau.core.utils.verify_metadata_version`
     def patched__verify_metadata_version(metadata_version):
         pass
 
     mocker.patch(
-        "kartothek.core.utils._verify_metadata_version",
+        "plateau.core.utils._verify_metadata_version",
         patched__verify_metadata_version,
     )
 
-    # Mock `kartothek.io_components.metapartition.parse_input_to_metapartition`
+    # Mock `plateau.io_components.metapartition.parse_input_to_metapartition`
     def patched__parse_input_to_metapartition(
         obj, table_name, metadata_version=None, *args, **kwargs
     ):
@@ -226,7 +226,7 @@ def mock_default_metadata_version(mocker, backend_identifier):
             raise AssertionError("Traversed through mock. Original error: {}".format(e))
 
     mocker.patch(
-        "kartothek.io.{backend_identifier}.parse_input_to_metapartition".format(
+        "plateau.io.{backend_identifier}.parse_input_to_metapartition".format(
             backend_identifier=backend_identifier
         ),
         patched__parse_input_to_metapartition,
@@ -430,7 +430,7 @@ def meta_partitions_evaluation_files_only(
 @pytest.fixture(scope="session")
 def dataset(meta_partitions_files_only, store_session_factory):
     """
-    Create a proper kartothek dataset in store with two partitions
+    Create a proper plateau dataset in store with two partitions
 
     """
     with cm_frozen_time(TIME_TO_FREEZE):
@@ -455,7 +455,7 @@ def dataset_factory(dataset, store_session_factory):
 @pytest.fixture(scope="session")
 def dataset_partition_keys(meta_partitions_dataframe, store_session_factory):
     """
-    Create a proper kartothek dataset in store with two partitions
+    Create a proper plateau dataset in store with two partitions
 
     """
     with cm_frozen_time(TIME_TO_FREEZE):
@@ -487,7 +487,7 @@ def dataset_with_index(
     meta_partitions_dataframe, store_session_factory, metadata_version
 ):
     """
-    Create a proper kartothek dataset in store with two partitions
+    Create a proper plateau dataset in store with two partitions
 
     """
     with cm_frozen_time(TIME_TO_FREEZE):
@@ -519,7 +519,7 @@ def dataset_with_index_factory(dataset_with_index, store_session_factory):
 @pytest.fixture(scope="function")
 def dataset_function(meta_partitions_files_only_function, store):
     """
-    Create a proper kartothek dataset in store with two partitions
+    Create a proper plateau dataset in store with two partitions
 
     """
     with cm_frozen_time(TIME_TO_FREEZE):

@@ -15,8 +15,8 @@ If you've found a bug, please report it to the issue tracker and
 To get started, set up a new virtual environment and install all requirements
 
 ```bash
-virtualenv kartothek-dev --python=python3.6
-source kartothek-dev/bin/activate
+virtualenv plateau-dev --python=python3.9
+source plateau-dev/bin/activate
 pip install -e .
 pip install -r test-requirements.txt
 ```
@@ -60,5 +60,5 @@ If you prefer to perform manual formatting and linting, you can run the necessar
 toolchain like this
 
 ```bash
-./format_code.sh
+pre-commit run -a
 ```

@@ -1,7 +1,7 @@
 import pandas as pd
 import pandas.testing as pdt
 
-from kartothek.io.dask.dataframe import hash_dataset
+from plateau.io.dask.dataframe import hash_dataset
 
 
 def test_hash_dataset(dataset_with_index_factory):

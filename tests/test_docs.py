@@ -11,7 +11,7 @@ def test_docs_use_api():
         with open(file_) as fd:
             content = fd.read()
 
-        pattern = r"(from|import) kartothek\.(?!(api))"
+        pattern = r"(from|import) plateau\.(?!(api))"
         import re
 
         if re.search(pattern, content):

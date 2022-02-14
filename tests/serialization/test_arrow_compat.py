@@ -8,8 +8,8 @@ import pandas.testing as pdt
 import pytest
 from storefact import get_store_from_url
 
-from kartothek.core.testing import get_dataframe_alltypes
-from kartothek.serialization import ParquetSerializer
+from plateau.core.testing import get_dataframe_alltypes
+from plateau.serialization import ParquetSerializer
 
 KNOWN_ARROW_VERSIONS = [
     "0.12.1",
@@ -61,7 +61,7 @@ def test_arrow_compat(arrow_version, reference_store, mocker):
     executing `generate_reference.py` or `batch_generate_reference.sh`.
     """
 
-    uuid_hook = mocker.patch("kartothek.core.uuid._uuid_hook_object")
+    uuid_hook = mocker.patch("plateau.core.uuid._uuid_hook_object")
     uuid_hook.return_value = uuid.UUID(
         bytes=b"\x82\xd6\xc1\x06Z\x08\x11\xe9\x85eJ\x00\x07\xf8\n\x10"
     )

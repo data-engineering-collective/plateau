@@ -1,7 +1,7 @@
 import pytest
 
-from kartothek.io.eager import delete_dataset
-from kartothek.io.testing.delete import *  # noqa
+from plateau.io.eager import delete_dataset
+from plateau.io.testing.delete import *  # noqa
 
 
 def _delete_store_factory(dataset_uuid, store_factory):

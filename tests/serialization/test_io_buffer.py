@@ -2,7 +2,7 @@ import io
 
 import pytest
 
-from kartothek.serialization._io_buffer import BlockBuffer
+from plateau.serialization._io_buffer import BlockBuffer
 
 
 class _ReadRecordWrapper:

@@ -3,8 +3,8 @@ from functools import partial
 
 import pytest
 
-from kartothek.io.dask.delayed import read_dataset_as_delayed
-from kartothek.io.testing.read import *  # noqa
+from plateau.io.dask.delayed import read_dataset_as_delayed
+from plateau.io.testing.read import *  # noqa
 
 
 @pytest.fixture(params=["table"])

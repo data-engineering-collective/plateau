@@ -6,18 +6,18 @@ import pandas as pd
 import pandas.testing as pdt
 import pytest
 
-from kartothek.core.common_metadata import make_meta, store_schema_metadata
-from kartothek.core.index import ExplicitSecondaryIndex
-from kartothek.core.naming import DEFAULT_METADATA_VERSION
-from kartothek.core.testing import get_dataframe_not_nested
-from kartothek.io_components.metapartition import (
+from plateau.core.common_metadata import make_meta, store_schema_metadata
+from plateau.core.index import ExplicitSecondaryIndex
+from plateau.core.naming import DEFAULT_METADATA_VERSION
+from plateau.core.testing import get_dataframe_not_nested
+from plateau.io_components.metapartition import (
     SINGLE_TABLE,
     MetaPartition,
     _unique_label,
     parse_input_to_metapartition,
     partition_labels_from_mps,
 )
-from kartothek.serialization import DataFrameSerializer, ParquetSerializer
+from plateau.serialization import DataFrameSerializer, ParquetSerializer
 
 
 def test_store_single_dataframe_as_partition(store, metadata_version):

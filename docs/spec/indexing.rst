@@ -3,13 +3,13 @@
 Indexing
 ========
 
-Kartothek uses different types of `inverted file indices`_ to enable efficient partition pruning and improve query performance, see also :doc:`efficient_querying` for more hints on how to optimize performance. This section describes the different types of indices, how to create them and how to interact with them
+plateau uses different types of `inverted file indices`_ to enable efficient partition pruning and improve query performance, see also :doc:`efficient_querying` for more hints on how to optimize performance. This section describes the different types of indices, how to create them and how to interact with them
 
 
 Principle in-memory representation
 ----------------------------------
 
-All currently supported kartothek index types are inverted indices and are mapping observed values of a given field to a list of partitions where they were observed.
+All currently supported plateau index types are inverted indices and are mapping observed values of a given field to a list of partitions where they were observed.
 
 .. ipython:: python
 
@@ -19,11 +19,11 @@ Where, in this example, the value ``1`` is found in exactly one partition which 
 
 Users typically do not interact with indices directly since querying a dataset will automatically load and interact with the indices. For some applications it is still quite useful to interact with them directly.
 
-All indices implement :class:`~kartothek.core.index.IndexBase` which allows the user to interact with the indices in some useful ways.
+All indices implement :class:`~plateau.core.index.IndexBase` which allows the user to interact with the indices in some useful ways.
 
 .. ipython:: python
 
-    from kartothek.api.dataset import IndexBase
+    from plateau.api.dataset import IndexBase
 
     index = IndexBase(column="FieldName", index_dct=index_dct)
 
@@ -39,17 +39,17 @@ All indices implement :class:`~kartothek.core.index.IndexBase` which allows the 
 Partition Indices
 -----------------
 
-The first index type kartothek offers is a partition index. The partition index is created by partitioning a dataset in a hive-like partition scheme.
+The first index type plateau offers is a partition index. The partition index is created by partitioning a dataset in a hive-like partition scheme.
 
 .. ipython:: python
     :suppress:
 
     import string
     import pandas as pd
-    from kartothek.api.dataset import ensure_store
+    from plateau.api.dataset import ensure_store
 
     store = ensure_store("hmemory://")
-    from kartothek.api.dataset import store_dataframes_as_dataset
+    from plateau.api.dataset import store_dataframes_as_dataset
 
 .. ipython:: python
     :okwarning:

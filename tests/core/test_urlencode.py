@@ -2,8 +2,8 @@
 
 from urllib.parse import quote as quote_python
 
-from kartothek.core.urlencode import quote as quote_ktk
-from kartothek.core.urlencode import unquote as unquote_ktk
+from plateau.core.urlencode import quote as quote_ktk
+from plateau.core.urlencode import unquote as unquote_ktk
 
 TEST_STRING = "Test string with lots of special characters !@#$%^&*+=()[]\\{}<>?|'\"-_~`☺✌☕file.par"
 

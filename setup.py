@@ -11,27 +11,22 @@ def get_install_requirements(path):
     return [req for req in content.split("\n") if req != "" and not req.startswith("#")]
 
 
-def setup_package():
-    setup(
-        name="kartothek",
-        author="Blue Yonder GmbH",
-        install_requires=get_install_requirements("requirements.txt"),
-        tests_require=get_install_requirements("test-requirements.txt"),
-        packages=find_packages(exclude=["tests*"]),
-        classifiers=[
-            "Development Status :: 5 - Production/Stable",
-            "Programming Language :: Python",
-            "Programming Language :: Python :: 3",
-            "Programming Language :: Python :: 3.6",
-            "Programming Language :: Python :: 3.7",
-            "Programming Language :: Python :: 3.8",
-        ],
-        use_scm_version=True,
-        long_description=open("README.md", "r").read(),
-        long_description_content_type="text/markdown",
-        python_requires=">=3.6",
-    )
-
-
-if __name__ == "__main__":
-    setup_package()
+setup(
+    name="plateau",
+    author="data engineering collective",
+    install_requires=get_install_requirements("requirements.txt"),
+    tests_require=get_install_requirements("test-requirements.txt"),
+    packages=find_packages(exclude=["tests*"]),
+    classifiers=[
+        "Development Status :: 5 - Production/Stable",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+    ],
+    use_scm_version=True,
+    long_description=open("README.md", "r").read(),
+    long_description_content_type="text/markdown",
+    python_requires=">=3.6",
+)

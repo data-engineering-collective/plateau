@@ -9,14 +9,14 @@ import pytest
 import storefact
 from pyarrow.parquet import ParquetFile
 
-from kartothek.serialization import DataFrameSerializer, ParquetSerializer
-from kartothek.serialization._parquet import (
+from plateau.serialization import DataFrameSerializer, ParquetSerializer
+from plateau.serialization._parquet import (
     MAX_NB_RETRIES,
     ParquetReadError,
     _predicate_accepts,
     _reset_dictionary_columns,
 )
-from kartothek.serialization._util import _check_contains_null
+from plateau.serialization._util import _check_contains_null
 
 
 @pytest.fixture
@@ -46,7 +46,7 @@ def chunk_size(request, mocker):
         # Test for a chunk size of one and mock the filter_df call. This way we can ensure that
         # the predicate for IO is properly evaluated and pushed down
         mocker.patch(
-            "kartothek.serialization._parquet.filter_df",
+            "plateau.serialization._parquet.filter_df",
             new=lambda x, *args, **kwargs: x,
         )
     return chunk_size
@@ -465,7 +465,7 @@ def test_reset_dict_cols(store):
 
 def test_retry_on_IOError(monkeypatch, caplog, store):
     """
-    See https://github.com/JDASoftwareGroup/kartothek/issues/407 :
+    See https://github.com/JDASoftwareGroup/plateau/issues/407 :
     We are testing a retry-workaround for the above issue here. Once the issue is resolved,
     this test and the workaround can be removed.
     """
@@ -496,7 +496,7 @@ def test_retry_on_IOError(monkeypatch, caplog, store):
 
 def test_retries_on_IOError_logs(monkeypatch, caplog, store):
     """
-    See https://github.com/JDASoftwareGroup/kartothek/issues/407 :
+    See https://github.com/JDASoftwareGroup/plateau/issues/407 :
     We are testing a retry-workaround for the above issue here. Once the issue is resolved,
     this test and the workaround can be removed.
     """
@@ -522,7 +522,7 @@ def test_retries_on_IOError_logs(monkeypatch, caplog, store):
 
 def test_retry_fail_on_other_error(monkeypatch, caplog, store):
     """
-    See https://github.com/JDASoftwareGroup/kartothek/issues/407 :
+    See https://github.com/JDASoftwareGroup/plateau/issues/407 :
     We are testing a retry-workaround for the above issue here. Once the issue is resolved,
     this test and the workaround can be removed.
 

@@ -6,10 +6,10 @@ import uuid
 
 from storefact import get_store_from_url
 
-from kartothek.core.common_metadata import make_meta
-from kartothek.core.testing import get_dataframe_alltypes
-from kartothek.io_components.metapartition import MetaPartition
-from kartothek.io_components.write import (
+from plateau.core.common_metadata import make_meta
+from plateau.core.testing import get_dataframe_alltypes
+from plateau.io_components.metapartition import MetaPartition
+from plateau.io_components.write import (
     persist_common_metadata,
     store_dataset_from_partitions,
 )

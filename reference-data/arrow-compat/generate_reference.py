@@ -4,8 +4,8 @@ import os
 import pyarrow as pa
 from storefact import get_store_from_url
 
-from kartothek.core.testing import get_dataframe_alltypes
-from kartothek.serialization import ParquetSerializer
+from plateau.core.testing import get_dataframe_alltypes
+from plateau.serialization import ParquetSerializer
 
 if __name__ == "__main__":
     ser = ParquetSerializer()

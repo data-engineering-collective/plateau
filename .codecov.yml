@@ -7,5 +7,5 @@ coverage:
         threshold: 0.1
 
 ignore:
-  - kartothek/io/testing/*
-  - kartothek/core/_deprecation.py
+  - plateau/io/testing/*
+  - plateau/core/_deprecation.py

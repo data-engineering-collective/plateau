@@ -8,8 +8,8 @@ import datetime
 import numpy as np
 import pandas as pd
 
-from kartothek.core.common_metadata import make_meta
-from kartothek.io_components.metapartition import MetaPartition
+from plateau.core.common_metadata import make_meta
+from plateau.io_components.metapartition import MetaPartition
 
 from .config import AsvBenchmarkConfig
 

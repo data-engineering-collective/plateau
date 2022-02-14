@@ -5,7 +5,7 @@ import pandas as pd
 import pytest
 from pandas import testing as pdt
 
-from kartothek.serialization import filter_array_like, filter_df_from_predicates
+from plateau.serialization import filter_array_like, filter_df_from_predicates
 
 
 @pytest.fixture(

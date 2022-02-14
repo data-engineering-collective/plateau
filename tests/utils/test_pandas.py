@@ -4,7 +4,7 @@ import pandas as pd
 import pandas.testing as pdt
 import pytest
 
-from kartothek.utils.pandas import (
+from plateau.utils.pandas import (
     aggregate_to_lists,
     concat_dataframes,
     drop_sorted_duplicates_keep_last,

@@ -8,8 +8,8 @@ from collections import OrderedDict
 import pandas as pd
 import pandas.testing as pdt
 
-from kartothek.core.dataset import DatasetMetadata
-from kartothek.core.index import ExplicitSecondaryIndex
+from plateau.core.dataset import DatasetMetadata
+from plateau.core.index import ExplicitSecondaryIndex
 
 
 def test_dataset_get_indices_as_dataframe_partition_keys_only(

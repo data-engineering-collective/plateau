@@ -10,11 +10,11 @@ import pyarrow.parquet as pq
 import pytest
 import simplejson
 
-import kartothek.core._zmsgpack as msgpack
-from kartothek.core.common_metadata import make_meta, store_schema_metadata
-from kartothek.core.dataset import DatasetMetadata
-from kartothek.core.index import ExplicitSecondaryIndex, PartitionIndex
-from kartothek.core.testing import cm_frozen_time
+import plateau.core._zmsgpack as msgpack
+from plateau.core.common_metadata import make_meta, store_schema_metadata
+from plateau.core.dataset import DatasetMetadata
+from plateau.core.index import ExplicitSecondaryIndex, PartitionIndex
+from plateau.core.testing import cm_frozen_time
 
 # Basic functionality tests.
 #
@@ -98,7 +98,7 @@ def test_raise_multitable(metadata_version):
 
     with pytest.raises(
         RuntimeError,
-        match=r"Dataset uuid has tables.*but read support for multi tabled dataset was dropped with kartothek 4\.0\.",
+        match=r"Dataset uuid has tables.*but read support for multi tabled dataset was dropped with plateau 4\.0\.",
     ):
         DatasetMetadata.from_dict(expected)
 

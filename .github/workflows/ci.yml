@@ -89,19 +89,19 @@ jobs:
       - name: Conda Install conda-requirements.txt
         # run this AFTER pyarrow, since this is less restrictive (so conda doesn't spend too much time downgrading)
         run: mamba install --file=conda-requirements.txt
-      - name: Pip Install kartothek
+      - name: Pip Install plateau
         run: pip install --no-deps .
       - name: Test import
         run: |
-          python -c "import kartothek"
-          python -c "import kartothek.api"
-          python -c "import kartothek.api.dataset"
-          python -c "import kartothek.api.serialization"
-          python -c "import kartothek.core"
-          python -c "import kartothek.io"
-          python -c "import kartothek.io_components"
-          python -c "import kartothek.serialization"
-          python -c "import kartothek.utils"
+          python -c "import plateau"
+          python -c "import plateau.api"
+          python -c "import plateau.api.dataset"
+          python -c "import plateau.api.serialization"
+          python -c "import plateau.core"
+          python -c "import plateau.io"
+          python -c "import plateau.io_components"
+          python -c "import plateau.serialization"
+          python -c "import plateau.utils"
       - name: Conda install test requirements
         run: mamba install
               -c conda-forge
@@ -134,7 +134,7 @@ jobs:
       - name: Codecov
         uses: codecov/codecov-action@v2.1.0
         with:
-          # NOTE: `token` is not required, because the kartothek repo is public
+          # NOTE: `token` is not required, because the plateau repo is public
           file: ./coverage.xml
           name: pytest-numfocus_nightly_${{ matrix.numfocus_nightly }}-os_${{ matrix.os }}-pyarrow_${{ matrix.pyarrow }}-python_${{ matrix.python }}
 
@@ -157,7 +157,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
-          release_name: Kartothek ${{ github.ref }}
+          release_name: plateau ${{ github.ref }}
           body_path: release_notes.md
           draft: false
           prerelease: false

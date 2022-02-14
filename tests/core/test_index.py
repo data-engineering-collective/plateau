@@ -14,8 +14,8 @@ import pytz
 from hypothesis import assume, given
 from pandas.testing import assert_series_equal
 
-from kartothek.core.index import ExplicitSecondaryIndex, IndexBase, merge_indices
-from kartothek.core.testing import get_numpy_array_strategy
+from plateau.core.index import ExplicitSecondaryIndex, IndexBase, merge_indices
+from plateau.core.testing import get_numpy_array_strategy
 
 
 @pytest.mark.parametrize("inplace", [True, False])
@@ -591,7 +591,7 @@ def test_index_normalize_during_init_warn_collision(collision, caplog):
     warn = [
         t[2]
         for t in caplog.record_tuples
-        if t[0] == "kartothek.core.index" and t[1] == logging.WARN
+        if t[0] == "plateau.core.index" and t[1] == logging.WARN
     ]
 
     if collision:

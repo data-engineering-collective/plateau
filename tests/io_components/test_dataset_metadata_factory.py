@@ -5,7 +5,7 @@ from functools import partial
 import pytest
 from simplekv import KeyValueStore
 
-from kartothek.core.factory import DatasetFactory
+from plateau.core.factory import DatasetFactory
 
 
 class CountStore(KeyValueStore):

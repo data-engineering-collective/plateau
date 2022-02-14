@@ -2,9 +2,14 @@
 Changelog
 =========
 
+plateau 4.0.4 (2022-02-XX)
+==========================
+
+* Fork and rename the project as `plateau` (flat files, flat land).
 
 Kartothek 4.0.3 (2021-06-10)
 ============================
+
 * Pin dask to not use 2021.5.1 and 2020.6.0 (#475)
 
 Kartothek 4.0.2 (2021-06-07)
@@ -27,13 +32,13 @@ This is a major release of kartothek with breaking API changes.
 * Removal of complex user input (see gh427)
 * Removal of multi table feature
 * Removal of `kartothek.io.merge` module
-* class :class:`~kartothek.core.dataset.DatasetMetadata` now has an attribute called `schema` which replaces the previous attribute `table_meta` and returns only a single schema
+* class ``kartothek.core.dataset.DatasetMetadata`` now has an attribute called `schema` which replaces the previous attribute `table_meta` and returns only a single schema
 * All outputs which previously returned a sequence of dictionaries where each key-value pair would correspond to a table-data pair now returns only one :class:`pandas.DataFrame`
 * All read pipelines will now automatically infer the table to read such that it is no longer necessary to provide `table` or `table_name` as an input argument
 * All writing pipelines which previously supported a complex user input type now expose an argument `table_name` which can be used to continue usage of legacy datasets (i.e. datasets with an intrinsic, non-trivial table name). This usage is discouraged and we recommend users to migrate to a default table name (i.e. leave it None / `table`)
 * All pipelines which previously accepted an argument `tables` to select the subset of tables to load no longer accept this keyword. Instead the to-be-loaded table will be inferred
 * Trying to read a multi-tabled dataset will now cause an exception telling users that this is no longer supported with kartothek 4.0
-* The dict schema for :meth:`~kartothek.core.dataset.DatasetMetadataBase.to_dict` and :meth:`~kartothek.core.dataset.DatasetMetadata.from_dict` changed replacing a dictionary in `table_meta` with the simple `schema`
+* The dict schema for ``kartothek.core.dataset.DatasetMetadataBase.to_dict`` and ``kartothek.core.dataset.DatasetMetadata.from_dict`` changed replacing a dictionary in `table_meta` with the simple `schema`
 * All pipeline arguments which previously accepted a dictionary of sequences to describe a table specific subset of columns now accept plain sequences (e.g. `columns`, `categoricals`)
 * Remove the following list of deprecated arguments for io pipelines
   * label_filter
@@ -41,13 +46,13 @@ This is a major release of kartothek with breaking API changes.
   * load_dynamic_metadata
   * load_dataset_metadata
   * concat_partitions_on_primary_index
-* Remove `output_dataset_uuid` and `df_serializer` from :func:`kartothek.io.eager.commit_dataset` since these arguments didn't have any effect
-* Remove `metadata`, `df_serializer`, `overwrite`, `metadata_merger` from :func:`kartothek.io.eager.write_single_partition`
-* :func:`~kartothek.io.eager.store_dataframes_as_dataset` now requires a list as an input
+* Remove `output_dataset_uuid` and `df_serializer` from ``kartothek.io.eager.commit_dataset`` since these arguments didn't have any effect
+* Remove `metadata`, `df_serializer`, `overwrite`, `metadata_merger` from ``kartothek.io.eager.write_single_partition``
+* ``kartothek.io.eager.store_dataframes_as_dataset`` now requires a list as an input
 * Default value for argument `date_as_object` is now universally set to ``True``. The behaviour for `False` will be deprecated and removed in the next major release
-* No longer allow to pass `delete_scope` as a delayed object to :func:`~kartothek.io.dask.dataframe.update_dataset_from_ddf`
-* :func:`~kartothek.io.dask.dataframe.update_dataset_from_ddf` and :func:`~kartothek.io.dask.dataframe.store_dataset_from_ddf` now return a `dd.core.Scalar` object. This enables all `dask.DataFrame` graph optimizations by default.
-* Remove argument `table_name` from :func:`~kartothek.io.dask.dataframe.collect_dataset_metadata`
+* No longer allow to pass `delete_scope` as a delayed object to ``kartothek.io.dask.dataframe.update_dataset_from_ddf``
+* ``kartothek.io.dask.dataframe.update_dataset_from_ddf`` and :func:``kartothek.io.dask.dataframe.store_dataset_from_ddf`` now return a `dd.core.Scalar` object. This enables all `dask.DataFrame` graph optimizations by default.
+* Remove argument `table_name` from ``kartothek.io.dask.dataframe.collect_dataset_metadata``
 
 
 Version 3.20.0 (2021-03-15)
@@ -55,13 +60,13 @@ Version 3.20.0 (2021-03-15)
 
 This will be the final release in the 3.X series. Please ensure your existing
 codebase does not raise any DeprecationWarning from kartothek and migrate your
-import paths ahead of time to the new :mod:`kartothek.api` modules to ensure a
+import paths ahead of time to the new ``kartothek.api`` modules to ensure a
 smooth migration to 4.X.
 
-* Introduce :mod:`kartothek.api` as the public definition of the API. See also :doc:`versioning`.
+* Introduce ``kartothek.api`` as the public definition of the API. See also :doc:`versioning`.
 * Introduce `DatasetMetadataBase.schema` to prepare deprecation of `table_meta`
-* :func:`~kartothek.io.eager.read_dataset_as_dataframes` and
-  :func:`~kartothek.io.iter.read_dataset_as_dataframes__iterator` now correctly return
+* ``kartothek.io.eager.read_dataset_as_dataframes`` and
+  ``kartothek.io.iter.read_dataset_as_dataframes__iterator`` now correctly return
   categoricals as requested for misaligned categories.
 
 
@@ -69,7 +74,7 @@ Version 3.19.1 (2021-02-24)
 ===========================
 
 * Allow ``pyarrow==3`` as a dependency.
-* Fix a bug in :func:`~kartothek.io_components.utils.align_categories` for dataframes
+* Fix a bug in ``kartothek.io_components.utils.align_categories`` for dataframes
   with missings and of non-categorical dtype.
 * Fix an issue with the cube index validation introduced in v3.19.0 (#413).
 
@@ -81,8 +86,8 @@ Version 3.19.0 (2021-02-12)
   dask.dataframe might not update all secondary indices, resulting in a corrupt
   state after the update
 * Expose compression type and row group chunk size in Cube interface via optional
-  parameter of type :class:`~kartothek.serialization.ParquetSerializer`.
-* Add retries to  :func:`~kartothek.serialization._parquet.ParquetSerializer.restore_dataframe`
+  parameter of type ``kartothek.serialization.ParquetSerializer``.
+* Add retries to ``kartothek.serialization._parquet.ParquetSerializer.restore_dataframe``
   IOErrors on long running ktk + dask tasks have been observed. Until the root cause is fixed,
   the serialization is retried to gain more stability.
 
@@ -90,8 +95,8 @@ Version 3.18.0 (2021-01-25)
 ===========================
 
 * Add ``cube.suppress_index_on`` to switch off the default index creation for dimension columns
-* Fixed the import issue of zstd module for `kartothek.core _zmsgpack`.
-* Fix a bug in `kartothek.io_components.read.dispatch_metapartitions_from_factory` where
+* Fixed the import issue of zstd module for ``kartothek.core _zmsgpack``.
+* Fix a bug in ``kartothek.io_components.read.dispatch_metapartitions_from_factory`` where
   `dispatch_by=[]` would be treated like `dispatch_by=None`, not merging all dataset partitions into
   a single partitions.
 
@@ -121,18 +126,18 @@ Version 3.17.0 (2020-11-23)
 Improvements
 ^^^^^^^^^^^^
 * Improve performance for "in" predicate literals using long object lists as values
-* :func:`~kartothek.io.eager.commit_dataset` now allows to modify the user
+* ``kartothek.io.eager.commit_dataset`` now allows to modify the user
   metadata without adding new data.
 
 Bugfixes
 ^^^^^^^^
-* Fix an issue where :func:`~kartothek.io.dask.dataframe.collect_dataset_metadata` would return
+* Fix an issue where ``kartothek.io.dask.dataframe.collect_dataset_metadata`` would return
   improper rowgroup statistics
-* Fix an issue where :func:`~kartothek.io.dask.dataframe.collect_dataset_metadata` would execute
+* Fix an issue where ``kartothek.io.dask.dataframe.collect_dataset_metadata`` would execute
   ``get_parquet_metadata`` at graph construction time
-* Fix a bug in `kartothek.io.eager_cube.remove_partitions` where all partitions were removed
+* Fix a bug in ``kartothek.io.eager_cube.remove_partitions`` where all partitions were removed
   instead of non at all.
-* Fix a bug in :meth:`~kartothek.core.dataset.DatasetMetadataBase.get_indices_as_dataframe` which would
+* Fix a bug in ``kartothek.core.dataset.DatasetMetadataBase.get_indices_as_dataframe`` which would
   raise an ``IndexError`` if indices were empty or had not been loaded
 
 Version 3.16.0 (2020-09-29)
@@ -157,15 +162,15 @@ Version 3.15.0 (2020-09-28)
 
 New functionality
 ^^^^^^^^^^^^^^^^^
-* Add :func:`~kartothek.io.dask.dataframe.store_dataset_from_ddf` to offer write
+* Add ``kartothek.io.dask.dataframe.store_dataset_from_ddf`` to offer write
   support of a dask dataframe without update support. This forbids or explicitly
   allows overwrites and does not update existing datasets.
 * The ``sort_partitions_by`` feature now supports multiple columns. While this
   has only marginal effect for predicate pushdown, it may be used to improve the
   parquet compression.
 * ``build_cube_from_dataframe`` now supports the ``shuffle`` methods offered by
-  :func:`~kartothek.io.dask.dataframe.store_dataset_from_ddf` and
-  :func:`~kartothek.io.dask.dataframe.update_dataset_from_ddf` but writes the
+  ``kartothek.io.dask.dataframe.store_dataset_from_ddf`` and
+  ``kartothek.io.dask.dataframe.update_dataset_from_ddf`` but writes the
   output in the cube format
 
 Improvements
@@ -219,7 +224,7 @@ Version 3.11.0 (2020-07-15)
 New functionality
 ^^^^^^^^^^^^^^^^^
 
-* Add :meth:`~kartothek.io_components.metapartition.MetaPartition.get_parquet_metadata` and :func:`~kartothek.io.dask.dataframe.collect_dataset_metadata`, enabling users to collect information about the Parquet metadata of a dataset (#306)
+* Add ``kartothek.io_components.metapartition.MetaPartition.get_parquet_metadata`` and ``kartothek.io.dask.dataframe.collect_dataset_metadata``, enabling users to collect information about the Parquet metadata of a dataset (#306)
 
 Bug fixes
 ^^^^^^^^^
@@ -239,7 +244,7 @@ Improvements
 Bug fixes
 ^^^^^^^^^
 
-* Ensure that the empty (sentinel) DataFrame used in :func:`~kartothek.io.eager.read_table`
+* Ensure that the empty (sentinel) DataFrame used in `kartothek.io.eager.read_table``
   also has the correct behaviour when using the ``categoricals`` argument.
 
 
@@ -258,14 +263,14 @@ Improvements
 ^^^^^^^^^^^^
 * Arrow 0.17.X support
 * Significant performance improvements for shuffle operations in
-  :func:`~kartothek.io.dask.dataframe.update_dataset_from_ddf`
+  ``kartothek.io.dask.dataframe.update_dataset_from_ddf``
   for large dask.DataFrames with many payload columns by using in-memory
   compression during the shuffle operation.
-* Allow calling :func:`~kartothek.io.dask.dataframe.update_dataset_from_ddf`
+* Allow calling ``kartothek.io.dask.dataframe.update_dataset_from_ddf``
   without `partition_on` when `shuffle=True`.
-* :func:`~kartothek.io.dask.dataframe.read_dataset_as_ddf` supports kwarg ``dispatch_by``
+* ``kartothek.io.dask.dataframe.read_dataset_as_ddf`` supports kwarg ``dispatch_by``
   to control the internal partitioning structure when creating a dataframe.
-* :func:`~kartothek.io.dask.dataframe.read_dataset_as_ddf` and :func:`~kartothek.io.dask.dataframe.update_dataset_from_ddf`
+* ``kartothek.io.dask.dataframe.read_dataset_as_ddf`` and ``kartothek.io.dask.dataframe.update_dataset_from_ddf``
   now allow the keyword ``table`` to be optional, using the default SINGLE_TABLE identifier.
   (recommended since the multi table dataset support is in sunset).
 
@@ -308,7 +313,7 @@ Improvements
 ^^^^^^^^^^^^
 
 * Add keyword argument `dask_index_on` which reconstructs a dask index from an kartothek index when loading the dataset
-* Add method :func:`~kartothek.core.index.IndexBase.observed_values` which returns an array of all observed values of the index column
+* Add method ``kartothek.core.index.IndexBase.observed_values`` which returns an array of all observed values of the index column
 * Updated and improved documentation w.r.t. guides and API documentation
 
 Bug fixes
@@ -318,7 +323,7 @@ Bug fixes
 * No longer trigger the SettingWithCopyWarning when using bucketing
 * GH228 Fix an issue where empty header creation from a pyarrow schema would not
   normalize the schema which causes schema violations during update.
-* Fix an issue where :func:`~kartothek.io.eager.create_empty_dataset_header`
+* Fix an issue where ``kartothek.io.eager.create_empty_dataset_header``
   would not accept a store factory.
 
 
@@ -332,13 +337,13 @@ Improvements
 * Decrease scheduling overhead for dask based pipelines
 * Performance improvements for categorical data when using pyarrow>=0.15.0
 * Dask is now able to calculate better size estimates for the following classes:
-    * :class:`~kartothek.core.dataset.DatasetMetadata`
-    * :class:`~kartothek.core.factory.DatasetFactory`
-    * :class:`~kartothek.io_components.metapartition.MetaPartition`
-    * :class:`~kartothek.core.index.ExplicitSecondaryIndex`
-    * :class:`~kartothek.core.index.PartitionIndex`
-    * :class:`~kartothek.core.partition.Partition`
-    * :class:`~kartothek.core.common_metadata.SchemaWrapper`
+    * ``kartothek.core.dataset.DatasetMetadata``
+    * ``kartothek.core.factory.DatasetFactory``
+    * ``kartothek.io_components.metapartition.MetaPartition``
+    * ``kartothek.core.index.ExplicitSecondaryIndex``
+    * ``kartothek.core.index.PartitionIndex``
+    * ``kartothek.core.partition.Partition``
+    * ``kartothek.core.common_metadata.SchemaWrapper``
 
 
 Version 3.6.2 (2019-12-17)
@@ -347,11 +352,11 @@ Version 3.6.2 (2019-12-17)
 Improvements
 ^^^^^^^^^^^^
 
-* Add more explicit typing to :mod:`kartothek.io.eager`.
+* Add more explicit typing to ``kartothek.io.eager``.
 
 Bug fixes
 ^^^^^^^^^
-* Fix an issue where :func:`~kartothek.io.dask.dataframe.update_dataset_from_ddf` would create a column named "_KTK_HASH_BUCKET" in the dataset
+* Fix an issue where ``kartothek.io.dask.dataframe.update_dataset_from_ddf`` would create a column named "_KTK_HASH_BUCKET" in the dataset
 
 
 Version 3.6.1 (2019-12-11)
@@ -367,7 +372,7 @@ Version 3.6.0 (2019-12-03)
 
 New functionality
 ^^^^^^^^^^^^^^^^^
-- The partition on shuffle algorithm in :func:`~kartothek.io.dask.dataframe.update_dataset_from_ddf` now supports
+- The partition on shuffle algorithm in ``kartothek.io.dask.dataframe.update_dataset_from_ddf`` now supports
   producing deterministic buckets based on hashed input data.
 
 Bug fixes
@@ -379,8 +384,8 @@ Bug fixes
 Version 3.5.1 (2019-10-25)
 ==========================
 - Fix potential ``pyarrow.lib.ArrowNotImplementedError`` when trying to store or pickle empty
-  :class:`~kartothek.core.index.ExplicitSecondaryIndex` objects
-- Fix pickling of :class:`~kartothek.core.index.ExplicitSecondaryIndex` unloaded in
+  ``kartothek.core.index.ExplicitSecondaryIndex`` objects
+- Fix pickling of ``kartothek.core.index.ExplicitSecondaryIndex`` unloaded in
   `dispatch_metapartitions_from_factory`
 
 
@@ -390,14 +395,14 @@ Version 3.5.0 (2019-10-21)
 New functionality
 ^^^^^^^^^^^^^^^^^
 - Add support for pyarrow 0.15.0
-- Additional functions in `kartothek.serialization` module for dealing with predicates
-  * :func:`~kartothek.serialization.check_predicates`
-  * :func:`~kartothek.serialization.filter_predicates_by_column`
-  * :func:`~kartothek.serialization.columns_in_predicates`
+- Additional functions in ``kartothek.serialization`` module for dealing with predicates
+  * ``kartothek.serialization.check_predicates``
+  * ``kartothek.serialization.filter_predicates_by_column``
+  * ``kartothek.serialization.columns_in_predicates``
 - Added available types for type annotation when dealing with predicates
-  * `~kartothek.serialization.PredicatesType`
-  * `~kartothek.serialization.ConjunctionType`
-  * `~kartothek.serialization.LiteralType`
+  * ``kartothek.serialization.PredicatesType``
+  * ``kartothek.serialization.ConjunctionType``
+  * ``kartothek.serialization.LiteralType``
 - Make ``kartothek.io.*read_table*`` methods use default table name if unspecified
 - ``MetaPartition.parse_input_to_metapartition`` accepts dicts and list of tuples equivalents as ``obj`` input
 - Added `secondary_indices` as a default argument to the `write` pipelines
@@ -408,7 +413,7 @@ Bug fixes
 - ``MetaPartition.load_dataframes`` now raises if table in ``columns`` argument doesn't exist
 - require ``urlquote>=1.1.0`` (where ``urlquote.quoting`` was introduced)
 - Improve performance for some cases where predicates are used with the `in` operator.
-- Correctly preserve :class:`~kartothek.core.index.ExplicitSecondaryIndex` dtype when index is empty
+- Correctly preserve :class:``kartothek.core.index.ExplicitSecondaryIndex`` dtype when index is empty
 - Fixed DeprecationWarning in pandas ``CategoricalDtype``
 - Fixed broken docstring for `store_dataframes_as_dataset`
 - Internal operations no longer perform schema validations. This will improve
@@ -434,7 +439,7 @@ Version 3.4.0 (2019-09-17)
 
 Version 3.3.0 (2019-08-15)
 ==========================
-- Fix rejection of bool predicates in :func:`~kartothek.serialization.filter_array_like` when bool columns contains
+- Fix rejection of bool predicates in ``kartothek.serialization.filter_array_like`` when bool columns contains
   ``None``
 - Streamline behavior of `store_dataset_from_ddf` when passing empty ddf.
 - Fix an issue where a segmentation fault may be raised when comparing MetaPartition instances
@@ -445,21 +450,21 @@ Version 3.2.0 (2019-07-25)
 ==========================
 - Fix gh:66 where predicate pushdown may evalute false results if evaluated
   using improper types. The behavior now is to raise in these situations.
-- Predicate pushdown and :func:`~kartothek.serialization.filter_array_like` will now properly handle pandas Categoricals.
-- Add :meth:`~kartothek.io.dask.bag.read_dataset_as_dataframe_bag`
-- Add `kartothek.io.dask.bag.read_dataset_as_metapartitions_bag`
+- Predicate pushdown and ``kartothek.serialization.filter_array_like`` will now properly handle pandas Categoricals.
+- Add ``kartothek.io.dask.bag.read_dataset_as_dataframe_bag``
+- Add ``kartothek.io.dask.bag.read_dataset_as_metapartitions_bag``
 
 
 Version 3.1.1 (2019-07-12)
 ==========================
 
-- make :func:`~kartothek.io.dask.bag.build_dataset_indices__bag` more efficient
-- make :func:`~kartothek.io.eager.build_dataset_indices` more efficient
-- fix pseudo-private :meth:`~kartothek.io_components.read.dispatch_metapartitions` handling of
+- make ``kartothek.io.dask.bag.build_dataset_indices__bag`` more efficient
+- make ``kartothek.io.eager.build_dataset_indices`` more efficient
+- fix pseudo-private ``kartothek.io_components.read.dispatch_metapartitions`` handling of
   ``concat_partitions_on_primary_index``
-- fix internal errors if querying (e.g. via :meth:`~kartothek.io.eager.read_dataset_as_dataframes`) with
+- fix internal errors if querying (e.g. via ``kartothek.io.eager.read_dataset_as_dataframes``) with
   ``datetime.date`` predicates that use the dataset index; this affects all code paths using
-  :meth:`~kartothek.io_components.metapartition.MetaPartition.load_dataframes`
+  ``kartothek.io_components.metapartition.MetaPartition.load_dataframes``
 
 
 Version 3.1.0 (2019-07-10)
@@ -470,17 +475,17 @@ Version 3.1.0 (2019-07-10)
 - remove ``funcsigs`` requirement
 - Implement reference ``io.eager`` implementation, adding the functions:
 
-    - :meth:`~kartothek.io.eager.garbage_collect_dataset`
-    - :meth:`~kartothek.io.eager.build_dataset_indices`
-    - :meth:`~kartothek.io.eager.update_dataset_from_dataframes`
+    - ``kartothek.io.eager.garbage_collect_dataset``
+    - ``kartothek.io.eager.build_dataset_indices``
+    - ``kartothek.io.eager.update_dataset_from_dataframes``
 
 - fix ``_apply_partition_key_predicates`` ``FutureWarning``
-- serialize :class:`~kartothek.core.index.ExplicitSecondaryIndex` to parquet
+- serialize ``kartothek.core.index.ExplicitSecondaryIndex`` to parquet
 - improve messages for schema violation errors
 - Ensure binary column names are read as type ``str``:
 
-    - Ensure dataframe columns are of type ``str`` in :func:`~kartothek.core.common_metadata.empty_dataframe_from_schema`
-    - Testing: create :func:`~kartothek.io.testing.read.test_binary_column_metadata` which checks column names stored as
+    - Ensure dataframe columns are of type ``str`` in ``kartothek.core.common_metadata.empty_dataframe_from_schema``
+    - Testing: create ``kartothek.io.testing.read.test_binary_column_metadata`` which checks column names stored as
       ``bytes`` objects are read as type ``str``
 
 - fix issue where it was possible to add an index to an existing dataset by using update functions and partition indices
@@ -488,20 +493,20 @@ Version 3.1.0 (2019-07-10)
 
 - fix issue where unreferenced files were not being removed when deleting an entire dataset
 
-- support nested :class:`~kartothek.io_components.metapartition.MetaPartition`
-  in :meth:`~kartothek.io_components.metapartition.MetaPartition.add_metapartition`.
+- support nested ``kartothek.io_components.metapartition.MetaPartition``
+  in ``kartothek.io_components.metapartition.MetaPartition.add_metapartition``.
   This fixes issue https://github.com/JDASoftwareGroup/kartothek/issues/40 .
 
-- Add :meth:`~kartothek.io.dask.bag.build_dataset_indices__bag`
+- Add ``kartothek.io.dask.bag.build_dataset_indices__bag``
 
-- Return `dask.bag.Item` object from :meth:`~kartothek.io.dask.bag.store_bag_as_dataset` to avoid misoptimization
+- Return `dask.bag.Item` object from ``kartothek.io.dask.bag.store_bag_as_dataset`` to avoid misoptimization
 
 **Breaking:**
 
-- categorical normalization was moved from :meth:`~kartothek.core.common_metadata.make_meta` to
-  :meth:`~kartothek.core.common_metadata.normalize_type`.
-- :meth:`kartothek.core.common_metadata.SchemaWrapper.origin` is now a set of of strings instead of a single string
-- ``Partition.from_v2_dict`` was removed, use :meth:`kartothek.core.partition.Partition.from_dict` instead
+- categorical normalization was moved from ``kartothek.core.common_metadata.make_meta`` to
+  ``kartothek.core.common_metadata.normalize_type``.
+- ``kartothek.core.common_metadata.SchemaWrapper.origin`` is now a set of of strings instead of a single string
+- ``Partition.from_v2_dict`` was removed, use ``kartothek.core.partition.Partition.from_dict`` instead
 
 
 Version 3.0.0 (2019-05-02)

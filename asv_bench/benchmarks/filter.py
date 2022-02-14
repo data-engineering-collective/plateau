@@ -1,8 +1,5 @@
-from kartothek.serialization._generic import (
-    filter_array_like,
-    filter_df_from_predicates,
-)
-from kartothek.serialization.testing import get_dataframe_not_nested
+from plateau.serialization._generic import filter_array_like, filter_df_from_predicates
+from plateau.serialization.testing import get_dataframe_not_nested
 
 
 class TimeFilterDF:

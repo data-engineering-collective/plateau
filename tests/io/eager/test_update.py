@@ -3,13 +3,13 @@ import pandas as pd
 import pyarrow as pa
 import pytest
 
-from kartothek.io.eager import (
+from plateau.io.eager import (
     commit_dataset,
     create_empty_dataset_header,
     update_dataset_from_dataframes,
     write_single_partition,
 )
-from kartothek.io.testing.update import *  # noqa: F40
+from plateau.io.testing.update import *  # noqa: F40
 
 
 @pytest.fixture()

@@ -4,7 +4,7 @@
 Partitioning
 ============
 
-As we have already seen, writing data in Kartothek amounts to writing
+As we have already seen, writing data in plateau amounts to writing
 partitions, which in the underlying key-value store translates to writing files
 to the storage layer in a structured manner.
 
@@ -13,7 +13,7 @@ of written data didn't require reading through an entire dataset to be able to
 identify and access the required subset. This is where *explicitly* partitioning by
 table columns helps.
 
-Kartothek is designed primarily for storing large datasets consistently. One way
+plateau is designed primarily for storing large datasets consistently. One way
 to do this is to structure the data well, this can be done by
 explicitly partitioning the dataset by select columns.
 
@@ -22,7 +22,7 @@ which makes reading as well as mutating (replacing or deleting) subsets of data 
 more efficient as only a select amount of files need to be read.
 
 To see explicit partitioning in action, let's set up some data and a storage location
-first and store the data there with Kartothek:
+first and store the data there with plateau:
 
 .. ipython:: python
 
@@ -32,7 +32,7 @@ first and store the data there with Kartothek:
     from tempfile import TemporaryDirectory
     from storefact import get_store_from_url
 
-    from kartothek.api.dataset import store_dataframes_as_dataset
+    from plateau.api.dataset import store_dataframes_as_dataset
 
     dataset_dir = TemporaryDirectory()
 
@@ -56,7 +56,7 @@ first and store the data there with Kartothek:
     df
 
 
-Kartothek allows users to explicitly partition their data by the values of table
+plateau allows users to explicitly partition their data by the values of table
 columns such that, for a given input partition, all the rows with the same value of the
 column all get written to the same partition. To do this, we use the
 ``partition_on`` keyword argument:
@@ -105,7 +105,7 @@ can be read as just the 2 logical partitions by using the argument
 ``dispatch_by=["E", "F"]`` at reading time).
 
 
-As noted above, when data is appended to a dataset, Kartothek guarantees it has
+As noted above, when data is appended to a dataset, plateau guarantees it has
 the proper schema and partitioning.
 
 The order of columns provided in ``partition_on`` is important, as the partition
@@ -126,7 +126,7 @@ number of physical input partitions.
 
     import dask.dataframe as dd
     import numpy as np
-    from kartothek.api.dataset import update_dataset_from_ddf
+    from plateau.api.dataset import update_dataset_from_ddf
 
     df = pd.DataFrame(
         {

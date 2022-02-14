@@ -1,6 +1,6 @@
 import pytest
 
-from kartothek.serialization import CsvSerializer, ParquetSerializer
+from plateau.serialization import CsvSerializer, ParquetSerializer
 
 
 @pytest.mark.parametrize(

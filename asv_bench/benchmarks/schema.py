@@ -3,12 +3,12 @@
 
 from copy import deepcopy
 
-from kartothek.core.common_metadata import (
+from plateau.core.common_metadata import (
     make_meta,
     validate_compatible,
     validate_shared_columns,
 )
-from kartothek.core.testing import get_dataframe_alltypes
+from plateau.core.testing import get_dataframe_alltypes
 
 from .config import AsvBenchmarkConfig
 

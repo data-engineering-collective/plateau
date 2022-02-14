@@ -1,18 +1,18 @@
 ================================================
-kartothek - manage tabular data in object stores
+plateau - manage tabular data in object stores
 ================================================
 
 :Release: |release|
 :Date: |today|
 
 
-Kartothek is a Python library to manage (create, read, update, delete) large
+plateau is a Python library to manage (create, read, update, delete) large
 amounts of tabular data in a blob store. It stores data as datasets, which
 it presents as pandas DataFrames to the user. Datasets are a collection of
-files with the same schema that reside in a blob store. Kartothek uses a
+files with the same schema that reside in a blob store. plateau uses a
 metadata definition to handle these datasets efficiently. For distributed
-access and manipulation of datasets, Kartothek offers a `Dask
-<https://dask.org>`_ interface (:mod:`kartothek.io.dask`).
+access and manipulation of datasets, plateau offers a `Dask
+<https://dask.org>`_ interface (:mod:`plateau.io.dask`).
 
 Storing data distributed over multiple files in a blob store (S3, ABS, GCS,
 etc.) allows for a fast, cost-efficient and highly scalable data
@@ -20,22 +20,15 @@ infrastructure. A downside of storing data solely in an object store is that the
 storages themselves give little to no guarantees beyond the consistency of a
 single file. In particular, they cannot guarantee the consistency of your
 dataset. If we demand a consistent state of our dataset at all times, we need to
-track the state of the dataset. Kartothek frees us from having to do this
+track the state of the dataset. plateau frees us from having to do this
 manually.
 
-The :mod:`kartothek.io` module provides building blocks to create and modify
-these datasets in data pipelines. Kartothek handles I/O, tracks dataset
+The :mod:`plateau.io` module provides building blocks to create and modify
+these datasets in data pipelines. plateau handles I/O, tracks dataset
 partitions and selects subsets of data transparently.
 
 To get started, have a look at our :doc:`guide/getting_started` guide,
 head to the description of the :doc:`spec/format_specification` or head straight to the API documentation :doc:`api`.
-
-What is a (real) Kartothek?
----------------------------
-
-A Kartothek (or more modern: Zettelkasten/Katalogkasten) is a tool to organize
-(high-level) information extracted from a source of information.
-
 
 .. toctree::
    :maxdepth: 2

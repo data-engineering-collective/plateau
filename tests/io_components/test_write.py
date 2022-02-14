@@ -5,11 +5,11 @@
 import pandas as pd
 import pytest
 
-from kartothek.core.dataset import DatasetMetadata
-from kartothek.core.index import ExplicitSecondaryIndex
-from kartothek.core.testing import TIME_TO_FREEZE_ISO
-from kartothek.io_components.metapartition import MetaPartition
-from kartothek.io_components.write import (
+from plateau.core.dataset import DatasetMetadata
+from plateau.core.index import ExplicitSecondaryIndex
+from plateau.core.testing import TIME_TO_FREEZE_ISO
+from plateau.io_components.metapartition import MetaPartition
+from plateau.io_components.write import (
     raise_if_dataset_exists,
     store_dataset_from_partitions,
 )

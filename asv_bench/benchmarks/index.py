@@ -14,8 +14,8 @@ import pandas as pd
 import pyarrow as pa
 import storefact
 
-from kartothek.core.index import ExplicitSecondaryIndex
-from kartothek.io_components.metapartition import MetaPartition
+from plateau.core.index import ExplicitSecondaryIndex
+from plateau.io_components.metapartition import MetaPartition
 
 from .config import AsvBenchmarkConfig
 

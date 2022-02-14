@@ -4,11 +4,11 @@
 import pytest
 import simplejson
 
-import kartothek.core._zmsgpack as msgpack
-from kartothek.core.dataset import DatasetMetadata, DatasetMetadataBuilder
-from kartothek.core.index import ExplicitSecondaryIndex
-from kartothek.core.partition import Partition
-from kartothek.core.testing import TIME_TO_FREEZE_ISO
+import plateau.core._zmsgpack as msgpack
+from plateau.core.dataset import DatasetMetadata, DatasetMetadataBuilder
+from plateau.core.index import ExplicitSecondaryIndex
+from plateau.core.partition import Partition
+from plateau.core.testing import TIME_TO_FREEZE_ISO
 
 
 @pytest.mark.parametrize("explicit_partitions", [True, False])
