@@ -771,10 +771,10 @@ def _construct_dynamic_index_from_partitions(
     for col, index_dct in _key_indices.items():
         arrow_type = _get_type_from_meta(schema, col, default_dtype)
 
-        # convert defaultdicts into dicts
+        # convert defaultdicts into dicts with deterministically ordered values
         new_indices[col] = PartitionIndex(
             column=col,
-            index_dct={k1: list(v1) for k1, v1 in index_dct.items()},
+            index_dct={k1: sorted(list(v1)) for k1, v1 in index_dct.items()},
             dtype=arrow_type,
         )
     return new_indices
