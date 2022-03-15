@@ -6,6 +6,7 @@ plateau 4.0.4 (2022-02-XX)
 ==========================
 
 * Fork and rename the project as `plateau` (flat files, flat land).
+* Fixed a bug where sometimes data partitions in a `plateau` dataset would be read in a non-deterministic order among Python executions (#23).
 
 Kartothek 4.0.3 (2021-06-10)
 ============================
