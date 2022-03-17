@@ -2,7 +2,7 @@
 Changelog
 =========
 
-Plateau 4.0.4 (2022-03-16)
+Plateau 4.0.4 (2022-03-17)
 ==========================
 
 * Fork and rename the project as `plateau` (flat files, flat land).
