@@ -29,11 +29,11 @@ jobs:
         include:
           - numfocus_nightly: true
             os: "ubuntu-latest"
-            pyarrow: "2.0.0"
+            pyarrow: "4.0.1"
             python: "3.8"
           - numfocus_nightly: false
             os: "macos-latest"
-            pyarrow: "0.17.1"
+            pyarrow: "4.0.1"
             python: "3.8"
     continue-on-error: ${{ matrix.numfocus_nightly || matrix.pyarrow == 'nightly' }}
 
@@ -45,7 +45,7 @@ jobs:
         shell: bash -l {0}
 
     env:
-      IS_MASTER_BUILD: ${{ !matrix.numfocus_nightly && matrix.os == 'ubuntu-latest' && matrix.pyarrow == '0.17.1' && matrix.python == '3.8' }}
+      IS_MASTER_BUILD: ${{ !matrix.numfocus_nightly && matrix.os == 'ubuntu-latest' && matrix.pyarrow == '4.0.1' && matrix.python == '3.8' }}
       IS_TAG: ${{ github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')}}
 
     steps:
