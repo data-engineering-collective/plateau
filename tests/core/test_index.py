@@ -11,7 +11,7 @@ import pandas as pd
 import pyarrow as pa
 import pytest
 import pytz
-from hypothesis import assume, given
+from hypothesis import assume, example, given
 from pandas.testing import assert_series_equal
 
 from plateau.core.index import ExplicitSecondaryIndex, IndexBase, merge_indices
@@ -629,6 +629,23 @@ def test_index_normalize_during_query():
     ],
 )
 @given(index_data=get_numpy_array_strategy(unique=True, sort=True, allow_nan=False))
+@example(
+    index_data=np.array(
+        [
+            b"",
+            b"\x01",
+            b"\x02",
+            b"\x03",
+            b"\x04",
+            b"\x05",
+            b"\x06",
+            b"\x07",
+            b"\x08",
+            b"\t",
+        ],
+        dtype="|S1",
+    )
+)
 def test_eval_operators(index_data, op, value, expected):
     index = ExplicitSecondaryIndex(
         column="col",
