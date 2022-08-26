@@ -170,13 +170,13 @@ measures the scale in digits (therefore :math:`P \ge S`).
 ... })
 >>> schema = pa.Schema.from_pandas(df)
 >>> schema.field("profit_eu").type
-Decimal128Type(decimal(5, 2))
+Decimal128Type(decimal128(5, 2))
 >>> schema.field("reveneu_eu").type
-Decimal128Type(decimal(6, 2))
+Decimal128Type(decimal128(6, 2))
 >>> schema.field("profit_lyd").type
-Decimal128Type(decimal(6, 4))
+Decimal128Type(decimal128(6, 4))
 >>> schema.field("reveneu_lyd").type
-Decimal128Type(decimal(7, 4))
+Decimal128Type(decimal128(7, 4))
 
 As shown, not only the scale changes for various numbers but also the precision is bound to the largest number. While
 the scale-handling makes sense (currencies should not be mixed), the precision-handling is unfortunate and may lead to
