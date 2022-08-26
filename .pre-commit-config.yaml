@@ -1,8 +1,8 @@
 repos:
-  - repo: https://github.com/ambv/black
-    rev: 22.1.0
+  - repo: https://github.com/Quantco/pre-commit-mirrors-black
+    rev: 22.3.0
     hooks:
-      - id: black
+      - id: black-conda
         args:
           - --safe
           - --target-version=py36
@@ -27,9 +27,9 @@ repos:
         additional_dependencies: [toml]
         verbose: true
 
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v0.780
+  - repo: https://github.com/Quantco/pre-commit-mirrors-mypy
+    rev: "0.780"
     hooks:
-    -   id: mypy
-        verbose: true
-        files: plateau
+    - id: mypy-conda
+      verbose: true
+      files: plateau

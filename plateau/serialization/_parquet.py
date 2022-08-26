@@ -221,7 +221,9 @@ class ParquetSerializer(DataFrameSerializer):
                 # Check earlier for missing columns to produce the same error
                 # as we ever did with earlier pyarrow versions
                 if columns is not None:
-                    missing_columns = set(columns) - set(parquet_file.schema.to_arrow_schema().names)
+                    missing_columns = set(columns) - set(
+                        parquet_file.schema.to_arrow_schema().names
+                    )
                     if missing_columns:
                         raise ValueError(
                             "Columns cannot be found in stored dataframe: {missing}".format(
