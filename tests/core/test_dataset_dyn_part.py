@@ -1,6 +1,4 @@
-import os
 import random
-import tempfile
 from urllib.parse import quote
 
 import numpy as np
@@ -305,19 +303,18 @@ def test_dynamic_partitions_quote(store, metadata_version):
     assert dmd_dict["indices"] == expected_indices
 
 
-def test_dask_partitions(metadata_version):
+def test_dask_partitions(metadata_version, tmp_path):
     """
     Create partitions for one table with dask
     and check that it can be read with plateau
     """
     import dask.dataframe
 
-    bucket_dir = tempfile.mkdtemp()
     dataset_uuid = "uuid+namespace-attribute12_underscored"
-    os.mkdir("{}/{}".format(bucket_dir, dataset_uuid))
-    table_dir = "{}/{}/core".format(bucket_dir, dataset_uuid)
-    os.mkdir(table_dir)
-    store = storefact.get_store_from_url("hfs://{}".format(bucket_dir))
+    (tmp_path / dataset_uuid).mkdir()
+    table_path = tmp_path / dataset_uuid / "core"
+    table_path.mkdir()
+    store = storefact.get_store_from_url(f"hfs://{tmp_path}")
 
     locations = ["L-{}".format(i) for i in range(2)]
     df = pd.DataFrame()
@@ -335,7 +332,7 @@ def test_dask_partitions(metadata_version):
         df = pd.concat([df, core])
 
     ddf = dask.dataframe.from_pandas(df, npartitions=1)
-    dask.dataframe.to_parquet(ddf, table_dir, partition_on=["location"])
+    dask.dataframe.to_parquet(ddf, str(table_path), partition_on=["location"])
 
     partition0 = "{}/core/location=L-0/part.0.parquet".format(dataset_uuid)
     partition1 = "{}/core/location=L-1/part.0.parquet".format(dataset_uuid)
