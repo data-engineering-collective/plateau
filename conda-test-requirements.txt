@@ -9,7 +9,6 @@ hypothesis
 pytest>=4.5.0
 pytest-cov
 pytest-mock
-pytest-xdist
 setuptools_scm
 
 # GitHub CI

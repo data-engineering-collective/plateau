@@ -217,6 +217,20 @@ class ParquetSerializer(DataFrameSerializer):
                 reader = BlockBuffer(reader, 4 * 1024 * 1024)
             try:
                 parquet_file = ParquetFile(reader)
+
+                # Check earlier for missing columns to produce the same error
+                # as we ever did with earlier pyarrow versions
+                if columns is not None:
+                    missing_columns = set(columns) - set(
+                        parquet_file.schema.to_arrow_schema().names
+                    )
+                    if missing_columns:
+                        raise ValueError(
+                            "Columns cannot be found in stored dataframe: {missing}".format(
+                                missing=", ".join(sorted(missing_columns))
+                            )
+                        )
+
                 if predicates and parquet_file.metadata.num_rows > 0:
                     # We need to calculate different predicates for predicate
                     # pushdown and the later DataFrame filtering. This is required

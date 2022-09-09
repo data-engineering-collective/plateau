@@ -32,6 +32,10 @@ jobs:
             pyarrow: "4.0.1"
             python: "3.8"
           - numfocus_nightly: false
+            os: "ubuntu-latest"
+            pyarrow: "6.0.1"
+            python: "3.9"
+          - numfocus_nightly: false
             os: "macos-latest"
             pyarrow: "4.0.1"
             python: "3.8"
@@ -116,7 +120,8 @@ jobs:
 
       # Tests
       - name: Pytest
-        run: pytest -n auto --dist loadscope --cov --cov-report xml
+        # FIXME: Add `-n auto` again to allow for parallelism here.
+        run: pytest --cov --cov-report xml
 
       - name: Running benchmarks
         run: |
