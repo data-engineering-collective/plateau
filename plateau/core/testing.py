@@ -3,6 +3,7 @@
 
 import contextlib
 import datetime
+import re
 from datetime import date
 from unittest import mock
 from warnings import catch_warnings, simplefilter
@@ -134,6 +135,18 @@ def get_numpy_array_strategy(
 
     if exclude_dtypes is None or "datetime" not in exclude_dtypes:
         array_strategy = array_strategy.filter(_restrict_datetime_ranges)
+
+    # Don't check for issues with surrogates, we don't handle them.
+    def _restrict_surrogate_strings(arr):
+        has_surrogate = re.compile("[\ud800-\udbff][\udc00-\udfff]", re.UNICODE)
+        search_surrogate = np.vectorize(lambda x: bool(has_surrogate.search(x)))
+        if np.issubdtype(arr.dtype, np.str_):
+            return not any(search_surrogate(arr))
+        return True
+
+    if exclude_dtypes is None or "unicode" not in exclude_dtypes:
+        array_strategy = array_strategy.filter(_restrict_surrogate_strings)
+
     if not allow_nan:
 
         def _check_for_nan(arr):
