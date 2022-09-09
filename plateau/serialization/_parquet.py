@@ -13,6 +13,7 @@ import numpy as np
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
+from packaging import version
 from pyarrow.parquet import ParquetFile
 from simplekv import KeyValueStore
 
@@ -40,6 +41,7 @@ _logger = logging.getLogger(__name__)
 EPOCH_ORDINAL = datetime.date(1970, 1, 1).toordinal()
 MAX_NB_RETRIES = 6  # longest retry backoff = BACKOFF_TIME * 2**(MAX_NB_RETRIES - 2)
 BACKOFF_TIME = 0.01  # 10 ms
+PYARROW_LT_8 = version.parse(pa.__version__) < version.parse("8")
 
 
 def _empty_table_from_schema(parquet_file):
@@ -455,7 +457,7 @@ def _normalize_predicates(parquet_file, predicates, for_pushdown):
 
 def _timelike_to_arrow_encoding(value, pa_type):
     # Date32 columns are encoded as days since 1970 prior to pyarrow 8
-    if pa.__version__ < "8" and pa.types.is_date32(pa_type):
+    if PYARROW_LT_8 and pa.types.is_date32(pa_type):
         if isinstance(value, datetime.date):
             return value.toordinal() - EPOCH_ORDINAL
     else:
