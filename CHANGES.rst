@@ -5,7 +5,7 @@ Changelog
 Plateau 4.1.0 (2022-09-??)
 ==========================
 
-* Support for ``pyarrow`` 6, 7
+* Support for ``pyarrow`` 6, 7, 8
 * Support for ``numpy`` 1.23
 
 Plateau 4.0.4 (2022-03-17)

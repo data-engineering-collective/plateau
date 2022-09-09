@@ -454,8 +454,8 @@ def _normalize_predicates(parquet_file, predicates, for_pushdown):
 
 
 def _timelike_to_arrow_encoding(value, pa_type):
-    # Date32 columns are encoded as days since 1970
-    if pa.types.is_date32(pa_type):
+    # Date32 columns are encoded as days since 1970 prior to pyarrow 8
+    if pa.__version__ < "8" and pa.types.is_date32(pa_type):
         if isinstance(value, datetime.date):
             return value.toordinal() - EPOCH_ORDINAL
     else:
