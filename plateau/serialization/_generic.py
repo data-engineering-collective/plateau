@@ -393,6 +393,8 @@ def _ensure_type_stability(
         # various string kinds
         ("O", "S"),
         ("O", "U"),
+        ("S", "O"),
+        ("U", "O"),
         # bool w/ Nones
         ("b", "O"),
     ]
@@ -502,6 +504,11 @@ def filter_array_like(
                 # join below, rendering the mask useless
                 unique_vals = np.unique(value[~nullmask])
                 value_ser = pd.Series(unique_vals, name="value")
+                if value_ser.dtype.kind == "S":
+                    # pandas 1.4.3+ supports S|*-typed series but cannot handle null
+                    # values inside of them. Thus fall back to the old behaviour of
+                    # using an object typed series.
+                    value_ser = value_ser.astype("object")
                 arr_ser = pd.Series(array_like, name="array").to_frame()
                 matching_idx = (
                     ~arr_ser.merge(
