@@ -138,7 +138,7 @@ def get_numpy_array_strategy(
 
     # Don't check for issues with surrogates, we don't handle them.
     def _restrict_surrogate_strings(arr):
-        has_surrogate = re.compile("[\ud800-\udbff][\udc00-\udfff]", re.UNICODE)
+        has_surrogate = re.compile("[\ud800-\udbff,\udc00-\udfff]", re.UNICODE)
         search_surrogate = np.vectorize(lambda x: bool(has_surrogate.search(x)))
         if np.issubdtype(arr.dtype, np.str_):
             return not any(search_surrogate(arr))
