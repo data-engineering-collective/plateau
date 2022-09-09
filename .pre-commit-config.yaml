@@ -33,4 +33,4 @@ repos:
     - id: mypy-conda
       verbose: true
       files: plateau
-      additional_dependencies: [types-setuptools, types-decorator, types-simplejson]
+      additional_dependencies: [-c, conda-forge, types-setuptools, types-decorator, types-simplejson]
