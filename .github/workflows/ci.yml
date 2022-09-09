@@ -44,6 +44,10 @@ jobs:
             pyarrow: "8.0.1"
             python: "3.10"
           - numfocus_nightly: false
+            os: "ubuntu-latest"
+            pyarrow: "9.0.0"
+            python: "3.10"
+          - numfocus_nightly: false
             os: "macos-latest"
             pyarrow: "4.0.1"
             python: "3.8"
