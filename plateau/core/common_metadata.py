@@ -18,6 +18,7 @@ from plateau.core import naming
 from plateau.core._compat import load_json
 from plateau.core.naming import SINGLE_TABLE
 from plateau.core.utils import ensure_string_type
+from plateau.serialization._parquet import PARQUET_VERSION
 
 _logger = logging.getLogger()
 
@@ -391,7 +392,7 @@ def store_schema_metadata(
 
 def _schema2bytes(schema: SchemaWrapper) -> bytes:
     buf = pa.BufferOutputStream()
-    pq.write_metadata(schema, buf, version="2.0", coerce_timestamps="us")
+    pq.write_metadata(schema, buf, version=PARQUET_VERSION, coerce_timestamps="us")
     return buf.getvalue().to_pybytes()
 
 
