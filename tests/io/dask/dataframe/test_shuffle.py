@@ -201,4 +201,4 @@ def test_update_shuffle_buckets(
         dataset_uuid=dataset.uuid, store=store_factory
     ):
         assert len(df.primary.unique()) == 1
-        assert df.sorted_column.is_monotonic
+        assert df.sorted_column.is_monotonic_increasing
