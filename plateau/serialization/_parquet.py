@@ -13,6 +13,7 @@ import numpy as np
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
+from packaging import version
 from pyarrow.parquet import ParquetFile
 from simplekv import KeyValueStore
 
@@ -40,6 +41,15 @@ _logger = logging.getLogger(__name__)
 EPOCH_ORDINAL = datetime.date(1970, 1, 1).toordinal()
 MAX_NB_RETRIES = 6  # longest retry backoff = BACKOFF_TIME * 2**(MAX_NB_RETRIES - 2)
 BACKOFF_TIME = 0.01  # 10 ms
+PYARROW_LT_5 = version.parse(pa.__version__) < version.parse("5")
+PYARROW_LT_8 = version.parse(pa.__version__) < version.parse("8")
+
+# Since pyarrow 5, the Parquet version/features can be selected more granular.
+# Version 2.0 is equal to 2.4 but 2.4 doesn't trigger deprecation warnings.
+if PYARROW_LT_5:
+    PARQUET_VERSION = "2.0"
+else:
+    PARQUET_VERSION = "2.4"
 
 
 def _empty_table_from_schema(parquet_file):
@@ -157,7 +167,6 @@ class ParquetSerializer(DataFrameSerializer):
             ser.store(store, "key", df)
     """
 
-    _PARQUET_VERSION = "2.0"
     type_stable = True
 
     def __init__(
@@ -355,7 +364,7 @@ class ParquetSerializer(DataFrameSerializer):
         pq.write_table(
             table,
             buf,
-            version=self._PARQUET_VERSION,
+            version=PARQUET_VERSION,
             chunk_size=self.chunk_size,
             compression=self.compression,
             coerce_timestamps="us",
@@ -454,8 +463,8 @@ def _normalize_predicates(parquet_file, predicates, for_pushdown):
 
 
 def _timelike_to_arrow_encoding(value, pa_type):
-    # Date32 columns are encoded as days since 1970
-    if pa.types.is_date32(pa_type):
+    # Date32 columns are encoded as days since 1970 prior to pyarrow 8
+    if PYARROW_LT_8 and pa.types.is_date32(pa_type):
         if isinstance(value, datetime.date):
             return value.toordinal() - EPOCH_ORDINAL
     else:

@@ -26,6 +26,7 @@ from plateau.core.common_metadata import (
     validate_shared_columns,
 )
 from plateau.serialization import ParquetSerializer
+from plateau.serialization._parquet import PARQUET_VERSION
 
 try:
     arrow_version = parse_version(pa.__version__)
@@ -176,7 +177,7 @@ def test_compat_old_rw_path(df_all_types, store):
     old_meta = dask_make_meta(df)
     pa_table = pa.Table.from_pandas(old_meta)
     buf = pa.BufferOutputStream()
-    pq.write_table(pa_table, buf, version="2.0")
+    pq.write_table(pa_table, buf, version=PARQUET_VERSION)
     key_old = _get_common_metadata_key("dataset_uuid_old", "table")
     store.put(key_old, buf.getvalue().to_pybytes())
 

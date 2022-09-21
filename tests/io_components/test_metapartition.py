@@ -803,7 +803,7 @@ def test_partition_on_stable_order():
     new_mp = mp.partition_on("partition_key")
     for sub_mp in new_mp:
         sub_df = sub_mp.data
-        assert sub_df.sorted_col.is_monotonic
+        assert sub_df.sorted_col.is_monotonic_increasing
 
 
 def test_table_meta(store):

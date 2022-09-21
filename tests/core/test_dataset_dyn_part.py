@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import simplejson
 import storefact
+from packaging import version
 
 from plateau.core.common_metadata import (
     _get_common_metadata_key,
@@ -332,7 +333,12 @@ def test_dask_partitions(metadata_version, tmp_path):
         df = pd.concat([df, core])
 
     ddf = dask.dataframe.from_pandas(df, npartitions=1)
-    dask.dataframe.to_parquet(ddf, str(table_path), partition_on=["location"])
+    dask_kwargs = {}
+    if version.parse(dask.__version__) >= version.parse("2022.4.2"):
+        dask_kwargs["write_metadata_file"] = True
+    dask.dataframe.to_parquet(
+        ddf, str(table_path), partition_on=["location"], **dask_kwargs
+    )
 
     partition0 = "{}/core/location=L-0/part.0.parquet".format(dataset_uuid)
     partition1 = "{}/core/location=L-1/part.0.parquet".format(dataset_uuid)

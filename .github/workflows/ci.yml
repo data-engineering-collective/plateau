@@ -30,11 +30,23 @@ jobs:
           - numfocus_nightly: true
             os: "ubuntu-latest"
             pyarrow: "4.0.1"
-            python: "3.8"
+            python: "3.10"
           - numfocus_nightly: false
             os: "ubuntu-latest"
             pyarrow: "6.0.1"
             python: "3.9"
+          - numfocus_nightly: false
+            os: "ubuntu-latest"
+            pyarrow: "7.0.0"
+            python: "3.10"
+          - numfocus_nightly: false
+            os: "ubuntu-latest"
+            pyarrow: "8.0.1"
+            python: "3.10"
+          - numfocus_nightly: false
+            os: "ubuntu-latest"
+            pyarrow: "9.0.0"
+            python: "3.10"
           - numfocus_nightly: false
             os: "macos-latest"
             pyarrow: "4.0.1"
@@ -113,7 +125,8 @@ jobs:
               --freeze-installed
       - name: Pip Instal NumFOCUS nightly
         # NumFOCUS nightly wheels, contains numpy and pandas
-        run: pip install --pre --upgrade --timeout=60 --extra-index-url https://pypi.anaconda.org/scipy-wheels-nightly/simple pandas numpy
+        # TODO(gh-45): Re-add numpy
+        run: pip install --pre --upgrade --timeout=60 --extra-index-url https://pypi.anaconda.org/scipy-wheels-nightly/simple pandas
         if: matrix.numfocus_nightly
       - name: Conda Export
         run: conda list --export

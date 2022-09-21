@@ -28,8 +28,9 @@ repos:
         verbose: true
 
   - repo: https://github.com/Quantco/pre-commit-mirrors-mypy
-    rev: "0.780"
+    rev: "0.971"
     hooks:
     - id: mypy-conda
       verbose: true
       files: plateau
+      additional_dependencies: [-c, conda-forge, types-setuptools, types-decorator, types-simplejson]
