@@ -147,7 +147,7 @@ jobs:
 
       # Builds
       - name: Build Wheel and sdist
-        run: python -m build
+        run: python -m build --no-isolation
 
       - name: Codecov
         uses: codecov/codecov-action@v3.1.1
