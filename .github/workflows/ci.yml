@@ -71,12 +71,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Cache conda
-        uses: actions/cache@v3.0.10
-        with:
-          path: ~/conda_pkgs_dir
-          key: ${{ runner.os }}-${{ matrix.python }}-${{ matrix.pyarrow }}-${{ hashFiles('conda-requirements.txt', 'conda-test-requirements.txt')}}
-
       - name: Conda Bootstrap
         uses: conda-incubator/setup-miniconda@v2
         with:
@@ -84,7 +78,7 @@ jobs:
           channel-priority: strict
           channels: conda-forge
           miniforge-variant: Mambaforge
-          miniforge-version: 4.11.0-0
+          miniforge-version: 4.14.0-0
           use-mamba: true
           python-version: ${{ matrix.python }}
       - name: Conda Config
