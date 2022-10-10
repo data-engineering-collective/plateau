@@ -32,4 +32,4 @@ jobs:
       - name: Build docs
         shell: bash -l {0}
         run: |
-            python setup.py docs
+            sphinx-build -b html docs docs/_build
