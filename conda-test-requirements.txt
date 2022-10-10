@@ -19,3 +19,6 @@ ipython
 
 # ASV // Benchmark
 asv
+
+# Packaging infrastructure
+python-build

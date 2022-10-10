@@ -146,8 +146,8 @@ jobs:
         if: env.IS_MASTER_BUILD == 'true'
 
       # Builds
-      - name: Build Wheel
-        run: python setup.py sdist bdist_wheel
+      - name: Build Wheel and sdist
+        run: python -m build
 
       - name: Codecov
         uses: codecov/codecov-action@v3.1.1
