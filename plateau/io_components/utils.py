@@ -4,7 +4,7 @@ This module is a collection of helper functions
 import collections
 import inspect
 import logging
-from typing import Dict, Iterable, List, Optional, Union, overload
+from typing import Dict, Iterable, List, Literal, Optional, Union, overload
 
 import decorator
 import pandas as pd
@@ -13,11 +13,6 @@ from plateau.core.dataset import DatasetMetadata, DatasetMetadataBase
 from plateau.core.factory import _ensure_factory
 from plateau.core.typing import StoreFactory, StoreInput
 from plateau.core.utils import ensure_store, lazy_store
-
-try:
-    from typing_extensions import Literal  # type: ignore
-except ImportError:
-    from typing import Literal  # type: ignore
 
 signature = inspect.signature
 

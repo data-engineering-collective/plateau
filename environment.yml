@@ -1,12 +1,13 @@
-name: plateau-docs
+name: plateau
 channels:
   - conda-forge
+  - nodefaults
 dependencies:
-  - python>=3.8
-  - dask[dataframe]
+  - dask!=2021.5.1,!=2021.6.0  # gh475 - 2021.5.1 and 2021.6.0 broke ci, omit those versions
   - decorator
   - msgpack-python>=0.5.2
   # Currently dask and numpy==1.16.0 clash
+  # TODO: add support for numpy>=1.23
   - numpy!=1.15.0,!=1.16.0
   - pandas>=0.23.0, !=1.0.0
   - pyarrow>=0.17.1,!=1.0.0, <10
@@ -20,22 +21,22 @@ dependencies:
   - click
   - prompt-toolkit
   - pyyaml
-
   # Test Code Dependencies
-  - distributed
+  - distributed!=2021.5.1,!=2021.6.0 # gh475 - 2021.5.1 and 2021.6.0 broke ci, omit those versions
   - pytz
   - cloudpickle
   - freezegun
-
   # Test Framework
   - hypothesis
   - pytest>=4.5.0
   - pytest-cov
   - pytest-mock
   - setuptools_scm
-
-  # Documentation
-  - sphinx<4.0
-  - jinja2<3.1
-  - sphinx_rtd_theme
-  - IPython
+  # GitHub CI
+  - pandoc
+  # CLI
+  - ipython
+  # ASV // Benchmark
+  - asv
+  # Packaging infrastructure
+  - python-build
