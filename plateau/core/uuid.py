@@ -8,7 +8,7 @@ Using these routines ensures compatibility w/ plateau as well as the application
 import uuid
 
 
-def gen_uuid():
+def gen_uuid() -> str:
     """
     Generate new UUID.
 
@@ -32,7 +32,7 @@ def _uuid_hook_object():
     return uuid.uuid4()
 
 
-def _uuid_hook_str():
+def _uuid_hook_str() -> str:
     """
     Internal UUID function that could easily be overwritten for tests.
 

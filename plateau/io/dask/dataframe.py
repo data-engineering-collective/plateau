@@ -124,11 +124,11 @@ def read_dataset_as_ddf(
     if dask_index_on:
         divisions = ds_factory.indices[dask_index_on].observed_values()
         divisions.sort()
-        divisions = list(divisions)
-        divisions.append(divisions[-1])
+        divisions_lst = list(divisions)
+        divisions_lst.append(divisions[-1])
         return dd.from_delayed(
-            delayed_partitions, meta=meta, divisions=divisions
-        ).set_index(dask_index_on, divisions=divisions, sorted=True)
+            delayed_partitions, meta=meta, divisions=divisions_lst
+        ).set_index(dask_index_on, divisions=divisions_lst, sorted=True)
     else:
         return dd.from_delayed(delayed_partitions, meta=meta)
 

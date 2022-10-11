@@ -192,7 +192,7 @@ def default_docs(func):
 
     try:
         buf = StringIO(docs)
-        line = True
+        line = "<intentionally non-empty>"
         while line:
             line = buf.readline()
 

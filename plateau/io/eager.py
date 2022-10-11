@@ -97,9 +97,9 @@ def delete_dataset(dataset_uuid=None, store=None, factory=None):
 def read_dataset_as_dataframes(
     dataset_uuid: Optional[str] = None,
     store=None,
-    columns: Dict[str, List[str]] = None,
+    columns: Optional[Dict[str, List[str]]] = None,
     predicate_pushdown_to_io: bool = True,
-    categoricals: List[str] = None,
+    categoricals: Optional[List[str]] = None,
     dates_as_object: bool = True,
     predicates: Optional[List[List[Tuple[str, str, Any]]]] = None,
     factory: Optional[DatasetFactory] = None,
@@ -215,9 +215,9 @@ def read_dataset_as_metapartitions(
 def read_table(
     dataset_uuid: Optional[str] = None,
     store=None,
-    columns: Dict[str, List[str]] = None,
+    columns: Optional[Dict[str, List[str]]] = None,
     predicate_pushdown_to_io: bool = True,
-    categoricals: List[str] = None,
+    categoricals: Optional[List[str]] = None,
     dates_as_object: bool = True,
     predicates: Optional[List[List[Tuple[str, str, Any]]]] = None,
     factory: Optional[DatasetFactory] = None,
@@ -291,8 +291,8 @@ def commit_dataset(
     dataset_uuid: Optional[str] = None,
     new_partitions: Optional[Iterable[MetaPartition]] = None,
     delete_scope: Optional[Iterable[Dict[str, Any]]] = None,
-    metadata: Dict = None,
-    metadata_merger: Callable[[List[Dict]], Dict] = None,
+    metadata: Optional[Dict[Any, Any]] = None,
+    metadata_merger: Optional[Callable[[List[Dict]], Dict]] = None,
     default_metadata_version: int = DEFAULT_METADATA_VERSION,
     partition_on: Optional[Iterable[str]] = None,
     factory: Optional[DatasetFactory] = None,
@@ -630,7 +630,7 @@ def update_dataset_from_dataframes(
     delete_scope=None,
     metadata=None,
     df_serializer: Optional[DataFrameSerializer] = None,
-    metadata_merger: Callable = None,
+    metadata_merger: Optional[Callable] = None,
     default_metadata_version: int = DEFAULT_METADATA_VERSION,
     partition_on: Optional[List[str]] = None,
     sort_partitions_by: Optional[str] = None,
@@ -718,6 +718,8 @@ def build_dataset_indices(store, dataset_uuid, columns, factory=None):
         factory=factory,
     )
 
+    if ds_factory.schema is None:
+        raise ValueError("Dataset schema needs to be loaded for column selection.")
     cols_to_load = set(columns) & set(ds_factory.schema.names)
 
     new_partitions = []

@@ -4,8 +4,10 @@ Improved IO buffering compared to ``io.BufferedReader``.
 The main issues w/ ``io.BufferedReader`` is that it is only meant of sequencial reads and that it resets the buffer on
 ``.seek(...)``. This happens quite often in pyarrow and basically renders the buffereing inefficient.
 """
+
 import io
 import logging
+from typing import Any, List, Optional
 
 _logger = logging.getLogger(__name__)
 
@@ -28,8 +30,8 @@ class BlockBuffer(io.BufferedIOBase):
     def __init__(self, raw, blocksize=1024):
         self._raw = raw
         self._blocksize = blocksize
-        self._size = None
-        self._cached_blocks = None
+        self._size: Optional[int] = None
+        self._cached_blocks: Optional[List[Any]] = None
         self._pos = 0
 
         if self._raw_closed():
@@ -122,6 +124,7 @@ class BlockBuffer(io.BufferedIOBase):
             raise BufferReadError(err)
 
         # fill blocks
+        assert self._cached_blocks is not None
         for i in range(n):
             begin = i * self._blocksize
             end = min((i + 1) * self._blocksize, size)
@@ -152,6 +155,7 @@ class BlockBuffer(io.BufferedIOBase):
         done = -offset
         to_fetch_start = None
         to_fetch_n = None
+        assert self._cached_blocks is not None
         while done < size:
             if self._cached_blocks[block] is not None:
                 # current block is loaded
@@ -203,6 +207,7 @@ class BlockBuffer(io.BufferedIOBase):
         if read_size % self._blocksize != 0:
             n_blocks += 1
 
+        assert self._cached_blocks is not None
         return b"".join(self._cached_blocks[block : (block + n_blocks)])[
             offset : (size + offset)
         ]
@@ -224,6 +229,7 @@ class BlockBuffer(io.BufferedIOBase):
 
         if (size is None) or (size < 0) or (self._pos + size > self._size):
             # read entire, remaining file
+            assert self._size is not None
             size = self._size - self._pos
 
         self._ensure_range_loaded(self._pos, size)

@@ -622,6 +622,8 @@ def validate_compatible(schemas, ignore_pandas=False):
     )
 
     for current, null_columns in schemas_to_evaluate:
+        # We have schemas so the reference schema should be non-none.
+        assert reference is not None
         # Compare each schema to the reference but ignore the null_cols and the Pandas schema information.
         reference_to_compare = _strip_columns_from_schema(
             reference, null_columns
@@ -706,7 +708,7 @@ def validate_shared_columns(schemas, ignore_pandas=False):
     ValueError
         Incompatible columns were found.
     """
-    seen = {}
+    seen: Dict[str, Any] = {}
     has_pandas = _pandas_in_schemas(schemas) and not ignore_pandas
 
     for schema in schemas:

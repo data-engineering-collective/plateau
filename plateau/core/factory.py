@@ -120,7 +120,7 @@ class DatasetFactory(DatasetMetadataBase):
         return {k: v for k, v in self.__dict__.items() if not k.startswith("_cache_")}
 
     def __setstate__(self, state):
-        self.__init__(
+        self.__init__(  # type: ignore
             dataset_uuid=state["dataset_uuid"],
             store_factory=state["store_factory"],
             load_schema=state["load_schema"],
