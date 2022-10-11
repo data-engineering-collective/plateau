@@ -85,7 +85,7 @@ jobs:
         # Install both arrow-cpp and pyarrow to make sure that we have the
         # latest nightly of both packages. It is sadly not guaranteed that the
         # nightlies and the latest release would otherwise work together.
-        run: micromamba install -c arrow-nightlies -c conda-forge arrow-cpp pyarrow
+        run: micromamba update -c arrow-nightlies -c conda-forge arrow-cpp pyarrow
         if: matrix.pyarrow == 'nightly'
       - name: Pip Instal NumFOCUS nightly
         # NumFOCUS nightly wheels, contains numpy and pandas
