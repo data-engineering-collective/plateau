@@ -4,7 +4,7 @@ This module is a collection of helper functions
 import collections
 import inspect
 import logging
-from typing import Dict, Iterable, List, Literal, Optional, Union, overload
+from typing import Dict, Iterable, List, Literal, Optional, Union, cast, overload
 
 import decorator
 import pandas as pd
@@ -95,7 +95,7 @@ def _combine_metadata(dataset_metadata, append_to_list):
                 )
             return new_dict
         elif isinstance(first, list) and isinstance(second, list):
-            new_list = first.extend(second)
+            new_list = first + second
             if append_to_list:
                 return new_list
             else:
@@ -166,6 +166,15 @@ _NORMALIZE_ARGS_LIST = [
 ]
 
 _NORMALIZE_ARGS = _NORMALIZE_ARGS_LIST + ["store", "dispatch_by"]
+_NormalizeArgsLiteral = Literal[
+    "partition_on",
+    "delete_scope",
+    "secondary_indices",
+    "sort_partitions_by",
+    "bucket_by",
+    "store",
+    "dispatch_by",
+]
 
 
 @overload
@@ -263,6 +272,7 @@ def normalize_args(function, *args, **kwargs):
 
     def _wrapper(*args, **kwargs):
         for arg_name in _NORMALIZE_ARGS:
+            arg_name = cast(_NormalizeArgsLiteral, arg_name)
             if arg_name in sig.parameters.keys():
 
                 ix = inspect.getfullargspec(function).args.index(arg_name)
@@ -341,10 +351,10 @@ def align_categories(dfs, categoricals):
 
         # use the categories of the largest DF as a baseline to avoid having
         # to rewrite its codes. Append the remainder and sort it for reproducibility
-        categories = list(largest_df_categories) + sorted(
+        categories_lst = list(largest_df_categories) + sorted(
             set(categories) - set(largest_df_categories)
         )
-        cat_dtype = pd.api.types.CategoricalDtype(categories, ordered=False)
+        cat_dtype = pd.api.types.CategoricalDtype(categories_lst, ordered=False)
         col_dtype[column] = cat_dtype
 
     return_dfs = []

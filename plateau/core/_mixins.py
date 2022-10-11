@@ -5,7 +5,7 @@ import inspect
 
 class CopyMixin:
     def copy(self, **kwargs):
-        constructor_args = inspect.signature(self.__init__).parameters
+        constructor_args = inspect.signature(self.__init__).parameters  # type: ignore
         init_args = collections.OrderedDict()
 
         for arg in constructor_args.keys():

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from typing import List, Tuple, Union
+from typing import Iterable, List, Tuple, Union
 
 from urlquote import quote as urlquote_quote
 from urlquote import unquote as urlquote_unquote
@@ -50,7 +50,7 @@ def decode_key(
     return dataset_uuid, table, key_indices, file_
 
 
-def quote_indices(indices: List[Tuple[str, str]]) -> List[str]:
+def quote_indices(indices: Iterable[Tuple[str, str]]) -> List[str]:
     """
     Urlencode a list of column-value pairs and encode them as:
 

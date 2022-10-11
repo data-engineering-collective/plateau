@@ -4,6 +4,7 @@ Pandas performance helpers.
 from __future__ import absolute_import
 
 from collections import OrderedDict
+from typing import Any, List, cast
 
 import numpy as np
 import pandas as pd
@@ -140,7 +141,7 @@ def is_dataframe_sorted(df, columns):
         else:
             state = comp_le | (comp_eq & state)
 
-    return state.all()
+    return cast(Any, state).all()
 
 
 def sort_dataframe(df, columns):
@@ -291,12 +292,12 @@ def aggregate_to_lists(df, by, data_col):
     # collect the following data for every group:
     # - by-values
     # - list of values in `data_col`
-    result_idx_data = [[] for _ in by]
-    result_labels = []
+    result_idx_data: List[Any] = [[] for _ in by]
+    result_labels: List[List[Any]] = []
 
     # remember index (aka values in `by`) and list of data values for current group
     group_idx = None  # Tuple[Any, ...]
-    group_values = None  # List[Any]
+    group_values: List[Any] = []
 
     def _store_group():
         """

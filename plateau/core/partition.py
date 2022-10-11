@@ -7,7 +7,10 @@ PartitionDictType = Dict[str, Dict[str, str]]
 # Changing the partition class needs to be done with are since it's to_dict is used for the storage metadata spec
 class Partition:
     def __init__(
-        self, label: str, files: Optional[Dict[str, str]] = None, metadata: Dict = None
+        self,
+        label: str,
+        files: Optional[Dict[str, str]] = None,
+        metadata: Optional[Dict] = None,
     ):
         """
         An object for the internal representation of the metadata of a partition.

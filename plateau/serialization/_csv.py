@@ -5,7 +5,7 @@ This module contains functionality for persisting/serialising DataFrames.
 """
 
 import gzip
-from io import BytesIO, StringIO
+from io import BufferedIOBase, BytesIO, StringIO
 from typing import Any, Dict, Iterable, Optional
 
 import pandas as pd
@@ -91,6 +91,7 @@ class CsvSerializer(DataFrameSerializer):
             df = df.to_pandas()
         key = "{}.csv".format(key_prefix)
         result_stream = BytesIO()
+        iostream: BufferedIOBase
         if self.compress:
             iostream = gzip.GzipFile(fileobj=result_stream, mode="wb")
             key += ".gz"

@@ -2,7 +2,7 @@ import copy
 import logging
 import re
 from collections import OrderedDict, defaultdict
-from typing import Any, Dict, List, Optional, Set, Tuple, TypeVar, Union
+from typing import Any, Dict, List, Optional, Set, Tuple, TypeVar, Union, cast
 
 import pandas as pd
 import pyarrow as pa
@@ -323,7 +323,7 @@ class DatasetMetadataBase(CopyMixin):
 
         return ds.load_partition_indices()
 
-    def query(self, indices: List[IndexBase] = None, **kwargs) -> List[str]:
+    def query(self, indices: Optional[List[IndexBase]] = None, **kwargs) -> List[str]:
         """
         Query the dataset for partitions that contain specific values. Lookup is performed
         using the embedded and loaded external indices. Additional indices need to operate
@@ -808,7 +808,7 @@ def _get_partition_keys_from_partitions(partitions):
 
 
 def _load_partitions_from_filenames(store, storage_keys, metadata_version):
-    partitions = defaultdict(_get_empty_partition)
+    partitions: Dict[str, Dict[str, Any]] = defaultdict(_get_empty_partition)
     depth_indices = None
     for key in storage_keys:
         dataset_uuid, table, indices, file_ = decode_key(key)
@@ -1004,7 +1004,9 @@ class DatasetMetadataBuilder(CopyMixin):
                 elif index.loaded:
                     dct["indices"][column] = index.to_dict()
                 else:
-                    dct["indices"][column] = index.index_storage_key
+                    dct["indices"][column] = cast(
+                        ExplicitSecondaryIndex, index
+                    ).index_storage_key
         if self.metadata:
             dct["metadata"] = self.metadata
 

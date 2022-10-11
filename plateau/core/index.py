@@ -774,7 +774,7 @@ class ExplicitSecondaryIndex(IndexBase):
             index_dct = None
         else:
             index_dct, column_type = _parquet_bytes_to_dict(column, parquet_bytes)
-        self.__init__(
+        self.__init__(  # type: ignore
             column=column,
             index_dct=index_dct,
             index_storage_key=storage_key,

@@ -362,8 +362,8 @@ class MetaPartition(Iterable):
         # the nested metapartitions.
         if len(self.metapartitions) > 1:
             for mp_self, mp_other in zip(
-                sorted(self.metapartitions, key=lambda x: x["label"]),
-                sorted(other.metapartitions, key=lambda x: x["label"]),
+                sorted(self.metapartitions, key=lambda x: x["label"]),  # type: ignore
+                sorted(other.metapartitions, key=lambda x: x["label"]),  # type: ignore
             ):
                 if mp_self == mp_other:
                     continue
@@ -554,6 +554,8 @@ class MetaPartition(Iterable):
         """
         # Construct a single line DF with the partition columns
         schema = self.schema
+        if schema is None:
+            raise ValueError("schema needs to be loaded before applying predicates.")
         index_df_dct = {}
         for column, value in indices:
             pa_dtype = schema[schema.get_field_index(column)].type
@@ -749,6 +751,8 @@ class MetaPartition(Iterable):
         original_columns = list(df.columns)
         zeros = np.zeros(len(df), dtype=int)
         schema = self.schema
+        if schema is None:
+            raise ValueError("Cannot reconstruct indices before the schema is loaded.")
 
         # One of the few places `inplace=True` makes a signifcant difference
         df.reset_index(drop=True, inplace=True)
@@ -1142,10 +1146,10 @@ class MetaPartition(Iterable):
             )
 
     def _partition_data(self, partition_on):
-        existing_indices, base_label = decode_key("uuid/table/{}".format(self.label))[
-            2:
-        ]
-        dct = dict()
+        existing_indices, base_label = cast(
+            Tuple[List, str], decode_key("uuid/table/{}".format(self.label))[2:]
+        )
+        dct: Dict[str, Any] = dict()
         df = self.data
 
         # Check that data sizes do not change. This might happen if the

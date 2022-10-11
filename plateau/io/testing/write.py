@@ -4,6 +4,7 @@
 
 from collections import OrderedDict
 from functools import partial
+from typing import cast
 
 import numpy as np
 import pandas as pd
@@ -12,6 +13,7 @@ import pytest
 from storefact import get_store_from_url
 
 from plateau.core.dataset import DatasetMetadata
+from plateau.core.index import ExplicitSecondaryIndex
 from plateau.core.uuid import gen_uuid
 from plateau.io.eager import read_table
 from plateau.io_components.metapartition import MetaPartition
@@ -143,7 +145,9 @@ def test_store_dataframes_as_dataset(
     assert dataset.metadata == stored_dataset.metadata
     assert dataset.partitions == stored_dataset.partitions
 
-    index_dct = stored_dataset.indices["P"].load(store).index_dct
+    index_dct = (
+        cast(ExplicitSecondaryIndex, stored_dataset.indices["P"]).load(store).index_dct
+    )
     assert sorted(index_dct.keys()) == list(range(0, 10))
 
     counter = 0

@@ -7,7 +7,7 @@ This module contains functionality for persisting/serialising DataFrames.
 import datetime
 import logging
 import time
-from typing import Iterable, Optional
+from typing import Any, Iterable, List, Optional
 
 import numpy as np
 import pandas as pd
@@ -18,6 +18,7 @@ from pyarrow.parquet import ParquetFile
 from simplekv import KeyValueStore
 
 from ._generic import (
+    ConjunctionType,
     DataFrameSerializer,
     PredicatesType,
     check_predicates,
@@ -417,12 +418,15 @@ def _read_row_groups_into_tables(parquet_file, columns, predicates_in):
     return result
 
 
-def _normalize_predicates(parquet_file, predicates, for_pushdown):
+def _normalize_predicates(
+    parquet_file, predicates: List[ConjunctionType], for_pushdown
+):
     schema = parquet_file.schema.to_arrow_schema()
 
     normalized_predicates = []
     for conjunction in predicates:
-        new_conjunction = []
+        evaluates_to_false = False
+        new_conjunction: List[Any] = []
 
         for literal in conjunction:
             col, op, val = literal
@@ -432,7 +436,7 @@ def _normalize_predicates(parquet_file, predicates, for_pushdown):
 
             if pa.types.is_null(pa_type):
                 # early exit, the entire conjunction evaluates to False
-                new_conjunction = None
+                evaluates_to_false = True
                 break
 
             if op == "in":
@@ -457,7 +461,7 @@ def _normalize_predicates(parquet_file, predicates, for_pushdown):
             new_literal = (literal[0], literal[1], normalized_value)
             new_conjunction.append(new_literal)
 
-        if new_conjunction is not None:
+        if not evaluates_to_false:
             normalized_predicates.append(new_conjunction)
     return normalized_predicates
 
