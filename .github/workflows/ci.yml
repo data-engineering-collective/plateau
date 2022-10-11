@@ -70,37 +70,28 @@ jobs:
         run: echo $IS_MASTER_BUILD
       - name: Checkout
         uses: actions/checkout@v3
-
-      - name: Conda Bootstrap
-        uses: conda-incubator/setup-miniconda@v2
+      - name: Set up Conda env
+        uses: mamba-org/provision-with-micromamba@a319a818023c3a5a448a60bd72e0c633408fbccc
         with:
-          auto-update-conda: true
-          channel-priority: strict
-          channels: conda-forge
-          miniforge-variant: Mambaforge
-          miniforge-version: 4.14.0-0
-          use-mamba: true
-          python-version: ${{ matrix.python }}
-      - name: Conda Config
-        run: |
-          conda config --set always_yes yes
-          conda config --set changeps1 no
-
-      # Installation into the `test` environment
-      - name: Conda Install Pyarrow (non-nightly)
-        run: mamba install -c conda-forge pyarrow==${{ matrix.pyarrow }}
+          cache-env: true
+          extra-specs: |
+            python=${{ matrix.PYTHON_VERSION }}
+      - name: Install repository
+        run: python -m pip install --no-build-isolation --no-deps --disable-pip-version-check -e .
+      - name: Install Pyarrow (non-nightly)
+        run: micromamba install pyarrow==${{ matrix.pyarrow }}
         if: matrix.pyarrow != 'nightly'
-      - name: Conda Install Pyarrow (nightly)
+      - name: Install Pyarrow (nightly)
         # Install both arrow-cpp and pyarrow to make sure that we have the
         # latest nightly of both packages. It is sadly not guaranteed that the
         # nightlies and the latest release would otherwise work together.
-        run: mamba install -c arrow-nightlies -c conda-forge arrow-cpp pyarrow
+        run: micromamba install -c arrow-nightlies -c conda-forge arrow-cpp pyarrow
         if: matrix.pyarrow == 'nightly'
-      - name: Conda Install conda-requirements.txt
-        # run this AFTER pyarrow, since this is less restrictive (so conda doesn't spend too much time downgrading)
-        run: mamba install --file=conda-requirements.txt
-      - name: Pip Install plateau
-        run: pip install --no-deps .
+      - name: Pip Instal NumFOCUS nightly
+        # NumFOCUS nightly wheels, contains numpy and pandas
+        # TODO(gh-45): Re-add numpy
+        run: python -m pip install --pre --upgrade --timeout=60 --extra-index-url https://pypi.anaconda.org/scipy-wheels-nightly/simple pandas
+        if: matrix.numfocus_nightly
       - name: Test import
         run: |
           python -c "import plateau"
@@ -112,18 +103,6 @@ jobs:
           python -c "import plateau.io_components"
           python -c "import plateau.serialization"
           python -c "import plateau.utils"
-      - name: Conda install test requirements
-        run: mamba install
-              -c conda-forge
-              --file=conda-test-requirements.txt
-              --freeze-installed
-      - name: Pip Instal NumFOCUS nightly
-        # NumFOCUS nightly wheels, contains numpy and pandas
-        # TODO(gh-45): Re-add numpy
-        run: pip install --pre --upgrade --timeout=60 --extra-index-url https://pypi.anaconda.org/scipy-wheels-nightly/simple pandas
-        if: matrix.numfocus_nightly
-      - name: Conda Export
-        run: conda list --export
 
       # Tests
       - name: Pytest
