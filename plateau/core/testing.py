@@ -121,8 +121,7 @@ def get_numpy_array_strategy(
             max_size=shape,
             unique=unique,
         )
-        date_start = date_start.map(np.array)
-        one_of_strategies = [array_strategy] + [date_start]
+        one_of_strategies = [array_strategy] + [date_start.map(np.array)]
         array_strategy = hyp_st.one_of(one_of_strategies)
 
     def _restrict_datetime_ranges(arr):
