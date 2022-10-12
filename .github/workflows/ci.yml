@@ -33,6 +33,10 @@ jobs:
             python: "3.10"
           - numfocus_nightly: false
             os: "ubuntu-latest"
+            pyarrow: "5.0.0"
+            python: "3.9"
+          - numfocus_nightly: false
+            os: "ubuntu-latest"
             pyarrow: "6.0.1"
             python: "3.9"
           - numfocus_nightly: false
