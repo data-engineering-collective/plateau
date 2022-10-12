@@ -41,3 +41,4 @@ repos:
         - types-simplejson
         - hypothesis
         - numpy=1.22
+        - minimalkv=1.4.2

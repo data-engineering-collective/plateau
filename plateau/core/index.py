@@ -745,6 +745,7 @@ class ExplicitSecondaryIndex(IndexBase):
 
         store = ensure_store(store)
 
+        assert self.index_storage_key is not None
         index_buffer = store.get(self.index_storage_key)
         index_dct, column_type = _parquet_bytes_to_dict(self.column, index_buffer)
 

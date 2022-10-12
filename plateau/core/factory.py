@@ -21,6 +21,7 @@ class DatasetFactory(DatasetMetadataBase):
     """
 
     _nullable_attributes = ["_cache_metadata", "_cache_store"]
+    _cache_store: Optional["KeyValueStore"]
 
     def __init__(
         self,

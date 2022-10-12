@@ -2,7 +2,18 @@ import copy
 import logging
 import re
 from collections import OrderedDict, defaultdict
-from typing import Any, Dict, List, Optional, Set, Tuple, TypeVar, Union, cast
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    List,
+    Optional,
+    Set,
+    Tuple,
+    TypeVar,
+    Union,
+    cast,
+)
 
 import pandas as pd
 import pyarrow as pa
@@ -27,6 +38,9 @@ from plateau.core.typing import StoreInput
 from plateau.core.urlencode import decode_key, quote_indices
 from plateau.core.utils import ensure_store, verify_metadata_version
 from plateau.serialization import PredicatesType, columns_in_predicates
+
+if TYPE_CHECKING:
+    from minimalkv import KeyValueStore
 
 _logger = logging.getLogger(__name__)
 
@@ -514,7 +528,7 @@ class DatasetMetadata(DatasetMetadataBase):
 
     @staticmethod
     def load_from_buffer(
-        buf, store: StoreInput, format: str = "json"
+        buf, store: "KeyValueStore", format: str = "json"
     ) -> "DatasetMetadata":
         """
         Load a dataset from a (string) buffer.
@@ -585,7 +599,7 @@ class DatasetMetadata(DatasetMetadataBase):
 
     @staticmethod
     def load_from_dict(
-        dct: Dict, store: StoreInput, load_schema: bool = True
+        dct: Dict, store: "KeyValueStore", load_schema: bool = True
     ) -> "DatasetMetadata":
         """
         Load dataset metadata from a dictionary and resolve any external includes.

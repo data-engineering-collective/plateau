@@ -10,7 +10,7 @@ from plateau.core.typing import StoreFactory, StoreInput
 __all__ = ("ensure_store", "lazy_store")
 
 
-def _verify_metadata_version(metadata_version):
+def _verify_metadata_version(metadata_version: int) -> None:
     """
     This is factored out to be an easier target for mocking
     """
@@ -26,8 +26,7 @@ def _verify_metadata_version(metadata_version):
         )
 
 
-def verify_metadata_version(*args, **kwargs):
-    return _verify_metadata_version(*args, **kwargs)
+verify_metadata_version = _verify_metadata_version
 
 
 def ensure_string_type(obj: Union[bytes, str]) -> str:
@@ -67,7 +66,7 @@ def ensure_store(store: StoreInput) -> KeyValueStore:
     # This function is often used in an eager context where we may allow
     # non-serializable stores, so skip the pickle test.
     if _is_minimalkv_key_value_store(store):
-        return store
+        return cast(KeyValueStore, store)
     return lazy_store(store)()
 
 

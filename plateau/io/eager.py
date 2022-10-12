@@ -380,7 +380,8 @@ def commit_dataset(
             raise RuntimeError(
                 f"Cannot commit more than one table to a dataset but got tables {sorted(tables_in_partitions)}"
             )
-    store = lazy_store(store)
+    if store is not None:
+        store = lazy_store(store)
     ds_factory, metadata_version, partition_on = validate_partition_keys(
         dataset_uuid=dataset_uuid,
         store=store,
@@ -593,7 +594,7 @@ def write_single_partition(
         raise TypeError("The parameter `data` is not optional")
     dataset_factory, ds_metadata_version, partition_on = validate_partition_keys(
         dataset_uuid=dataset_uuid,
-        store=lazy_store(store),
+        store=lazy_store(store) if store else None,
         ds_factory=factory,
         default_metadata_version=metadata_version,
         partition_on=partition_on,
