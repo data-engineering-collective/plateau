@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Write the benchmarking functions here.
 # See "Writing benchmarks" in the asv docs for more information.
 
@@ -31,7 +29,7 @@ class TimeMetaPartition(AsvBenchmarkConfig):
         self.schema = make_meta(df, partition_keys=["primary_key"], origin="df")
         self.df = df.drop("primary_key", axis=1)
         self.mp = MetaPartition(
-            label="primary_key={}/base_label".format(dtype[0]),
+            label=f"primary_key={dtype[0]}/base_label",
             metadata_version=4,
             schema=self.schema,
         )

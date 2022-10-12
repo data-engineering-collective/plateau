@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import pytest
 
 from plateau.io.iter import store_dataframes_as_dataset__iter

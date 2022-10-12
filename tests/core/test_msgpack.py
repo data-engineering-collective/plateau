@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from plateau.core._zmsgpack import packb, unpackb
 
 
