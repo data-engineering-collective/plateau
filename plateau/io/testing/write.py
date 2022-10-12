@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 import pandas.testing as pdt
 import pytest
-from storefact import get_store_from_url
+from minimalkv import get_store_from_url
 
 from plateau.core.dataset import DatasetMetadata
 from plateau.core.index import ExplicitSecondaryIndex

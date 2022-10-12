@@ -2,7 +2,7 @@ from functools import partial
 from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union, cast
 
 import pandas as pd
-from simplekv import KeyValueStore
+from minimalkv import KeyValueStore
 
 from plateau.core.common_metadata import (
     empty_dataframe_from_schema,
@@ -124,10 +124,10 @@ def read_dataset_as_dataframes(
 
     .. code ::
 
-        >>> import storefact
+        >>> import minimalkv
         >>> from plateau.io.eager import read_dataset_as_dataframes
 
-        >>> store = storefact.get_store_from_url('s3://bucket_with_dataset')
+        >>> store = minimalkv.get_store_from_url('s3://bucket_with_dataset')
 
         >>> dfs = read_dataset_as_dataframes('dataset_uuid', store, 'core')
 
@@ -182,10 +182,10 @@ def read_dataset_as_metapartitions(
 
     .. code ::
 
-        >>> import storefact
+        >>> import minimalkv
         >>> from plateau.io.eager import read_dataset_as_dataframe
 
-        >>> store = storefact.get_store_from_url('s3://bucket_with_dataset')
+        >>> store = minimalkv.get_store_from_url('s3://bucket_with_dataset')
 
         >>> list_mps = read_dataset_as_metapartitions('dataset_uuid', store, 'core')
 
@@ -242,10 +242,10 @@ def read_table(
 
     .. code ::
 
-        >>> import storefact
+        >>> import minimalkv
         >>> from plateau.io.eager import read_table
 
-        >>> store = storefact.get_store_from_url('s3://bucket_with_dataset')
+        >>> store = minimalkv.get_store_from_url('s3://bucket_with_dataset')
 
         >>> df = read_table(store, 'dataset_uuid', 'core')
 

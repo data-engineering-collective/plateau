@@ -1,10 +1,10 @@
 import random
 from urllib.parse import quote
 
+import minimalkv
 import numpy as np
 import pandas as pd
 import simplejson
-import storefact
 from packaging import version
 
 from plateau.core.common_metadata import (
@@ -315,7 +315,7 @@ def test_dask_partitions(metadata_version, tmp_path):
     (tmp_path / dataset_uuid).mkdir()
     table_path = tmp_path / dataset_uuid / "core"
     table_path.mkdir()
-    store = storefact.get_store_from_url(f"hfs://{tmp_path}")
+    store = minimalkv.get_store_from_url(f"hfs://{tmp_path}")
 
     locations = ["L-{}".format(i) for i in range(2)]
     df = pd.DataFrame()

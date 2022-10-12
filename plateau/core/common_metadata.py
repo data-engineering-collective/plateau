@@ -12,7 +12,7 @@ import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 import simplejson
-from simplekv import KeyValueStore
+from minimalkv import KeyValueStore
 
 from plateau.core import naming
 from plateau.core._compat import load_json
