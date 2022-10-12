@@ -252,7 +252,7 @@ When garbage collection is called, the files are removed.
 
     files_before.difference(store.keys())  # Show files removed
 
-.. _minimalkv: https://github.com/blue-yonder/minimalkv
+.. _minimalkv: https://github.com/data-engineering-collective/minimalkv
 
 
 Mutating indexed datasets
