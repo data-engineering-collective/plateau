@@ -6,7 +6,7 @@ import uuid
 
 import pandas.testing as pdt
 import pytest
-from storefact import get_store_from_url
+from minimalkv import get_store_from_url
 
 from plateau.core.testing import get_dataframe_alltypes
 from plateau.serialization import ParquetSerializer

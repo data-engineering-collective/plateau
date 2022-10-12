@@ -19,7 +19,7 @@ some data there with plateau.
     import pandas as pd
     from functools import partial
     from tempfile import TemporaryDirectory
-    from storefact import get_store_from_url
+    from minimalkv import get_store_from_url
 
     from plateau.api.dataset import store_dataframes_as_dataset
 
@@ -242,7 +242,7 @@ When garbage collection is called, the files are removed.
 .. ipython:: python
 
     from plateau.api.dataset import garbage_collect_dataset
-    from storefact import get_store_from_url
+    from minimalkv import get_store_from_url
 
     store = get_store_from_url(store_url)
 
@@ -252,7 +252,7 @@ When garbage collection is called, the files are removed.
 
     files_before.difference(store.keys())  # Show files removed
 
-.. _storefact: https://github.com/blue-yonder/storefact
+.. _minimalkv: https://github.com/data-engineering-collective/minimalkv
 
 
 Mutating indexed datasets

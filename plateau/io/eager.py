@@ -2,7 +2,7 @@ from functools import partial
 from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union, cast
 
 import pandas as pd
-from simplekv import KeyValueStore
+from minimalkv import KeyValueStore
 
 from plateau.core.common_metadata import (
     empty_dataframe_from_schema,
@@ -124,10 +124,10 @@ def read_dataset_as_dataframes(
 
     .. code ::
 
-        >>> import storefact
+        >>> import minimalkv
         >>> from plateau.io.eager import read_dataset_as_dataframes
 
-        >>> store = storefact.get_store_from_url('s3://bucket_with_dataset')
+        >>> store = minimalkv.get_store_from_url('s3://bucket_with_dataset')
 
         >>> dfs = read_dataset_as_dataframes('dataset_uuid', store, 'core')
 
@@ -182,10 +182,10 @@ def read_dataset_as_metapartitions(
 
     .. code ::
 
-        >>> import storefact
+        >>> import minimalkv
         >>> from plateau.io.eager import read_dataset_as_dataframe
 
-        >>> store = storefact.get_store_from_url('s3://bucket_with_dataset')
+        >>> store = minimalkv.get_store_from_url('s3://bucket_with_dataset')
 
         >>> list_mps = read_dataset_as_metapartitions('dataset_uuid', store, 'core')
 
@@ -242,10 +242,10 @@ def read_table(
 
     .. code ::
 
-        >>> import storefact
+        >>> import minimalkv
         >>> from plateau.io.eager import read_table
 
-        >>> store = storefact.get_store_from_url('s3://bucket_with_dataset')
+        >>> store = minimalkv.get_store_from_url('s3://bucket_with_dataset')
 
         >>> df = read_table(store, 'dataset_uuid', 'core')
 
@@ -380,7 +380,8 @@ def commit_dataset(
             raise RuntimeError(
                 f"Cannot commit more than one table to a dataset but got tables {sorted(tables_in_partitions)}"
             )
-    store = lazy_store(store)
+    if store is not None:
+        store = lazy_store(store)
     ds_factory, metadata_version, partition_on = validate_partition_keys(
         dataset_uuid=dataset_uuid,
         store=store,
@@ -593,7 +594,7 @@ def write_single_partition(
         raise TypeError("The parameter `data` is not optional")
     dataset_factory, ds_metadata_version, partition_on = validate_partition_keys(
         dataset_uuid=dataset_uuid,
-        store=lazy_store(store),
+        store=lazy_store(store) if store else None,
         ds_factory=factory,
         default_metadata_version=metadata_version,
         partition_on=partition_on,

@@ -102,7 +102,7 @@ def delete_dataset__delayed(dataset_uuid=None, store=None, factory=None):
 @normalize_args
 def garbage_collect_dataset__delayed(
     dataset_uuid: Optional[str] = None,
-    store: StoreInput = None,
+    store: Optional[StoreInput] = None,
     chunk_size: int = 100,
     factory=None,
 ) -> List[Delayed]:

@@ -9,7 +9,7 @@ from functools import partial
 
 import pandas as pd
 import pytest
-import storefact
+from minimalkv import get_store_from_url
 
 # fmt: off
 pytest.register_assert_rewrite("plateau.io.testing")
@@ -114,7 +114,7 @@ def _refuse_write(*args, **kwargs):
 
 def _get_store(path):
     url = "hfs://{}".format(path)
-    store = storefact.get_store_from_url(url)
+    store = get_store_from_url(url)
     store.delete = partial(_check_and_delete, store=store, delete_orig=store.delete)
     return store
 

@@ -24,7 +24,7 @@ from typing import (
 import numpy as np
 import pandas as pd
 import pyarrow as pa
-from simplekv import KeyValueStore
+from minimalkv import KeyValueStore
 
 from plateau.core import naming
 from plateau.core.common_metadata import (
@@ -864,6 +864,7 @@ class MetaPartition(Iterable):
         df_serializer = (
             df_serializer if df_serializer is not None else default_serializer()
         )
+        actual_store = ensure_store(store)
 
         key = get_partition_file_prefix(
             partition_label=self.label,
@@ -874,7 +875,7 @@ class MetaPartition(Iterable):
         if self.data is not None:
             df = self.data
             try:
-                file = df_serializer.store(store, key, df)
+                file = df_serializer.store(actual_store, key, df)
             except Exception as exc:
                 try:
                     if isinstance(df, pd.DataFrame):

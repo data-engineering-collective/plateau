@@ -12,7 +12,7 @@ from functools import lru_cache
 import numpy as np
 import pandas as pd
 import pyarrow as pa
-import storefact
+from minimalkv import get_store_from_url
 
 from plateau.core.index import ExplicitSecondaryIndex
 from plateau.io_components.metapartition import MetaPartition
@@ -44,7 +44,7 @@ class IndexBase(AsvBenchmarkConfig):
             column=self.column_name, index_dct=index_dct, dtype=arrow_type
         )
         self.tmp_dir = tempfile.mkdtemp()
-        self.store = storefact.get_store_from_url("hfs://{}".format(self.tmp_dir))
+        self.store = get_store_from_url("hfs://{}".format(self.tmp_dir))
         self.dataset_uuid = "some_uuid"
         self.storage_key = self.ktk_index.store(self.store, self.dataset_uuid)
 

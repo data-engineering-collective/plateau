@@ -1,7 +1,7 @@
 from functools import partial
 from typing import Dict, Iterable, List, Optional, cast
 
-from simplekv import KeyValueStore
+from minimalkv import KeyValueStore
 
 from plateau.core import naming
 from plateau.core.common_metadata import (

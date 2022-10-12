@@ -13,9 +13,9 @@ import numpy as np
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
+from minimalkv import KeyValueStore
 from packaging import version
 from pyarrow.parquet import ParquetFile
-from simplekv import KeyValueStore
 
 from ._generic import (
     ConjunctionType,
@@ -30,7 +30,7 @@ from ._util import ensure_unicode_string_type
 
 try:
     # Only check for BotoStore instance if boto is really installed
-    from simplekv.net.botostore import BotoStore
+    from minimalkv.net.botostore import BotoStore
 
     HAVE_BOTO = True
 except ImportError:

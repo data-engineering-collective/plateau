@@ -11,8 +11,7 @@ dependencies:
   - pandas>=0.23.0, !=1.0.0
   - pyarrow>=0.17.1,!=1.0.0, <10
   - simplejson
-  - simplekv
-  - storefact
+  - minimalkv
   - toolz
   - urlquote>=1.1.3
   - zstandard
