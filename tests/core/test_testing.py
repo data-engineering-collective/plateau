@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import pandas as pd
 
 from plateau.core.testing import get_dataframe_alltypes

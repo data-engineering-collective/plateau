@@ -241,9 +241,7 @@ def normalize_arg(arg_name, old_value):
         if _args is None:
             return []
         if isinstance(_args, (set, frozenset, dict)):
-            raise ValueError(
-                "{} is incompatible for normalisation.".format(type(_args))
-            )
+            raise ValueError(f"{type(_args)} is incompatible for normalisation.")
         return list(_args)
 
     if arg_name in _NORMALIZE_ARGS_LIST:

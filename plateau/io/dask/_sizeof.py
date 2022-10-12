@@ -6,12 +6,12 @@ def _dct_sizeof(obj):
 
 
 def register_sizeof_ktk_classes():
+    from plateau.core.common_metadata import SchemaWrapper
     from plateau.core.dataset import DatasetMetadata
     from plateau.core.factory import DatasetFactory
-    from plateau.io_components.metapartition import MetaPartition
     from plateau.core.index import ExplicitSecondaryIndex, PartitionIndex
     from plateau.core.partition import Partition
-    from plateau.core.common_metadata import SchemaWrapper
+    from plateau.io_components.metapartition import MetaPartition
 
     dask_sizeof.register(DatasetMetadata, _dct_sizeof)
     dask_sizeof.register(DatasetFactory, _dct_sizeof)

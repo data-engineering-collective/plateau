@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # pylint: disable=E1101
 
 
@@ -27,7 +26,7 @@ def test_store_dataset_from_partitions(meta_partitions_files_only, store, frozen
 
     assert dataset.metadata == expected_metadata
     assert sorted(dataset.partitions.values(), key=lambda x: x.label) == sorted(
-        [mp.partition for mp in meta_partitions_files_only], key=lambda x: x.label
+        (mp.partition for mp in meta_partitions_files_only), key=lambda x: x.label
     )
     assert dataset.uuid == "dataset_uuid"
 

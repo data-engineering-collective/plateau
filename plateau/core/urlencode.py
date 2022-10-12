@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from typing import Iterable, List, Tuple, Union
 
 from urlquote import quote as urlquote_quote
@@ -68,9 +67,7 @@ def quote_indices(indices: Iterable[Tuple[str, str]]) -> List[str]:
     """
     quoted_pairs = []
     for column, value in indices:
-        quoted_pairs.append(
-            "{column}={value}".format(column=quote(column), value=quote(value))
-        )
+        quoted_pairs.append(f"{quote(column)}={quote(value)}")
 
     return quoted_pairs
 
