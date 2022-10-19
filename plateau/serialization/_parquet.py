@@ -289,8 +289,11 @@ class ParquetSerializer(DataFrameSerializer):
 
         table = _reset_dictionary_columns(table, exclude=categories)
         df = table.to_pandas(date_as_object=date_as_object)
-        for col in categories or []:
-            df[col] = df[col].astype("category")
+
+        if categories:
+            for col in categories:
+                df[col] = df[col].astype("category")
+
         df.columns = df.columns.map(ensure_unicode_string_type)
         if predicates:
             df = filter_df_from_predicates(
