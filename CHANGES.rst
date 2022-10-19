@@ -2,7 +2,7 @@
 Changelog
 =========
 
-Plateau 4.1.0 (2022-09-??)
+Plateau 4.1.0 (2022-10-XX)
 ==========================
 
 * Support for ``pyarrow`` 5, 6, 7, 8, 9
@@ -10,6 +10,7 @@ Plateau 4.1.0 (2022-09-??)
 * Support for ``dask>=2022.4.2``
 * Support Python 3.8-3.10
 * Replaced ``simplekv`` and ``storefact`` usages with ``minimalkv``
+* Patch to load partition with only nulls as categorical (#55).
 
 Plateau 4.0.4 (2022-03-17)
 ==========================
