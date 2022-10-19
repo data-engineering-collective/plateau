@@ -288,11 +288,14 @@ class ParquetSerializer(DataFrameSerializer):
                 )
 
         table = _reset_dictionary_columns(table, exclude=categories)
+
         df = table.to_pandas(date_as_object=date_as_object)
 
+        # XXX: Patch until Pyarrow bug is resolved: https://issues.apache.org/jira/browse/ARROW-18099?filter=-2
         if categories:
             for col in categories:
-                df[col] = df[col].astype("category")
+                if col in df:
+                    df[col] = df[col].astype("category")
 
         df.columns = df.columns.map(ensure_unicode_string_type)
         if predicates:
