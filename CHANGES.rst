@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Plateau 4.1.2 (2022-10-20)
+==========================
+
+* Removed upper-bound pin in pyarrow version dependency
+
 Plateau 4.1.1 (2022-10-19)
 ==========================
 
