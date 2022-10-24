@@ -2,7 +2,12 @@
 Changelog
 =========
 
-Plateau 4.1.2 (2022-10-24)
+Plateau 4.1.3 (2022-10-24)
+==========================
+
+* Patch to load partition with only nulls as categorical (#55)
+
+Plateau 4.1.2 (2022-10-20)
 ==========================
 
 * Removed upper-bound pin in pyarrow version dependency
@@ -20,7 +25,6 @@ Plateau 4.1.0 (2022-10-19)
 * Support for ``dask>=2022.4.2``
 * Support Python 3.8-3.10
 * Replaced ``simplekv`` and ``storefact`` usages with ``minimalkv``
-* Patch to load partition with only nulls as categorical (#55).
 
 Plateau 4.0.4 (2022-03-17)
 ==========================
