@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Plateau 4.1.3 (2022-10-24)
+==========================
+
+* Patch to load partition with only nulls as categorical (#55)
+
 Plateau 4.1.2 (2022-10-20)
 ==========================
 
