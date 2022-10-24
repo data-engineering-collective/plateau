@@ -10,7 +10,7 @@ dependencies:
   # TODO: add support for numpy>=1.23
   - numpy!=1.15.0,!=1.16.0
   - pandas>=0.23.0, !=1.0.0
-  - pyarrow>=0.17.1,!=1.0.0, <10
+  - pyarrow>=0.17.1,!=1.0.0
   - simplejson
   - minimalkv>=1.4.2
   - toolz

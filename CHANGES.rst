@@ -2,7 +2,17 @@
 Changelog
 =========
 
-Plateau 4.1.0 (2022-10-XX)
+Plateau 4.1.2 (2022-10-24)
+==========================
+
+* Removed upper-bound pin in pyarrow version dependency
+
+Plateau 4.1.1 (2022-10-19)
+==========================
+
+* Fix usage of ``setuptools_scm``
+
+Plateau 4.1.0 (2022-10-19)
 ==========================
 
 * Support for ``pyarrow`` 5, 6, 7, 8, 9
