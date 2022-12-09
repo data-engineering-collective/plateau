@@ -118,7 +118,6 @@ def test_read_table_simple_list_for_cols_cats(dataset, store_session):
 
 
 def test_write_and_read_default_table_name(store_session):
-
     df_write = pd.DataFrame({"P": [3.14, 2.71]})
     store_dataframes_as_dataset(store_session, "test_default_table_name", [df_write])
 

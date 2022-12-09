@@ -9,11 +9,12 @@ _logger = logging.getLogger(__name__)
 
 
 def update_indices_from_partitions(partition_list, dataset_metadata_factory):
-    """
-    This takes indices from a partition list and overwrites all indices in the dataset metadata
-    provided by the dataset metadata factory. The same is done in the store dataset part. This is used
-    in an additional build index step (by the build_dataset_indices__pipeline) which should be used after
-    updating partitions of a dataset.
+    """This takes indices from a partition list and overwrites all indices in
+    the dataset metadata provided by the dataset metadata factory.
+
+    The same is done in the store dataset part. This is used in an
+    additional build index step (by the build_dataset_indices__pipeline)
+    which should be used after updating partitions of a dataset.
     """
 
     dataset_indices = MetaPartition.merge_indices(partition_list)

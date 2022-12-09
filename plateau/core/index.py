@@ -39,8 +39,7 @@ __all__ = (
 
 
 class IndexBase(CopyMixin):
-    """
-    Initialize an IndexBase.
+    """Initialize an IndexBase.
 
     Parameters
     ----------
@@ -138,17 +137,14 @@ class IndexBase(CopyMixin):
         )
 
     def observed_values(self, date_as_object=True) -> np.ndarray:
-        """
-        Return an array of all observed values
-        """
+        """Return an array of all observed values."""
         keys = np.array(list(self.index_dct.keys()))
         labeled_array = pa.array(keys, type=self.dtype)
         return np.array(labeled_array.to_pandas(date_as_object=date_as_object))
 
     @staticmethod
     def normalize_value(dtype: pa.DataType, value: Any) -> Any:
-        """
-        Normalize value according to index dtype.
+        """Normalize value according to index dtype.
 
         This may apply casts (e.g. integers to floats) or parsing (e.g. timestamps from strings) to the value.
 
@@ -207,15 +203,12 @@ class IndexBase(CopyMixin):
 
     @property
     def loaded(self) -> bool:
-        """
-        Check if the index was already loaded into memory.
-        """
+        """Check if the index was already loaded into memory."""
         return self._index_dct_available
 
     def eval_operator(self, op: str, value: ValueType) -> Set[str]:
-        """
-        Evaluates a given operator on the index for a given value and returns all
-        partition labels allowed by this index.
+        """Evaluates a given operator on the index for a given value and
+        returns all partition labels allowed by this index.
 
         Parameters
         ----------
@@ -253,9 +246,8 @@ class IndexBase(CopyMixin):
         return result
 
     def query(self, value: ValueType) -> List[str]:
-        """
-        Query this index for a given value. Raises an exception if the index is external
-        and not loaded.
+        """Query this index for a given value. Raises an exception if the index
+        is external and not loaded.
 
         Parameters
         ----------
@@ -275,18 +267,14 @@ class IndexBase(CopyMixin):
         return self.index_dct.get(IndexBase.normalize_value(self.dtype, value), [])
 
     def to_dict(self) -> IndexDictType:
-        """
-        Serialise the object to Python object that can be part of a larger
-        dictionary that may be serialised to JSON.
-        """
+        """Serialise the object to Python object that can be part of a larger
+        dictionary that may be serialised to JSON."""
         if self.index_dct is None:
             raise RuntimeError("Index dict not set.")
         return self.index_dct
 
     def update(self, index: "IndexBase", inplace: bool = False) -> "IndexBase":
-        """
-
-        Returns a new Index object in case of a change.
+        """Returns a new Index object in case of a change.
 
         The new index object will no longer carry the attribute `index_storage_key`
         since it is no longer a proper representation of the stored index object.
@@ -334,8 +322,7 @@ class IndexBase(CopyMixin):
     def remove_partitions(
         self, list_of_partitions: List[str], inplace: bool = False
     ) -> "IndexBase":
-        """
-        Removes a partition from the internal index dictionary
+        """Removes a partition from the internal index dictionary.
 
         The new index object will no longer carry the attribute `index_storage_key`
         since it is no longer a proper representation of the stored index object.
@@ -377,8 +364,7 @@ class IndexBase(CopyMixin):
     def remove_values(
         self, list_of_values: List[str], inplace: bool = False
     ) -> "IndexBase":
-        """
-        Removes a value from the internal index dictionary
+        """Removes a value from the internal index dictionary.
 
         Parameters
         ----------
@@ -449,9 +435,7 @@ class IndexBase(CopyMixin):
         date_as_object: bool = False,
         predicates: PredicatesType = None,
     ) -> pd.Series:
-        """
-
-        Convert the Index object to a pandas.Series
+        """Convert the Index object to a pandas.Series.
 
         Parameters
         ----------
@@ -487,7 +471,6 @@ class IndexBase(CopyMixin):
         part_1    1
         part_2    1
         Name: col, dtype: int64
-
         """
         check_predicates(predicates)
         table = _index_dct_to_table(
@@ -550,9 +533,9 @@ class IndexBase(CopyMixin):
 
 
 class PartitionIndex(IndexBase):
-    """
-    An Index class representing partition indices (sometimes also referred to as primary indices).
-    A PartitionIndex is usually constructed by parsing the partition filenames which encode index information.
+    """An Index class representing partition indices (sometimes also referred
+    to as primary indices). A PartitionIndex is usually constructed by parsing
+    the partition filenames which encode index information.
 
     The constructor for this class should usually not be called explicitly but indices should be created by e.g.
     :meth:`plateau.core.dataset.DatasetMetadataBase.load_partition_indices`
@@ -583,11 +566,13 @@ class PartitionIndex(IndexBase):
 
 
 class ExplicitSecondaryIndex(IndexBase):
-    """
-    An Index class representing an explicit, secondary index which is calculated and stored next to the dataset.
-    In contrast to the `PartitionIndex` this needs to be calculated by an explicit pass over the data. All mutations of
-    this class will erase the reference to the physical file and the storage of the mutated object will write to a new
-    storage key.
+    """An Index class representing an explicit, secondary index which is
+    calculated and stored next to the dataset.
+
+    In contrast to the `PartitionIndex` this needs to be calculated by
+    an explicit pass over the data. All mutations of this class will
+    erase the reference to the physical file and the storage of the
+    mutated object will write to a new storage key.
     """
 
     def __init__(
@@ -621,9 +606,7 @@ class ExplicitSecondaryIndex(IndexBase):
         )
 
     def unload(self) -> "IndexBase":
-        """
-        Drop index data to safe memory.
-        """
+        """Drop index data to safe memory."""
         idx = self.copy(index_dct={}, index_storage_key=self.index_storage_key)
         idx._index_dct_available = False
         return idx
@@ -642,8 +625,7 @@ class ExplicitSecondaryIndex(IndexBase):
 
     @staticmethod
     def from_v2(column: str, dct_or_str: Union[str, IndexDictType]) -> "IndexBase":
-        """
-        Create an index instance from a version 2 Python structure.
+        """Create an index instance from a version 2 Python structure.
 
         Parameters
         ----------
@@ -664,8 +646,7 @@ class ExplicitSecondaryIndex(IndexBase):
             return ExplicitSecondaryIndex(column=column, index_dct=dct_or_str)
 
     def store(self, store: StoreInput, dataset_uuid: str) -> str:
-        """
-        Store the index as a parquet file
+        """Store the index as a parquet file.
 
         If compatible, the new keyname will be the name stored under the attribute `index_storage_key`.
         If this attribute is None, a new key will be generated of the format
@@ -722,8 +703,7 @@ class ExplicitSecondaryIndex(IndexBase):
         return storage_key
 
     def load(self, store: StoreInput):
-        """
-        Load an external index into memory. Returns a new index object that
+        """Load an external index into memory. Returns a new index object that
         contains the index dictionary. Returns itself if the index is internal
         or an already loaded index.
 
@@ -786,8 +766,7 @@ _MULTI_COLUMN_INDEX_DCT_TYPE = Dict[str, IndexBase]
 def merge_indices(
     list_of_indices: List[_MULTI_COLUMN_INDEX_DCT_TYPE],
 ) -> _MULTI_COLUMN_INDEX_DCT_TYPE:
-    """
-    Merge a list of index dictionaries
+    """Merge a list of index dictionaries.
 
     Parameters
     ----------
@@ -821,8 +800,7 @@ def merge_indices(
 def remove_partitions_from_indices(
     index_dict: _MULTI_COLUMN_INDEX_DCT_TYPE, partitions: List[str]
 ):
-    """
-    Remove a given list of partitions from a plateau index dictionary
+    """Remove a given list of partitions from a plateau index dictionary.
 
     Parameters
     ----------
@@ -838,9 +816,8 @@ def remove_partitions_from_indices(
 
 
 def filter_indices(index_dict: _MULTI_COLUMN_INDEX_DCT_TYPE, partitions: Iterable[str]):
-    """
-    Filter a plateau index dictionary such that only the provided list of partitions is included
-    in the index dictionary
+    """Filter a plateau index dictionary such that only the provided list of
+    partitions is included in the index dictionary.
 
     All indices must be embedded!
 

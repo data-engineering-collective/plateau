@@ -1,6 +1,4 @@
-"""
-Workarounds for limitations of the minimalkv API.
-"""
+"""Workarounds for limitations of the minimalkv API."""
 import logging
 import time
 from urllib.parse import quote
@@ -16,14 +14,10 @@ try:
 except ImportError:
 
     class _BlockBlobService:  # type: ignore
-        """
-        Dummy class.
-        """
+        """Dummy class."""
 
     class _AzureMissingResourceHttpError:  # type: ignore
-        """
-        Dummy class.
-        """
+        """Dummy class."""
 
 
 try:
@@ -33,14 +27,10 @@ try:
 except ImportError:
 
     class _ContainerClient:  # type: ignore
-        """
-        Dummy class.
-        """
+        """Dummy class."""
 
     class _ResourceNotFoundError:  # type: ignore
-        """
-        Dummy class.
-        """
+        """Dummy class."""
 
 
 __all__ = ("copy_keys",)
@@ -187,8 +177,7 @@ def _copy_naive(keys, src_store, tgt_store):
 
 
 def copy_keys(keys, src_store, tgt_store):
-    """
-    Copy keys from one store the another.
+    """Copy keys from one store the another.
 
     Parameters
     ----------

@@ -38,9 +38,8 @@ pd.options.mode.chained_assignment = "raise"
 
 @pytest.fixture
 def frozen_time():
-    """
-    Depend on this fixture to set the time to TIME_TO_FREEZE
-    by patching plateau.core._time.* with mock objects.
+    """Depend on this fixture to set the time to TIME_TO_FREEZE by patching
+    plateau.core._time.* with mock objects.
 
     Note: you only need one of the fixtures `frozen_time`,
     `distributed_frozen_time`, or `frozen_time_em`:
@@ -310,11 +309,10 @@ def _get_meta_partitions_with_dataframe(metadata_version):
 
 @pytest.fixture(scope="session")
 def meta_partitions_dataframe(metadata_version):
-    """
-    Create a list of MetaPartitions for testing. The partitions
-    include in-memory pd.DataFrames without external references, i.e. files
-     are empty
+    """Create a list of MetaPartitions for testing.
 
+    The partitions include in-memory pd.DataFrames without external
+    references, i.e. files  are empty
     """
     with cm_frozen_time(TIME_TO_FREEZE):
         return _get_meta_partitions_with_dataframe(metadata_version)
@@ -322,22 +320,20 @@ def meta_partitions_dataframe(metadata_version):
 
 @pytest.fixture(scope="function")
 def meta_partitions_dataframe_function(metadata_version):
-    """
-    Create a list of MetaPartitions for testing. The partitions
-    include in-memory pd.DataFrames without external references, i.e. files
-     are empty
+    """Create a list of MetaPartitions for testing.
 
+    The partitions include in-memory pd.DataFrames without external
+    references, i.e. files  are empty
     """
     return _get_meta_partitions_with_dataframe(metadata_version)
 
 
 @pytest.fixture(scope="session")
 def meta_partitions_evaluation_dataframe(metadata_version):
-    """
-    Create a list of MetaPartitions for testing. The partitions
-    include in-memory pd.DataFrames without external references, i.e. files
-     are empty
+    """Create a list of MetaPartitions for testing.
 
+    The partitions include in-memory pd.DataFrames without external
+    references, i.e. files  are empty
     """
     df = pd.DataFrame(
         OrderedDict([("P", [1]), ("L", [1]), ("HORIZON", [1]), ("PRED", [10])])
@@ -384,10 +380,10 @@ def meta_partitions_complete_function(meta_partitions_dataframe_function, store)
 
 @pytest.fixture(scope="session")
 def meta_partitions_files_only(meta_partitions_complete):
-    """
-    Create a list of MetaPartitions for testing. The partitions
-    only include external file references with data stored in store
+    """Create a list of MetaPartitions for testing.
 
+    The partitions only include external file references with data
+    stored in store
     """
     result = []
     for mp in meta_partitions_complete:
@@ -398,10 +394,10 @@ def meta_partitions_files_only(meta_partitions_complete):
 
 @pytest.fixture(scope="function")
 def meta_partitions_files_only_function(meta_partitions_complete_function):
-    """
-    Create a list of MetaPartitions for testing. The partitions
-    only include external file references with data stored in store
+    """Create a list of MetaPartitions for testing.
 
+    The partitions only include external file references with data
+    stored in store
     """
     result = []
     for mp in meta_partitions_complete_function:
@@ -414,10 +410,10 @@ def meta_partitions_files_only_function(meta_partitions_complete_function):
 def meta_partitions_evaluation_files_only(
     meta_partitions_evaluation_dataframe, store_session
 ):
-    """
-    Create a list of MetaPartitions for testing. The partitions
-    only include external file references with data stored in store
+    """Create a list of MetaPartitions for testing.
 
+    The partitions only include external file references with data
+    stored in store
     """
     result = []
     for mp in meta_partitions_evaluation_dataframe:
@@ -429,10 +425,7 @@ def meta_partitions_evaluation_files_only(
 
 @pytest.fixture(scope="session")
 def dataset(meta_partitions_files_only, store_session_factory):
-    """
-    Create a proper plateau dataset in store with two partitions
-
-    """
+    """Create a proper plateau dataset in store with two partitions."""
     with cm_frozen_time(TIME_TO_FREEZE):
         return store_dataset_from_partitions(
             partition_list=meta_partitions_files_only,
@@ -454,10 +447,7 @@ def dataset_factory(dataset, store_session_factory):
 
 @pytest.fixture(scope="session")
 def dataset_partition_keys(meta_partitions_dataframe, store_session_factory):
-    """
-    Create a proper plateau dataset in store with two partitions
-
-    """
+    """Create a proper plateau dataset in store with two partitions."""
     with cm_frozen_time(TIME_TO_FREEZE):
         new_mps = []
         for mp in meta_partitions_dataframe:
@@ -486,10 +476,7 @@ def dataset_partition_keys_factory(dataset_partition_keys, store_session_factory
 def dataset_with_index(
     meta_partitions_dataframe, store_session_factory, metadata_version
 ):
-    """
-    Create a proper plateau dataset in store with two partitions
-
-    """
+    """Create a proper plateau dataset in store with two partitions."""
     with cm_frozen_time(TIME_TO_FREEZE):
         new_mps = []
         for mp in meta_partitions_dataframe:
@@ -518,10 +505,7 @@ def dataset_with_index_factory(dataset_with_index, store_session_factory):
 
 @pytest.fixture(scope="function")
 def dataset_function(meta_partitions_files_only_function, store):
-    """
-    Create a proper plateau dataset in store with two partitions
-
-    """
+    """Create a proper plateau dataset in store with two partitions."""
     with cm_frozen_time(TIME_TO_FREEZE):
         return store_dataset_from_partitions(
             partition_list=meta_partitions_files_only_function,

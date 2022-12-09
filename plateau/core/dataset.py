@@ -159,8 +159,7 @@ class DatasetMetadataBase(CopyMixin):
 
     @staticmethod
     def exists(uuid: str, store: StoreInput) -> bool:
-        """
-        Check if  a dataset exists in a storage
+        """Check if  a dataset exists in a storage.
 
         Parameters
         ----------
@@ -168,7 +167,6 @@ class DatasetMetadataBase(CopyMixin):
             UUID of the dataset.
         store
             Object that implements the .get method for file/object loading.
-
         """
         store = ensure_store(store)
         key = naming.metadata_key_from_uuid(uuid)
@@ -181,8 +179,7 @@ class DatasetMetadataBase(CopyMixin):
 
     @staticmethod
     def storage_keys(uuid: str, store: StoreInput) -> List[str]:
-        """
-        Retrieve all keys that belong to the given dataset.
+        """Retrieve all keys that belong to the given dataset.
 
         Parameters
         ----------
@@ -190,7 +187,6 @@ class DatasetMetadataBase(CopyMixin):
             UUID of the dataset.
         store
             Object that implements the .iter_keys method for key retrieval loading.
-
         """
         store = ensure_store(store)
         start_markers = [f"{uuid}.", f"{uuid}/"]
@@ -238,9 +234,8 @@ class DatasetMetadataBase(CopyMixin):
         return packb(self.to_dict())
 
     def load_partition_indices(self: T) -> T:
-        """
-        Load all filename encoded indices into RAM. File encoded indices can be extracted from datasets with partitions
-        stored in a format like
+        """Load all filename encoded indices into RAM. File encoded indices can
+        be extracted from datasets with partitions stored in a format like.
 
         .. code::
 
@@ -258,7 +253,6 @@ class DatasetMetadataBase(CopyMixin):
                     Value: ["partition_label"]
                 }
             }
-
         """
         if self.primary_indices_loaded:
             return self
@@ -274,8 +268,7 @@ class DatasetMetadataBase(CopyMixin):
         return self.copy(indices=combined_indices)
 
     def load_index(self: T, column: str, store: StoreInput) -> T:
-        """
-        Load an index into memory.
+        """Load an index into memory.
 
         Note: External indices need to be preloaded before they can be queried.
 
@@ -312,8 +305,7 @@ class DatasetMetadataBase(CopyMixin):
         return self.copy(indices=indices)
 
     def load_all_indices(self: T, store: StoreInput) -> T:
-        """
-        Load all registered indices into memory.
+        """Load all registered indices into memory.
 
         Note: External indices need to be preloaded before they can be queried.
 
@@ -338,11 +330,11 @@ class DatasetMetadataBase(CopyMixin):
         return ds.load_partition_indices()
 
     def query(self, indices: Optional[List[IndexBase]] = None, **kwargs) -> List[str]:
-        """
-        Query the dataset for partitions that contain specific values. Lookup is performed
-        using the embedded and loaded external indices. Additional indices need to operate
-        on the same partitions that the dataset contains, otherwise an empty list will be
-        returned (the query method only restricts the set of partition keys using the indices).
+        """Query the dataset for partitions that contain specific values.
+        Lookup is performed using the embedded and loaded external indices.
+        Additional indices need to operate on the same partitions that the
+        dataset contains, otherwise an empty list will be returned (the query
+        method only restricts the set of partition keys using the indices).
 
         Parameters
         ----------
@@ -376,8 +368,8 @@ class DatasetMetadataBase(CopyMixin):
         date_as_object: bool = True,
         predicates: PredicatesType = None,
     ):
-        """
-        Converts the dataset indices to a pandas dataframe and filter relevant indices by `predicates`.
+        """Converts the dataset indices to a pandas dataframe and filter
+        relevant indices by `predicates`.
 
         For a dataset with indices on columns `column_a` and `column_b` and three partitions,
         the dataset output may look like
@@ -441,8 +433,7 @@ class DatasetMetadataBase(CopyMixin):
     def _evaluate_conjunction(
         self, columns: List[str], predicates: PredicatesType, date_as_object: bool
     ) -> pd.DataFrame:
-        """
-        Evaluate all predicates related to `columns` to "AND".
+        """Evaluate all predicates related to `columns` to "AND".
 
         Parameters
         ----------
@@ -505,9 +496,7 @@ class DatasetMetadataBase(CopyMixin):
 
 
 class DatasetMetadata(DatasetMetadataBase):
-    """
-    Containing holding all metadata of the dataset.
-    """
+    """Containing holding all metadata of the dataset."""
 
     def __repr__(self):
         return (
@@ -530,8 +519,7 @@ class DatasetMetadata(DatasetMetadataBase):
     def load_from_buffer(
         buf, store: "KeyValueStore", format: str = "json"
     ) -> "DatasetMetadata":
-        """
-        Load a dataset from a (string) buffer.
+        """Load a dataset from a (string) buffer.
 
         Parameters
         ----------
@@ -558,8 +546,7 @@ class DatasetMetadata(DatasetMetadataBase):
         load_schema: bool = True,
         load_all_indices: bool = False,
     ) -> "DatasetMetadata":
-        """
-        Load a dataset from a storage
+        """Load a dataset from a storage.
 
         Parameters
         ----------
@@ -599,8 +586,8 @@ class DatasetMetadata(DatasetMetadataBase):
     def load_from_dict(
         dct: Dict, store: "KeyValueStore", load_schema: bool = True
     ) -> "DatasetMetadata":
-        """
-        Load dataset metadata from a dictionary and resolve any external includes.
+        """Load dataset metadata from a dictionary and resolve any external
+        includes.
 
         Parameters
         ----------
@@ -609,7 +596,6 @@ class DatasetMetadata(DatasetMetadataBase):
             Object that implements the .get method for file/object loading.
         load_schema
             Load table schema
-
         """
         # Use copy here to get an OrderedDict
         metadata = copy.copy(dct)
@@ -677,11 +663,10 @@ class DatasetMetadata(DatasetMetadataBase):
 
     @staticmethod
     def from_dict(dct: Dict, explicit_partitions: bool = True):
-        """
-        Load dataset metadata from a dictionary.
+        """Load dataset metadata from a dictionary.
 
-        This must have no external references. Otherwise use ``load_from_dict``
-        to have them resolved automatically.
+        This must have no external references. Otherwise use
+        ``load_from_dict`` to have them resolved automatically.
         """
 
         # Use the builder class for reconstruction to have a single point for metadata version changes
@@ -845,8 +830,7 @@ def create_partition_key(
     index_values: List[Tuple[str, str]],
     filename: str = "data",
 ):
-    """
-    Create partition key for a plateau partition
+    """Create partition key for a plateau partition.
 
     Parameters
     ----------
@@ -870,12 +854,11 @@ def create_partition_key(
 
 
 class DatasetMetadataBuilder(CopyMixin):
-    """
-    Incrementally build up a dataset.
+    """Incrementally build up a dataset.
 
-    In constrast to a :class:`plateau.core.dataset.DatasetMetadata` instance,
-    this object is mutable and may not be a full dataset (e.g. partitions don't
-    need to be fully materialised).
+    In constrast to a :class:`plateau.core.dataset.DatasetMetadata`
+    instance, this object is mutable and may not be a full dataset (e.g.
+    partitions don't need to be fully materialised).
     """
 
     def __init__(
@@ -918,8 +901,7 @@ class DatasetMetadataBuilder(CopyMixin):
         return ds_builder
 
     def add_partition(self, name, partition):
-        """
-        Add an (embedded) Partition.
+        """Add an (embedded) Partition.
 
         Parameters
         ----------
@@ -939,8 +921,7 @@ class DatasetMetadataBuilder(CopyMixin):
 
     # TODO: maybe remove
     def add_embedded_index(self, column, index):
-        """
-        Embed an index into the metadata.
+        """Embed an index into the metadata.
 
         Parameters
         ----------
@@ -959,8 +940,7 @@ class DatasetMetadataBuilder(CopyMixin):
         self.indices[column] = index
 
     def add_external_index(self, column, filename=None):
-        """
-        Add a reference to an external index.
+        """Add a reference to an external index.
 
         Parameters
         ----------
@@ -981,8 +961,7 @@ class DatasetMetadataBuilder(CopyMixin):
         return filename
 
     def add_metadata(self, key, value):
-        """
-        Add arbitrary key->value metadata.
+        """Add arbitrary key->value metadata.
 
         Parameters
         ----------
@@ -992,12 +971,10 @@ class DatasetMetadataBuilder(CopyMixin):
         self.metadata[key] = value
 
     def to_dict(self):
-        """
-        Render the dataset to a dict.
+        """Render the dataset to a dict.
 
         Returns
         -------
-
         """
         factory = type(self.metadata)
         dct = factory(
@@ -1031,8 +1008,7 @@ class DatasetMetadataBuilder(CopyMixin):
         return dct
 
     def to_json(self):
-        """
-        Render the dataset to JSON.
+        """Render the dataset to JSON.
 
         Returns
         -------
@@ -1047,8 +1023,7 @@ class DatasetMetadataBuilder(CopyMixin):
         )
 
     def to_msgpack(self) -> Tuple[str, bytes]:
-        """
-        Render the dataset to msgpack.
+        """Render the dataset to msgpack.
 
         Returns
         -------

@@ -4,9 +4,9 @@
 
 If you've found a bug, please report it to the issue tracker and
 
-* describe the bug you encountered and what the expected behavior should be,
-* provide a [mcve](https://stackoverflow.com/help/mcve) if possible, and
-* be as explicit about your environment as possible, e.g. provide a `pip freeze` / `conda list`.
+- describe the bug you encountered and what the expected behavior should be,
+- provide a [mcve](https://stackoverflow.com/help/mcve) if possible, and
+- be as explicit about your environment as possible, e.g. provide a `pip freeze` / `conda list`.
 
 ### Development
 
@@ -43,6 +43,7 @@ asv run --python=same --show-stderr
 ```
 
 #### Building documentation
+
 ```bash
 python setup.py docs
 ```

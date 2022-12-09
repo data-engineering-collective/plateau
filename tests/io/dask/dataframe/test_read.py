@@ -197,7 +197,6 @@ def test_reconstruct_dask_index_types(
 
 
 def test_reconstruct_dask_index_sorting(store_factory, monkeypatch):
-
     # Make sure we're not shuffling anything
     monkeypatch.delattr(
         dask.dataframe.shuffle, dask.dataframe.shuffle.set_index.__name__

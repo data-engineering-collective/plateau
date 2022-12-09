@@ -60,9 +60,9 @@ def _delete_all_additional_metadata(dataset_factory):
 
 
 def _delete_tl_metadata(dataset_factory, *args):
-    """
-    This function serves as a collector function for delayed objects. Therefore
-    allowing additional arguments which are not used.
+    """This function serves as a collector function for delayed objects.
+
+    Therefore allowing additional arguments which are not used.
     """
     delete_top_level_metadata(dataset_factory=dataset_factory)
 
@@ -106,8 +106,7 @@ def garbage_collect_dataset__delayed(
     chunk_size: int = 100,
     factory=None,
 ) -> List[Delayed]:
-    """
-    Remove auxiliary files that are no longer tracked by the dataset.
+    """Remove auxiliary files that are no longer tracked by the dataset.
 
     These files include indices that are no longer referenced by the metadata
     as well as files in the directories of the tables that are no longer
@@ -117,7 +116,6 @@ def garbage_collect_dataset__delayed(
     ----------
     chunk_size
         Number of files that should be deleted in a single job.
-
     """
 
     ds_factory = _ensure_factory(
@@ -159,9 +157,9 @@ def read_dataset_as_delayed_metapartitions(
     factory=None,
     dispatch_by=None,
 ):
-    """
-    A collection of dask.delayed objects to retrieve a dataset from store where each
-    partition is loaded as a :class:`~plateau.io_components.metapartition.MetaPartition`.
+    """A collection of dask.delayed objects to retrieve a dataset from store
+    where each partition is loaded as a
+    :class:`~plateau.io_components.metapartition.MetaPartition`.
 
     .. seealso:
 
@@ -169,7 +167,6 @@ def read_dataset_as_delayed_metapartitions(
 
     Parameters
     ----------
-
     """
     ds_factory = _ensure_factory(
         dataset_uuid=dataset_uuid,
@@ -238,8 +235,7 @@ def read_dataset_as_delayed(
     factory=None,
     dispatch_by=None,
 ):
-    """
-    A collection of dask.delayed objects to retrieve a dataset from store
+    """A collection of dask.delayed objects to retrieve a dataset from store
     where each partition is loaded as a :class:`~pandas.DataFrame`.
 
     Parameters
@@ -344,9 +340,8 @@ def store_delayed_as_dataset(
     table_name: str = SINGLE_TABLE,
     secondary_indices=None,
 ) -> Delayed:
-    """
-    Transform and store a list of dictionaries containing
-    dataframes to a plateau dataset in store.
+    """Transform and store a list of dictionaries containing dataframes to a
+    plateau dataset in store.
 
     Parameters
     ----------

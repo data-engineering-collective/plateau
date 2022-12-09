@@ -1,7 +1,7 @@
-"""
-This module contains logic to update an existing dataset. Update means adding
-new partitions and deleting existing partitions. plateau does not allow an
-update of the content of existing partitions.
+"""This module contains logic to update an existing dataset.
+
+Update means adding new partitions and deleting existing partitions.
+plateau does not allow an update of the content of existing partitions.
 """
 
 
@@ -11,7 +11,6 @@ from plateau.io_components.write import store_dataset_from_partitions
 
 
 def _get_partitions(dataset, query_params):
-
     partitions = []
     for params in query_params:
         partitions += dataset.query(**params)

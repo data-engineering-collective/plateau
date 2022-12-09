@@ -7,8 +7,7 @@ TEST_STRING = "Test string with lots of special characters !@#$%^&*+=()[]\\{}<>?
 
 
 def test_urlquoting_backwards_compatibility():
-    """
-    This tests asserts that unquoting strings encoded with urlquote does produce the same result as
-    unquoting strings quoted with pythons urllib (the encodings differ for Python < 3.7).
-    """
+    """This tests asserts that unquoting strings encoded with urlquote does
+    produce the same result as unquoting strings quoted with pythons urllib
+    (the encodings differ for Python < 3.7)."""
     assert unquote_ktk(quote_ktk(TEST_STRING)) == unquote_ktk(quote_python(TEST_STRING))

@@ -198,7 +198,8 @@ def test_collect_dataset_metadata_empty_dataset(store_factory):
 
 
 def test_collect_dataset_metadata_concat(store_factory):
-    """Smoke-test concatenation of empty and non-empty dataset metadata collections."""
+    """Smoke-test concatenation of empty and non-empty dataset metadata
+    collections."""
     df = pd.DataFrame(data={"A": [1, 1, 1, 1], "b": [1, 1, 2, 2]})
     store_dataframes_as_dataset(
         store=store_factory, dataset_uuid="dataset_uuid", dfs=[df], partition_on=["A"]

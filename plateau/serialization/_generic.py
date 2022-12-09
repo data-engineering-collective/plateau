@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-"""
-This module contains functionality for persisting/serialising DataFrames.
+"""This module contains functionality for persisting/serialising DataFrames.
 
 Available constants
 
@@ -34,9 +33,8 @@ PredicatesType = Optional[List[ConjunctionType]]
 
 
 class DataFrameSerializer:
-    """
-    Abstract class that supports serializing DataFrames to/from
-    minimalkv stores.
+    """Abstract class that supports serializing DataFrames to/from minimalkv
+    stores.
 
     :meta public:
     """
@@ -63,8 +61,7 @@ class DataFrameSerializer:
         predicates: Optional[PredicatesType] = None,
         date_as_object: bool = False,
     ) -> pd.DataFrame:
-        """
-        Load a DataFrame from the specified store. The key is also used to
+        """Load a DataFrame from the specified store. The key is also used to
         detect the used format.
 
         Parameters
@@ -127,8 +124,7 @@ class DataFrameSerializer:
         raise ValueError(f"The specified file format for '{key}' is not supported")
 
     def store(self, store: KeyValueStore, key_prefix: str, df: pd.DataFrame) -> str:
-        """
-        Persist a DataFrame to the specified store.
+        """Persist a DataFrame to the specified store.
 
         The used store format (e.g. Parquet) will be appended to the key.
 
@@ -152,11 +148,10 @@ class DataFrameSerializer:
 
 
 def filter_df(df, filter_query=None):
-    """
-    General implementation of query filtering.
+    """General implementation of query filtering.
 
-    Serialisation formats such as Parquet that support predicate push-down
-    may pre-filter in their own implementations.
+    Serialisation formats such as Parquet that support predicate push-
+    down may pre-filter in their own implementations.
     """
     if df.shape[0] > 0 and filter_query is not None:
         df = df.query(filter_query)
@@ -164,9 +159,7 @@ def filter_df(df, filter_query=None):
 
 
 def check_predicates(predicates: PredicatesType) -> None:
-    """
-    Check if predicates are well-formed.
-    """
+    """Check if predicates are well-formed."""
     if predicates is None:
         return
 
@@ -213,8 +206,8 @@ def check_predicates(predicates: PredicatesType) -> None:
 def filter_predicates_by_column(
     predicates: PredicatesType, columns: List[str]
 ) -> Optional[PredicatesType]:
-    """
-    Takes a predicate list and removes all literals which are not referencing one of the given column
+    """Takes a predicate list and removes all literals which are not
+    referencing one of the given column.
 
     .. ipython:: python
 
@@ -249,8 +242,7 @@ def filter_predicates_by_column(
 
 
 def columns_in_predicates(predicates: PredicatesType) -> Set[str]:
-    """
-    Determine all columns which are mentioned in the list of predicates.
+    """Determine all columns which are mentioned in the list of predicates.
 
     Parameters
     ----------
@@ -273,8 +265,8 @@ def filter_df_from_predicates(
     predicates: Optional[PredicatesType],
     strict_date_types: bool = False,
 ) -> pd.DataFrame:
-    """
-    Filter a `pandas.DataFrame` based on predicates in disjunctive normal form.
+    """Filter a `pandas.DataFrame` based on predicates in disjunctive normal
+    form.
 
     Parameters
     ----------
@@ -350,9 +342,8 @@ def _handle_timelike_values(array_value_type, value, value_dtype, strict_date_ty
 def _ensure_type_stability(
     array_like, value, strict_date_types, require_ordered, column_name=None
 ):
-    """
-    Ensure that the provided value and the provided array will have compatible
-    types, such that comparisons are unambiguous.
+    """Ensure that the provided value and the provided array will have
+    compatible types, such that comparisons are unambiguous.
 
     The type check is based on the numpy type system and accesses the arrays
     `kind` attribute and asserts equality. The provided value will be
@@ -426,8 +417,7 @@ def filter_array_like(
     strict_date_types: bool = False,
     column_name: Optional[str] = None,
 ):
-    """
-    Filter an array-like object using operations defined in the predicates
+    """Filter an array-like object using operations defined in the predicates.
 
     Parameters
     ----------

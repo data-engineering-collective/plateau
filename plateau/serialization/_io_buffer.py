@@ -1,8 +1,9 @@
-"""
-Improved IO buffering compared to ``io.BufferedReader``.
+"""Improved IO buffering compared to ``io.BufferedReader``.
 
-The main issues w/ ``io.BufferedReader`` is that it is only meant of sequencial reads and that it resets the buffer on
-``.seek(...)``. This happens quite often in pyarrow and basically renders the buffereing inefficient.
+The main issues w/ ``io.BufferedReader`` is that it is only meant of
+sequencial reads and that it resets the buffer on ``.seek(...)``. This
+happens quite often in pyarrow and basically renders the buffereing
+inefficient.
 """
 
 import io
@@ -13,18 +14,16 @@ _logger = logging.getLogger(__name__)
 
 
 class BufferReadError(IOError):
-    """
-    Internal plateau error while attempting to read from buffer
-    """
+    """Internal plateau error while attempting to read from buffer."""
 
     pass
 
 
 class BlockBuffer(io.BufferedIOBase):
-    """
-    Block-based buffer.
+    """Block-based buffer.
 
-    The input is split into fixed sizes blocks. Every block can be read independently.
+    The input is split into fixed sizes blocks. Every block can be read
+    independently.
     """
 
     def __init__(self, raw, blocksize=1024):
@@ -44,35 +43,31 @@ class BlockBuffer(io.BufferedIOBase):
             raise ValueError("blocksize must be at least 1")
 
     def _raw_closed(self):
-        """
-        If supported by ``raw``, return its closed state, otherwise return ``False``.
-        """
+        """If supported by ``raw``, return its closed state, otherwise return
+        ``False``."""
         if hasattr(self._raw, "closed"):
             return self._raw.closed
         else:
             return False
 
     def _raw_readable(self):
-        """
-        If supported by ``raw``, return its readable state, otherwise return ``True``.
-        """
+        """If supported by ``raw``, return its readable state, otherwise return
+        ``True``."""
         if hasattr(self._raw, "readable"):
             return self._raw.readable()
         else:
             return True
 
     def _raw_seekable(self):
-        """
-        If supported by ``raw``, return its seekable state, otherwise return ``True``.
-        """
+        """If supported by ``raw``, return its seekable state, otherwise return
+        ``True``."""
         if hasattr(self._raw, "seekable"):
             return self._raw.seekable()
         else:
             return True
 
     def _setup_cache(self):
-        """
-        Set up cache data structure and inspect underlying IO object.
+        """Set up cache data structure and inspect underlying IO object.
 
         If the cache is already inialized, this is a no-op.
         """
@@ -95,8 +90,7 @@ class BlockBuffer(io.BufferedIOBase):
         self._cached_blocks = [None] * n_blocks
 
     def _fetch_blocks(self, block, n):
-        """
-        Fetch blocks from underlying IO object.
+        """Fetch blocks from underlying IO object.
 
         This will mark the fetched blocks as loaded.
 
@@ -131,8 +125,7 @@ class BlockBuffer(io.BufferedIOBase):
             self._cached_blocks[block + i] = data[begin:end]
 
     def _ensure_range_loaded(self, start, size):
-        """
-        Ensure that a given byte range is loaded into the cache.
+        """Ensure that a given byte range is loaded into the cache.
 
         This will scan for blocks that are not loaded yet and tries to load consecutive blocks as once.
 
@@ -184,8 +177,7 @@ class BlockBuffer(io.BufferedIOBase):
             self._fetch_blocks(to_fetch_start, to_fetch_n)
 
     def _read_data_from_blocks(self, start, size):
-        """
-        Read data from bytes.
+        """Read data from bytes.
 
         Parameters
         ----------
@@ -213,8 +205,7 @@ class BlockBuffer(io.BufferedIOBase):
         ]
 
     def _check_closed(self):
-        """
-        Check that file object currently is not closed.
+        """Check that file object currently is not closed.
 
         Raises
         ------

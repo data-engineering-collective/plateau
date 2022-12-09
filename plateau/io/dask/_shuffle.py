@@ -16,9 +16,10 @@ _KTK_HASH_BUCKET = "__KTK_HASH_BUCKET"
 
 
 def _hash_bucket(df: pd.DataFrame, subset: Optional[Sequence[str]], num_buckets: int):
-    """
-    Categorize each row of `df` based on the data in the columns `subset`
-    into `num_buckets` values. This is based on `pandas.util.hash_pandas_object`
+    """Categorize each row of `df` based on the data in the columns `subset`
+    into `num_buckets` values.
+
+    This is based on `pandas.util.hash_pandas_object`
     """
 
     if not subset:
@@ -45,8 +46,7 @@ def shuffle_store_dask_partitions(
     sort_partitions_by: List[str],
     bucket_by: Sequence[str],
 ) -> da.Array:
-    """
-    Perform a dataset update with dask reshuffling to control partitioning.
+    """Perform a dataset update with dask reshuffling to control partitioning.
 
     The shuffle operation will perform the following steps
 
@@ -91,7 +91,6 @@ def shuffle_store_dask_partitions(
     -------
 
     A dask.Array holding relevant MetaPartition objects as values
-
     """
     if ddf.npartitions == 0:
         return ddf
@@ -141,7 +140,7 @@ def _unpack_store_partition(
     metadata_version: int,
     unpacked_meta: pd.DataFrame,
 ) -> MetaPartition:
-    """Unpack payload data and store partition"""
+    """Unpack payload data and store partition."""
     df = unpack_payload_pandas(df, unpacked_meta)
     if _KTK_HASH_BUCKET in df:
         df = df.drop(_KTK_HASH_BUCKET, axis=1)

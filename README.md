@@ -1,5 +1,4 @@
-plateau
-=======
+# plateau
 
 _flat files, flat land_
 
@@ -29,8 +28,8 @@ The `plateau.io` module provides building blocks to create and modify these
 datasets in data pipelines. plateau handles I/O, tracks dataset partitions
 and selects subsets of data transparently.
 
-Installation
----------------------------
+## Installation
+
 Installers for the latest released version are availabe at the [Python
 package index](https://pypi.org/project/plateau) and on conda-forge.
 

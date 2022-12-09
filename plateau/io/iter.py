@@ -47,10 +47,8 @@ def read_dataset_as_metapartitions__iterator(
     factory=None,
     dispatch_by=None,
 ):
-    """
-
-    A Python iterator to retrieve a dataset from store where each
-    partition is loaded as a :class:`~plateau.io_components.metapartition.MetaPartition`.
+    """A Python iterator to retrieve a dataset from store where each partition
+    is loaded as a :class:`~plateau.io_components.metapartition.MetaPartition`.
 
     .. seealso:
 
@@ -58,7 +56,6 @@ def read_dataset_as_metapartitions__iterator(
 
     Parameters
     ----------
-
     """
 
     ds_factory = _ensure_factory(
@@ -114,9 +111,8 @@ def read_dataset_as_dataframes__iterator(
     factory=None,
     dispatch_by=None,
 ):
-    """
-    A Python iterator to retrieve a dataset from store where each
-    partition is loaded as a :class:`~pandas.DataFrame`.
+    """A Python iterator to retrieve a dataset from store where each partition
+    is loaded as a :class:`~pandas.DataFrame`.
 
     Parameters
     ----------
@@ -184,8 +180,8 @@ def update_dataset_from_dataframes__iter(
     factory=None,
     table_name: str = SINGLE_TABLE,
 ):
-    """
-    Update a plateau dataset in store iteratively, using a generator of dataframes.
+    """Update a plateau dataset in store iteratively, using a generator of
+    dataframes.
 
     Useful for datasets which do not fit into memory.
 
@@ -266,8 +262,8 @@ def store_dataframes_as_dataset__iter(
     secondary_indices=None,
     table_name: str = SINGLE_TABLE,
 ):
-    """
-    Store `pd.DataFrame` s iteratively as a partitioned dataset with multiple tables (files).
+    """Store `pd.DataFrame` s iteratively as a partitioned dataset with
+    multiple tables (files).
 
     Useful for datasets which do not fit into memory.
 
@@ -278,7 +274,6 @@ def store_dataframes_as_dataset__iter(
     -------
     dataset: plateau.core.dataset.DatasetMetadata
         The stored dataset.
-
     """
 
     if dataset_uuid is None:

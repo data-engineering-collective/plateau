@@ -1,5 +1,4 @@
-"""
-Code was taken from pandas
+"""Code was taken from pandas.
 
 https://github.com/pandas-dev/pandas/blob/c5a47118d73a53a016a28103726b57e27924bf29/pandas/util/_decorators.py#L66
 

@@ -12,8 +12,8 @@ class Partition:
         files: Optional[Dict[str, str]] = None,
         metadata: Optional[Dict] = None,
     ):
-        """
-        An object for the internal representation of the metadata of a partition.
+        """An object for the internal representation of the metadata of a
+        partition.
 
         This class is for internal use only
 

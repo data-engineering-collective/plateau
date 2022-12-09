@@ -2,7 +2,6 @@
 
 Please describe the current behavior, why it is a problem and what the expected behavior should be.
 
-
 ### Example code (ideally copy-pastable)
 
 Please provide a minimal reproducible code example to reproduce the behavior,

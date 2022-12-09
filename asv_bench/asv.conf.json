@@ -1,7 +1,7 @@
 {
     "version": 1,
     "project": "plateau",
-    
+
     "project_url": "https://github.com/data-engineering-collective/plateau",
     "repo": ".",
     "environment_type": "virtualenv",

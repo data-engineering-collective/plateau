@@ -70,8 +70,8 @@ def read_dataset_as_ddf(
     dask_index_on=None,
     dispatch_by=None,
 ):
-    """
-    Retrieve a single table from a dataset as partition-individual :class:`~dask.dataframe.DataFrame` instance.
+    """Retrieve a single table from a dataset as partition-individual
+    :class:`~dask.dataframe.DataFrame` instance.
 
     Please take care when using categoricals with Dask. For index columns, this function will construct dataset
     wide categoricals. For all other columns, Dask will determine the categories on a partition level and will
@@ -134,9 +134,8 @@ def read_dataset_as_ddf(
 
 
 def _get_dask_meta_for_dataset(ds_factory, columns, categoricals, dates_as_object):
-    """
-    Calculate a schema suitable for the dask dataframe meta from the dataset.
-    """
+    """Calculate a schema suitable for the dask dataframe meta from the
+    dataset."""
     table_schema = ds_factory.schema
     meta = empty_dataframe_from_schema(
         table_schema, columns=columns, date_as_object=dates_as_object
@@ -281,9 +280,7 @@ def store_dataset_from_ddf(
     bucket_by: Optional[Union[List[str], str]] = None,
     overwrite: bool = False,
 ):
-    """
-    Store a dataset from a dask.dataframe.
-    """
+    """Store a dataset from a dask.dataframe."""
     # normalization done by normalize_args but mypy doesn't recognize this
     sort_partitions_by = cast(List[str], sort_partitions_by)
     secondary_indices = cast(List[str], secondary_indices)
@@ -413,8 +410,7 @@ def update_dataset_from_ddf(
     factory: Optional[DatasetFactory] = None,
     bucket_by: Optional[Union[List[str], str]] = None,
 ):
-    """
-    Update a dataset from a dask.dataframe.
+    """Update a dataset from a dask.dataframe.
 
     See Also
     --------
@@ -482,8 +478,8 @@ def collect_dataset_metadata(
     frac: float = 1.0,
     factory: Optional[DatasetFactory] = None,
 ) -> dd.DataFrame:
-    """
-    Collect parquet metadata of the dataset. The `frac` parameter can be used to select a subset of the data.
+    """Collect parquet metadata of the dataset. The `frac` parameter can be
+    used to select a subset of the data.
 
     .. warning::
       If the size of the partitions is not evenly distributed, e.g. some partitions might be larger than others,
@@ -521,7 +517,6 @@ def collect_dataset_metadata(
     ------
     ValueError
       If no metadata could be retrieved, raise an error.
-
     """
     if not 0.0 < frac <= 1.0:
         raise ValueError(
@@ -581,8 +576,7 @@ def hash_dataset(
     predicates: Optional[PredicatesType] = None,
     factory: Optional[DatasetFactory] = None,
 ) -> dd.Series:
-    """
-    Calculate a partition wise, or group wise, hash of the dataset.
+    """Calculate a partition wise, or group wise, hash of the dataset.
 
     .. note::
 

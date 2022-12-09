@@ -19,9 +19,8 @@ TIME_TO_FREEZE_ISO_QUOTED = "2000-01-01T01%3A01%3A01.000001"
 
 
 def get_dataframe_alltypes():
-    """
-    Return a pandas DataFrame of length one with a column for each commonly used data types
-    """
+    """Return a pandas DataFrame of length one with a column for each commonly
+    used data types."""
     # fmt: off
     not_nested = get_dataframe_not_nested()
     nested_types = pd.DataFrame(
@@ -69,9 +68,7 @@ def get_dataframe_not_nested():
 
 
 def get_scalar_dtype_strategy(exclude=None):
-    """
-    A `hypothesis` strategy yielding
-    """
+    """A `hypothesis` strategy yielding."""
     possible_strategies = {
         "datetime": hyp_np.datetime64_dtypes(max_period="ms", min_period="ns"),
         "uint": hyp_np.unsigned_integer_dtypes(),
@@ -167,10 +164,8 @@ def get_numpy_array_strategy(
 
 @contextlib.contextmanager
 def cm_frozen_time(time_to_freeze):
-    """
-    Context manager to monkeypatch plateau.core._time.* to return
-    a fixed datetime value `time_to_freeze`.
-    """
+    """Context manager to monkeypatch plateau.core._time.* to return a fixed
+    datetime value `time_to_freeze`."""
     with mock.patch("plateau.core._time.datetime_now") as mock_now, mock.patch(
         "plateau.core._time.datetime_utcnow"
     ) as mock_utcnow:

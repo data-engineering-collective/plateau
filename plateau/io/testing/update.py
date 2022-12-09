@@ -626,10 +626,8 @@ def test_update_raises_incompatible_inidces(
 def test_update_of_dataset_with_non_default_table_name(
     store_factory, bound_update_dataset
 ):
-    """
-    Tests that datasets with table names other than "table" can be created,
-    updated and read successfully (regression test for issue #445).
-    """
+    """Tests that datasets with table names other than "table" can be created,
+    updated and read successfully (regression test for issue #445)."""
 
     # Create initial dataset
     dataset_uuid = "dataset_uuid"

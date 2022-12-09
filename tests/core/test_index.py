@@ -36,9 +36,8 @@ def test_index_update(inplace):
 
 @pytest.mark.parametrize("inplace", [True, False])
 def test_storage_key_after_update(inplace):
-    """
-    Assert that the storage key is not set after mutation of the index object
-    """
+    """Assert that the storage key is not set after mutation of the index
+    object."""
     original_index = ExplicitSecondaryIndex(
         column="col",
         index_dct={1: ["part_1", "part_2"], 3: ["part_3"]},
@@ -284,7 +283,6 @@ def test_index_as_flat_series():
 
 
 def test_index_as_flat_series_single_value():
-
     index1 = ExplicitSecondaryIndex(
         column="col", index_dct={1: ["part_1", "part_2"]}, dtype=pa.int64()
     )
@@ -302,7 +300,6 @@ def test_index_as_flat_series_single_value():
 
 
 def test_index_as_flat_series_partitions_as_index():
-
     index1 = ExplicitSecondaryIndex(
         column="col",
         index_dct={1: ["part_1", "part_2"], 2: ["part_1"]},
@@ -345,9 +342,8 @@ def test_index_as_flat_series_highly_degenerated_sym():
 
 
 def test_index_as_flat_series_highly_degenerated_asym():
-    """
-    Ensure that the generation of the series is not bound by col numbers or nans in the matrix
-    """
+    """Ensure that the generation of the series is not bound by col numbers or
+    nans in the matrix."""
     dim = 4
     ind_dct = {k: [f"part_{i}" for i in range(0, dim)] for k in range(0, dim)}
     ind_dct[0] = ["part_1"]
@@ -778,7 +774,7 @@ def test_index_uint():
     ],
 )
 def test_serialization(key):
-    """Check index remains consistent after serializing and de-serializing"""
+    """Check index remains consistent after serializing and de-serializing."""
     index = ExplicitSecondaryIndex(
         column="col", index_dct={key: ["part_2", "part_4", "part_1"]}
     )
@@ -809,12 +805,12 @@ def test_serialization(key):
     ],
 )
 def test_serialization_normalization(key):
-    """
-    Check that index normalizes values consistently after serializing.
+    """Check that index normalizes values consistently after serializing.
 
     This is helpful to ensure correct behavior for cases such as when
-    key=`datetime.datetime(2018, 1, 1, 12, 30)`, as this would be parsed to
-    `pa.timestamp("us")` during index creation, but stored as `pa.timestamp("ns")`.
+    key=`datetime.datetime(2018, 1, 1, 12, 30)`, as this would be parsed
+    to `pa.timestamp("us")` during index creation, but stored as
+    `pa.timestamp("ns")`.
     """
     index = ExplicitSecondaryIndex(
         column="col", index_dct={key: ["part_2", "part_4", "part_1"]}

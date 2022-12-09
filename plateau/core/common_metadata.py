@@ -30,9 +30,8 @@ __all__ = (
 
 
 class SchemaWrapper:
-    """
-    Wrapper object for pyarrow.Schema to handle forwards and backwards compatibility.
-    """
+    """Wrapper object for pyarrow.Schema to handle forwards and backwards
+    compatibility."""
 
     def __init__(self, schema, origin: Union[str, Set[str]]):
         if isinstance(origin, str):
@@ -47,14 +46,12 @@ class SchemaWrapper:
         self._schema_compat()
 
     def with_origin(self, origin: Union[str, Set[str]]) -> "SchemaWrapper":
-        """
-        Create new SchemaWrapper with given origin.
+        """Create new SchemaWrapper with given origin.
 
         Parameters
         ----------
         origin:
             New origin.
-
         """
         return SchemaWrapper(self.__schema, origin)
 
@@ -148,8 +145,7 @@ class SchemaWrapper:
 
 
 def normalize_column_order(schema, partition_keys=None):
-    """
-    Normalize column order in schema.
+    """Normalize column order in schema.
 
     Columns are sorted in the following way:
 
@@ -219,8 +215,7 @@ def normalize_column_order(schema, partition_keys=None):
 
 
 def make_meta(obj, origin, partition_keys=None):
-    """
-    Create metadata object for DataFrame.
+    """Create metadata object for DataFrame.
 
     .. note::
         This function can, for convenience reasons, also be applied to schema objects in which case they are just
@@ -288,8 +283,7 @@ def normalize_type(
     t_np: Optional[str],
     metadata: Optional[Dict[str, Any]],
 ) -> Tuple[pa.DataType, Optional[str], Optional[str], Optional[Dict[str, Any]]]:
-    """
-    This will normalize types as followed:
+    """This will normalize types as followed:
 
     - all signed integers (``int8``, ``int16``, ``int32``, ``int64``) will be converted to ``int64``
     - all unsigned integers (``uint8``, ``uint16``, ``uint32``, ``uint64``) will be converted to ``uint64``
@@ -309,7 +303,6 @@ def normalize_type(
         numpy type identifier, e.g. ``"object"``.
     metadata
         metadata associated with the type, e.g. information about categorials.
-
     """
     if pa.types.is_signed_integer(t_pa):
         return pa.int64(), "int64", "int64", None
@@ -337,8 +330,7 @@ def _get_common_metadata_key(dataset_uuid, table):
 def read_schema_metadata(
     dataset_uuid: str, store: KeyValueStore, table: str = SINGLE_TABLE
 ) -> SchemaWrapper:
-    """
-    Read schema and metadata from store.
+    """Read schema and metadata from store.
 
     Parameters
     ----------
@@ -364,8 +356,7 @@ def store_schema_metadata(
     store: KeyValueStore,
     table: str = SINGLE_TABLE,
 ) -> str:
-    """
-    Store schema and metadata to store.
+    """Store schema and metadata to store.
 
     Parameters
     ----------
@@ -410,9 +401,7 @@ def _bytes2schema(data: bytes) -> SchemaWrapper:
 
 
 def _pandas_in_schemas(schemas):
-    """
-    Check if any schema contains pandas metadata
-    """
+    """Check if any schema contains pandas metadata."""
     has_pandas = False
     for schema in schemas:
         if schema.metadata and b"pandas" in schema.metadata:
@@ -423,9 +412,8 @@ def _pandas_in_schemas(schemas):
 def _determine_schemas_to_compare(
     schemas: Sequence[SchemaWrapper], ignore_pandas: bool
 ) -> Tuple[Optional[SchemaWrapper], List[Tuple[SchemaWrapper, List[str]]]]:
-    """
-    Iterate over a list of `pyarrow.Schema` objects and prepares them for comparison by picking a reference
-    and determining all null columns.
+    """Iterate over a list of `pyarrow.Schema` objects and prepares them for
+    comparison by picking a reference and determining all null columns.
 
     .. note::
 
@@ -586,8 +574,7 @@ def _diff_schemas(first, second):
 
 
 def validate_compatible(schemas, ignore_pandas=False):
-    """
-    Validate that all schemas in a given list are compatible.
+    """Validate that all schemas in a given list are compatible.
 
     Apart from the pandas version preserved in the schema metadata, schemas must be completely identical. That includes
     a perfect match of the whole metadata (except the pandas version) and pyarrow types.
@@ -675,8 +662,7 @@ Reference schema:
 
 
 def validate_shared_columns(schemas, ignore_pandas=False):
-    """
-    Validate that columns that are shared amongst schemas are compatible.
+    """Validate that columns that are shared amongst schemas are compatible.
 
     Only DataFrame columns are taken into account, other fields (like index data) are ignored. The following data must
     be an exact match:
@@ -751,8 +737,7 @@ def _dict_to_binary(dct):
 
 
 def empty_dataframe_from_schema(schema, columns=None, date_as_object=False):
-    """
-    Create an empty DataFrame from provided schema.
+    """Create an empty DataFrame from provided schema.
 
     Parameters
     ----------

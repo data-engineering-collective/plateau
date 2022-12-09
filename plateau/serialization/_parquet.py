@@ -1,6 +1,4 @@
-"""
-This module contains functionality for persisting/serialising DataFrames.
-"""
+"""This module contains functionality for persisting/serialising DataFrames."""
 
 
 import datetime
@@ -59,9 +57,7 @@ def _empty_table_from_schema(parquet_file):
 
 
 def _reset_dictionary_columns(table, exclude=None):
-    """
-    We need to ensure that the dtype is exactly as requested, see GH227
-    """
+    """We need to ensure that the dtype is exactly as requested, see GH227."""
     if exclude is None:
         exclude = []
 
@@ -84,15 +80,13 @@ def _reset_dictionary_columns(table, exclude=None):
 
 
 class ParquetReadError(IOError):
-    """
-    Internal plateau error while attempting to read Parquet file
-    """
+    """Internal plateau error while attempting to read Parquet file."""
 
     pass
 
 
 class ParquetSerializer(DataFrameSerializer):
-    """Serializer to store a :class:`pandas.DataFrame` as parquet
+    """Serializer to store a :class:`pandas.DataFrame` as parquet.
 
     On top of the plain serialization, this class handles forward and
     backwards compatibility between pyarrow versions.
@@ -393,10 +387,8 @@ def _columns_for_pushdown(columns, predicates):
 
 
 def _read_row_groups_into_tables(parquet_file, columns, predicates_in):
-    """
-    For each RowGroup check if the predicate in DNF applies and then
-    read the respective RowGroup.
-    """
+    """For each RowGroup check if the predicate in DNF applies and then read
+    the respective RowGroup."""
     arrow_schema = parquet_file.schema.to_arrow_schema()
     parquet_reader = parquet_file.reader
 
@@ -537,14 +529,14 @@ def _normalize_value(value, pa_type, column_name=None):
 
 
 def _predicate_accepts(predicate, row_meta, arrow_schema, parquet_reader):
-    """
-    Checks if a predicate evaluates on a column.
+    """Checks if a predicate evaluates on a column.
 
-    This method first casts the value of the predicate to the type used for this column
-    in the statistics and then applies the relevant operator. The operation applied here
-    is done in a fashion to check if the predicate would evaluate to True for any possible
-    row in the RowGroup. Thus e.g. for the `==` predicate, we check if the predicate value
-    is in the (min, max) range of the RowGroup.
+    This method first casts the value of the predicate to the type used
+    for this column in the statistics and then applies the relevant
+    operator. The operation applied here is done in a fashion to check
+    if the predicate would evaluate to True for any possible row in the
+    RowGroup. Thus e.g. for the `==` predicate, we check if the
+    predicate value is in the (min, max) range of the RowGroup.
     """
     col, op, val = predicate
     col_idx = parquet_reader.column_name_idx(col)

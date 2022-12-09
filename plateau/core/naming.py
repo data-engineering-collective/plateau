@@ -1,6 +1,4 @@
-"""
-Global naming constants for datasets
-"""
+"""Global naming constants for datasets."""
 
 
 # FIXME: move this constant somewhere else. Cannot import from its declaration due to cyclic imports

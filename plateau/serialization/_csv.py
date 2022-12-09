@@ -1,7 +1,5 @@
 #!/usr/bin/env python
-"""
-This module contains functionality for persisting/serialising DataFrames.
-"""
+"""This module contains functionality for persisting/serialising DataFrames."""
 
 import gzip
 from io import BufferedIOBase, BytesIO, StringIO

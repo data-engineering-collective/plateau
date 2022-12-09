@@ -505,9 +505,7 @@ def test_diff_schemas(df_all_types):
 
 
 def test_validate_schema_non_overlapping_nulls(df_all_types_schema):
-    """
-    Test that two schemas with non-overlapping null columns are valid
-    """
+    """Test that two schemas with non-overlapping null columns are valid."""
     first_ix = np.random.randint(len(df_all_types_schema))
     second_ix = first_ix
     while second_ix == first_ix:
