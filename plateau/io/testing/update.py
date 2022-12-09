@@ -664,5 +664,5 @@ def test_update_of_dataset_with_non_default_table_name(
         .compute()
         .reset_index(drop=True)
     )
-    df_expected = df_create.append(df_update).reset_index(drop=True)
+    df_expected = pd.concat([df_create, df_update]).reset_index(drop=True)
     pd.testing.assert_frame_equal(df_read, df_expected)

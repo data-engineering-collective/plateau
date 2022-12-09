@@ -406,8 +406,7 @@ def test_read_dataset_as_dataframes_dispatch_by_multi_col(
                 data = part
             unique_dispatch = data[list(dispatch_by)].drop_duplicates()
             assert len(unique_dispatch) == 1
-            row = unique_dispatch
-            uniques.append(row)
+            uniques = pd.concat([uniques, unique_dispatch])
         assert not any(uniques.duplicated())
 
 
