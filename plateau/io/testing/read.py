@@ -1,5 +1,6 @@
-"""
-This module is a collection of tests which should be implemented by all plateau
+"""This module is a collection of tests which should be implemented by all
+plateau.
+
 **read** backends. The tests are not subject to the semantic versioning scheme and may change with minor or even patch releases.
 
 To use the tests of this module, add the following import statement to your test module and ensure that the following fixtures are available in your test environment.
@@ -24,7 +25,6 @@ Feature toggles (optional):
 The following fixtures should be present (see tests.read.conftest)
 * ``use_categoricals`` - Whether or not the call retrievs categorical data.
 * ``dates_as_object`` - Whether or not the call retrievs date columns as objects.
-
 """
 
 import datetime
@@ -72,7 +72,6 @@ def no_pickle_store(url):
 
 
 def no_pickle_factory(url):
-
     return partial(no_pickle_store, url)
 
 

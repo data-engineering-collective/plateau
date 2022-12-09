@@ -2,9 +2,7 @@ from .utils import create_dataset
 
 
 def test_delete_dataset(store_factory, metadata_version, bound_delete_dataset):
-    """
-    Ensure that a dataset can be deleted
-    """
+    """Ensure that a dataset can be deleted."""
     create_dataset("dataset", store_factory, metadata_version)
 
     store = store_factory()
@@ -14,9 +12,7 @@ def test_delete_dataset(store_factory, metadata_version, bound_delete_dataset):
 
 
 def test_delete_single_dataset(store_factory, metadata_version, bound_delete_dataset):
-    """
-    Ensure that only the specified dataset is deleted
-    """
+    """Ensure that only the specified dataset is deleted."""
     create_dataset("dataset", store_factory, metadata_version)
     create_dataset("another_dataset", store_factory, metadata_version)
     store = store_factory()
@@ -27,10 +23,8 @@ def test_delete_single_dataset(store_factory, metadata_version, bound_delete_dat
 
 
 def test_delete_only_dataset(store_factory, metadata_version, bound_delete_dataset):
-    """
-    Ensure that files including the UUID but not starting with it
-    are not deleted
-    """
+    """Ensure that files including the UUID but not starting with it are not
+    deleted."""
     create_dataset("UUID", store_factory, metadata_version)
 
     store = store_factory()
@@ -40,9 +34,8 @@ def test_delete_only_dataset(store_factory, metadata_version, bound_delete_datas
 
 
 def test_delete_missing_dataset(store_factory, store_factory2, bound_delete_dataset):
-    """
-    Ensure that a dataset can be deleted even though some keys are already removed.
-    """
+    """Ensure that a dataset can be deleted even though some keys are already
+    removed."""
     metadata_version = 4
     create_dataset("dataset", store_factory, metadata_version)
 
@@ -67,9 +60,8 @@ def test_delete_missing_dataset(store_factory, store_factory2, bound_delete_data
 def test_delete_dataset_unreferenced_files(
     store_factory, metadata_version, bound_delete_dataset
 ):
-    """
-    Ensure that unreferenced files of a dataset are also removed when a dataset is deleted
-    """
+    """Ensure that unreferenced files of a dataset are also removed when a
+    dataset is deleted."""
     uuid = "dataset"
     create_dataset(uuid, store_factory, metadata_version)
 

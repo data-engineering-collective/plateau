@@ -1,6 +1,4 @@
-"""
-Pandas performance helpers.
-"""
+"""Pandas performance helpers."""
 
 from collections import OrderedDict
 from typing import Any, List, cast
@@ -20,8 +18,7 @@ __all__ = (
 
 
 def concat_dataframes(dfs, default=None):
-    """
-    Concatenate given DataFrames.
+    """Concatenate given DataFrames.
 
     For non-empty iterables, this is roughly equivalent to::
 
@@ -88,8 +85,7 @@ def concat_dataframes(dfs, default=None):
 
 
 def is_dataframe_sorted(df, columns):
-    """
-    Check that the given DataFrame is sorted as specified.
+    """Check that the given DataFrame is sorted as specified.
 
     This is more efficient than sorting the DataFrame.
 
@@ -144,8 +140,7 @@ def is_dataframe_sorted(df, columns):
 
 
 def sort_dataframe(df, columns):
-    """
-    Sort DataFrame by columns.
+    """Sort DataFrame by columns.
 
     This is roughly equivalent to::
 
@@ -178,8 +173,7 @@ def sort_dataframe(df, columns):
 
 
 def mask_sorted_duplicates_keep_last(df, columns):
-    """
-    Mask duplicates on sorted data, keep last occurance as unique entry.
+    """Mask duplicates on sorted data, keep last occurance as unique entry.
 
     Roughly equivalent to::
 
@@ -218,8 +212,7 @@ def mask_sorted_duplicates_keep_last(df, columns):
 
 
 def drop_sorted_duplicates_keep_last(df, columns):
-    """
-    Drop duplicates on sorted data, keep last occurance as unique entry.
+    """Drop duplicates on sorted data, keep last occurance as unique entry.
 
     Roughly equivalent to::
 
@@ -253,8 +246,7 @@ def drop_sorted_duplicates_keep_last(df, columns):
 
 
 def aggregate_to_lists(df, by, data_col):
-    """
-    Do a group-by and collect the results as python lists.
+    """Do a group-by and collect the results as python lists.
 
     Roughly equivalent to::
 
@@ -299,9 +291,8 @@ def aggregate_to_lists(df, by, data_col):
     group_values: List[Any] = []
 
     def _store_group():
-        """
-        Store current group from `group_idx` and `group_values` intro result lists.
-        """
+        """Store current group from `group_idx` and `group_values` intro result
+        lists."""
         if group_idx is None:
             # no group exists yet
             return
@@ -332,8 +323,8 @@ def aggregate_to_lists(df, by, data_col):
 
 
 def merge_dataframes_robust(df1, df2, how):
-    """
-    Merge two given DataFrames but also work if there are no columns to join on.
+    """Merge two given DataFrames but also work if there are no columns to join
+    on.
 
     If now shared column between the given DataFrames is found, then the join will be performaned on a single, constant
     column.

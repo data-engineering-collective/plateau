@@ -93,7 +93,6 @@ def _combine_predicates(predicates, logical_conjunction):
 
 
 def _initialize_store_for_metapartition(method, method_args, method_kwargs):
-
     for store_variable in ["store", "storage"]:
         if store_variable in method_kwargs:
             method_kwargs[store_variable] = ensure_store(method_kwargs[store_variable])
@@ -118,8 +117,8 @@ def _initialize_store_for_metapartition(method, method_args, method_kwargs):
 
 
 def _apply_to_list(method):
-    """
-    Decorate a MetaPartition method to act upon the internal list of metapartitions
+    """Decorate a MetaPartition method to act upon the internal list of
+    metapartitions.
 
     The methods must return a MetaPartition object!
     """
@@ -197,10 +196,8 @@ class MetaPartitionIterator(Iterator):
 
 
 class MetaPartition(Iterable):
-    """
-    Wrapper for plateau partition which includes additional information
-    about the parent dataset
-    """
+    """Wrapper for plateau partition which includes additional information
+    about the parent dataset."""
 
     def __init__(
         self,
@@ -214,8 +211,7 @@ class MetaPartition(Iterable):
         partition_keys: Optional[Sequence[str]] = None,
         logical_conjunction: Optional[List[Tuple[Any, str, Any]]] = None,
     ):
-        """
-        Initialize the :mod:`plateau.io` base class MetaPartition.
+        """Initialize the :mod:`plateau.io` base class MetaPartition.
 
         The `MetaPartition` is used as a wrapper around the plateau
         `Partition` and primarily deals with dataframe manipulations,
@@ -434,8 +430,8 @@ class MetaPartition(Iterable):
         metapartition: "MetaPartition",
         schema_validation: bool = True,
     ):
-        """
-        Adds a metapartition to the internal list structure to enable batch processing.
+        """Adds a metapartition to the internal list structure to enable batch
+        processing.
 
         Parameters
         ----------
@@ -481,8 +477,8 @@ class MetaPartition(Iterable):
 
     @staticmethod
     def from_dict(dct):
-        """
-        Create a :class:`~plateau.io_components.metapartition.MetaPartition` from a dictionary.
+        """Create a :class:`~plateau.io_components.metapartition.MetaPartition`
+        from a dictionary.
 
         Parameters
         ----------
@@ -491,7 +487,6 @@ class MetaPartition(Iterable):
 
         Returns
         -------
-
         """
         return MetaPartition(
             label=dct["label"],
@@ -520,16 +515,12 @@ class MetaPartition(Iterable):
 
     @_apply_to_list
     def remove_dataframes(self):
-        """
-        Remove all dataframes from the metapartition in memory.
-        """
+        """Remove all dataframes from the metapartition in memory."""
         return self.copy(data=None)
 
     def _split_predicates_in_index_and_content(self, predicates):
-        """
-        Split a list of predicates in the parts that can be resolved by the
-        partition columns and the ones that are persisted in the data file.
-        """
+        """Split a list of predicates in the parts that can be resolved by the
+        partition columns and the ones that are persisted in the data file."""
         # Predicates are split in this function into the parts that apply to
         # the partition key columns `key_part` and the parts that apply to the
         # contents of the file `content_part`.
@@ -548,10 +539,9 @@ class MetaPartition(Iterable):
         return split_predicates, has_index_condition
 
     def _apply_partition_key_predicates(self, indices, split_predicates):
-        """
-        Apply the predicates to the partition_key columns and return the remaining
-        predicates that should be pushed to the DataFrame serialiser.
-        """
+        """Apply the predicates to the partition_key columns and return the
+        remaining predicates that should be pushed to the DataFrame
+        serialiser."""
         # Construct a single line DF with the partition columns
         schema = self.schema
         if schema is None:
@@ -602,8 +592,7 @@ class MetaPartition(Iterable):
         dates_as_object: bool = True,
         predicates: PredicatesType = None,
     ) -> "MetaPartition":
-        """
-        Load the dataframes of the partitions from store into memory.
+        """Load the dataframes of the partitions from store into memory.
 
         Parameters
         ----------
@@ -629,7 +618,6 @@ class MetaPartition(Iterable):
                     {
                         'core': pd.DataFrame()
                     }
-
         """
 
         if categoricals is None:
@@ -730,10 +718,8 @@ class MetaPartition(Iterable):
 
     @_apply_to_list
     def load_schema(self, store: StoreInput, dataset_uuid: str) -> "MetaPartition":
-        """
-        Loads all table metadata in memory and stores it under the `tables` attribute
-
-        """
+        """Loads all table metadata in memory and stores it under the `tables`
+        attribute."""
 
         if self.schema is None:
             store = ensure_store(store)
@@ -812,8 +798,8 @@ class MetaPartition(Iterable):
     def validate_schema_compatible(
         self, store: StoreInput, dataset_uuid: str
     ) -> "MetaPartition":
-        """
-        Validates that the currently held DataFrames match the schema of the existing dataset.
+        """Validates that the currently held DataFrames match the schema of the
+        existing dataset.
 
         Parameters
         ----------
@@ -845,9 +831,9 @@ class MetaPartition(Iterable):
         dataset_uuid: str,
         df_serializer: Optional[DataFrameSerializer] = None,
     ) -> "MetaPartition":
-        """
-        Stores all dataframes of the MetaPartitions and registers the saved
-        files under the `files` atrribute. The dataframe itself is deleted from memory.
+        """Stores all dataframes of the MetaPartitions and registers the saved
+        files under the `files` atrribute. The dataframe itself is deleted from
+        memory.
 
         Parameters
         ----------
@@ -905,8 +891,7 @@ class MetaPartition(Iterable):
         func: Callable,
         type_safe: bool = False,
     ) -> "MetaPartition":
-        """
-        Applies a given function to all dataframes of the MetaPartition.
+        """Applies a given function to all dataframes of the MetaPartition.
 
         Parameters
         ----------
@@ -916,7 +901,6 @@ class MetaPartition(Iterable):
             The changed dataset is assigned a new UUID.
         type_safe
             If the transformation is type-safe, optimizations can be applied
-
         """
 
         new_data = func(self.data)
@@ -940,9 +924,8 @@ class MetaPartition(Iterable):
         )
 
     def copy(self, **kwargs):
-        """
-        Creates a shallow copy where the kwargs overwrite existing attributes
-        """
+        """Creates a shallow copy where the kwargs overwrite existing
+        attributes."""
 
         def _renormalize_meta(meta):
             if "partition_keys" in kwargs and meta is not None:
@@ -1006,9 +989,9 @@ class MetaPartition(Iterable):
 
     @_apply_to_list
     def build_indices(self, columns: Iterable[str]):
-        """
-        This builds the indices for this metapartition for the given columns. The indices for the passed columns
-        are rebuilt, so exisiting index entries in the metapartition are overwritten.
+        """This builds the indices for this metapartition for the given
+        columns. The indices for the passed columns are rebuilt, so exisiting
+        index entries in the metapartition are overwritten.
 
         :param columns: A list of columns from which the indices over all dataframes in the metapartition
             are overwritten
@@ -1051,8 +1034,8 @@ class MetaPartition(Iterable):
 
     @_apply_to_list
     def partition_on(self, partition_on: Union[str, Sequence[str]]):
-        """
-        Partition all dataframes assigned to this MetaPartition according the the given columns.
+        """Partition all dataframes assigned to this MetaPartition according
+        the the given columns.
 
         If the MetaPartition object contains index information, the information is split in such a way that they
         reference the new partitions.
@@ -1085,8 +1068,6 @@ class MetaPartition(Iterable):
         Parameters
         ----------
         partition_on
-
-
         """
         if partition_on == self.partition_keys:
             return self
@@ -1280,9 +1261,8 @@ class MetaPartition(Iterable):
         return self.copy(file=None, data=None)
 
     def get_parquet_metadata(self, store: StoreInput) -> pd.DataFrame:
-        """
-        Retrieve the parquet metadata for the MetaPartition.
-        Especially relevant for calculating dataset statistics.
+        """Retrieve the parquet metadata for the MetaPartition. Especially
+        relevant for calculating dataset statistics.
 
         Parameters
         ----------
@@ -1339,10 +1319,8 @@ def _unique_label(label_list):
 
 
 def partition_labels_from_mps(mps: List[MetaPartition]) -> List[str]:
-    """
-    Get a list of partition labels, flattening any nested meta partitions in the input and ignoring sentinels.
-
-    """
+    """Get a list of partition labels, flattening any nested meta partitions in
+    the input and ignoring sentinels."""
     partition_labels = []
     for mp in mps:
         if len(mp) > 1:
@@ -1360,8 +1338,7 @@ def parse_input_to_metapartition(
     table_name: str = SINGLE_TABLE,
     metadata_version: Optional[int] = None,
 ) -> MetaPartition:
-    """
-    Parses given user input and return a MetaPartition
+    """Parses given user input and return a MetaPartition.
 
     The expected input is a :class:`pandas.DataFrame` or a list of
     :class:`pandas.DataFrame`.

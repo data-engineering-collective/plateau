@@ -6,26 +6,26 @@ from urlquote.quoting import PYTHON_3_7_QUOTING
 
 
 def quote(value):
-    """
-    Performs percent encoding on a sequence of bytes. if the given value is of string type, it will
-    be encoded. If the value is neither of string type nor bytes type, it will be cast using the `str`
-    constructor before being encoded in UTF-8.
+    """Performs percent encoding on a sequence of bytes.
+
+    if the given value is of string type, it will be encoded. If the
+    value is neither of string type nor bytes type, it will be cast
+    using the `str` constructor before being encoded in UTF-8.
     """
     return urlquote_quote(value, quoting=PYTHON_3_7_QUOTING).decode("utf-8")
 
 
 def unquote(value):
-    """
-    Decodes a urlencoded string and performs necessary decoding depending on the used python version.
-    """
+    """Decodes a urlencoded string and performs necessary decoding depending on
+    the used python version."""
     return urlquote_unquote(value).decode("utf-8")
 
 
 def decode_key(
     key: str,
 ) -> Union[Tuple[str, str, List, str], Tuple[str, None, List, None]]:
-    """
-    Split a given key into its plateau components `{dataset_uuid}/{table}/{key_indices}/{filename}`
+    """Split a given key into its plateau components
+    `{dataset_uuid}/{table}/{key_indices}/{filename}`
 
     Example:
         `uuid/table/index_col=1/index_col=2/partition_label.parquet`
@@ -50,8 +50,7 @@ def decode_key(
 
 
 def quote_indices(indices: Iterable[Tuple[str, str]]) -> List[str]:
-    """
-    Urlencode a list of column-value pairs and encode them as:
+    """Urlencode a list of column-value pairs and encode them as:
 
         `quote(column)=quote(value)`
 
@@ -73,8 +72,7 @@ def quote_indices(indices: Iterable[Tuple[str, str]]) -> List[str]:
 
 
 def unquote_indices(index_strings: List[str]) -> List[Tuple[str, str]]:
-    """
-    Take a list of encoded column-value strings and decode them to tuples
+    """Take a list of encoded column-value strings and decode them to tuples.
 
     input: `quote(column)=quote(value)`
     output `(column, value)`

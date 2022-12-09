@@ -5,10 +5,8 @@ from plateau.serialization.testing import get_dataframe_not_nested
 
 
 class TimeRestore:
-    """
-    An example benchmark that times the performance of various kinds
-    of iterating over dictionaries in Python.
-    """
+    """An example benchmark that times the performance of various kinds of
+    iterating over dictionaries in Python."""
 
     params = [(10**3, 10**4), (10, 10**2, 10**3)]
     param_names = ["num_rows", "chunk_size"]

@@ -11,9 +11,7 @@ def _check_contains_null(val):
 
 
 def ensure_unicode_string_type(obj):
-    """
-    ensures obj is a of native string type:
-    """
+    """ensures obj is a of native string type:"""
     if isinstance(obj, bytes):
         return obj.decode("utf8")
     else:

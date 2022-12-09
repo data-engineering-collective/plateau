@@ -45,7 +45,7 @@ def reference_store():
 
 
 def test_current_arrow_version_tested():
-    """Ensure that we do not forget to generate the reference file"""
+    """Ensure that we do not forget to generate the reference file."""
     import pyarrow as pa
     from packaging.version import parse
 
@@ -56,12 +56,12 @@ def test_current_arrow_version_tested():
 
 
 def test_arrow_compat(arrow_version, reference_store, mocker):
-    """
-    Test if reading/writing across the supported arrow versions is actually
-    compatible
+    """Test if reading/writing across the supported arrow versions is actually
+    compatible.
 
-    Generate new reference files by going to the `reference-data/arrow-compat` directory and
-    executing `generate_reference.py` or `batch_generate_reference.sh`.
+    Generate new reference files by going to the `reference-data/arrow-
+    compat` directory and executing `generate_reference.py` or
+    `batch_generate_reference.sh`.
     """
 
     uuid_hook = mocker.patch("plateau.core.uuid._uuid_hook_object")

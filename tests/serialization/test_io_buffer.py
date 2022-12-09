@@ -6,9 +6,7 @@ from plateau.serialization._io_buffer import BlockBuffer
 
 
 class _ReadRecordWrapper:
-    """
-    Wrapper around file-like objects to record read requests.
-    """
+    """Wrapper around file-like objects to record read requests."""
 
     def __init__(self, raw):
         self.raw = raw
@@ -24,9 +22,8 @@ class _ReadRecordWrapper:
 
 
 class _ZeroFile:
-    """
-    Simulated files filled with NULL-bytes, can be used to test behavior on very large files.
-    """
+    """Simulated files filled with NULL-bytes, can be used to test behavior on
+    very large files."""
 
     def __init__(self, size):
         self._size = size

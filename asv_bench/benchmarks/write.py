@@ -30,9 +30,8 @@ def _partition_metadata(depth, num_leafs):
 
 
 def generate_metadata(max_depth=7, num_leafs=5):
-    """
-    Generate a metadata dictionary which holds many `partition_metadata` keys
-    """
+    """Generate a metadata dictionary which holds many `partition_metadata`
+    keys."""
     return {
         "creation_time": "2018-05-05 12:00:00",
         "partition_metadata": _partition_metadata(max_depth, num_leafs),

@@ -43,9 +43,10 @@ def write_partition(
     metadata_version: int,
     dataset_table_name: str = SINGLE_TABLE,
 ) -> MetaPartition:
-    """
-    Write a dataframe to store, performing all necessary preprocessing tasks
-    like partitioning, bucketing (NotImplemented), indexing, etc. in the correct order.
+    """Write a dataframe to store, performing all necessary preprocessing tasks
+    like partitioning, bucketing (NotImplemented), indexing, etc.
+
+    in the correct order.
     """
     store = ensure_store(store_factory)
 
@@ -217,7 +218,6 @@ def store_dataset_from_partitions(
 
 
 def update_metadata(dataset_builder, metadata_merger, dataset_metadata):
-
     metadata_list = [dataset_builder.metadata]
     new_dataset_metadata = metadata_merger(metadata_list)
 
@@ -233,7 +233,6 @@ def update_metadata(dataset_builder, metadata_merger, dataset_metadata):
 
 
 def update_partitions(dataset_builder, add_partitions, remove_partitions):
-
     for mp in add_partitions:
         for mmp in mp:
             if mmp.label is not None:

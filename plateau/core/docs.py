@@ -1,6 +1,4 @@
-"""
-This is a helper module to simplify code documentation
-"""
+"""This is a helper module to simplify code documentation."""
 
 import inspect
 from io import StringIO
@@ -181,10 +179,8 @@ _PARAMETER_MAPPING = {
 
 
 def default_docs(func):
-    """
-    A decorator which automatically takes care of default parameter
-    documentation for common pipeline factory parameters
-    """
+    """A decorator which automatically takes care of default parameter
+    documentation for common pipeline factory parameters."""
     # TODO (Kshitij68) Bug: The parameters are not come in the same order as listed in the function. For example in `store_dataframes_as_dataset`
     docs = func.__doc__
     new_docs = ""

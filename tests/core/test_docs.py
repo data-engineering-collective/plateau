@@ -102,14 +102,12 @@ def test_docs_duplicity():
     # then the parser does not end up pick the one under _PARAMETER_MAPPING
     @default_docs
     def dummy_function(store):
-        """
-        This is a dummy_function
+        """This is a dummy_function.
 
         Parameters
         -----------
         store: str
             This is an argument
-
         """
 
     resultant_docstrings = str(dummy_function.__doc__)

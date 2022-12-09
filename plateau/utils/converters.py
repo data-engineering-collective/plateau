@@ -1,6 +1,4 @@
-"""
-Helper module to convert user inputs into normalized forms.
-"""
+"""Helper module to convert user inputs into normalized forms."""
 
 from typing import Iterable, Optional, Tuple, Union
 
@@ -18,8 +16,8 @@ __all__ = (
 
 
 def converter_str_set(obj) -> frozenset:
-    """
-    Convert input to a set of unicode strings. ``None`` will be converted to an empty set.
+    """Convert input to a set of unicode strings. ``None`` will be converted to
+    an empty set.
 
     Parameters
     ----------
@@ -42,8 +40,7 @@ def converter_str_set(obj) -> frozenset:
 
 
 def converter_str_set_optional(obj):
-    """
-    Convert input to a set of unicode strings. ``None`` will be preserved.
+    """Convert input to a set of unicode strings. ``None`` will be preserved.
 
     Parameters
     ----------
@@ -66,8 +63,8 @@ def converter_str_set_optional(obj):
 
 
 def converter_str_tupleset(obj: Optional[Union[Iterable[str], str]]) -> Tuple[str, ...]:
-    """
-    Convert input to tuple of unique unicode strings. ``None`` will be converted to an empty set.
+    """Convert input to tuple of unique unicode strings. ``None`` will be
+    converted to an empty set.
 
     The input must not contain duplicate entries.
 
@@ -97,8 +94,7 @@ def converter_str_tupleset(obj: Optional[Union[Iterable[str], str]]) -> Tuple[st
 
 
 def converter_tuple(obj) -> tuple:
-    """
-    Convert input to a tuple. ``None`` will be converted to an empty tuple.
+    """Convert input to a tuple. ``None`` will be converted to an empty tuple.
 
     Parameters
     ----------
@@ -119,8 +115,7 @@ def converter_tuple(obj) -> tuple:
 
 
 def converter_str(obj) -> str:
-    """
-    Ensures input is a unicode string.
+    """Ensures input is a unicode string.
 
     Parameters
     ----------
@@ -150,8 +145,7 @@ def converter_str(obj) -> str:
 
 
 def get_str_to_python_converter(pa_type):
-    """
-    Get converter to parse string into python object.
+    """Get converter to parse string into python object.
 
     Parameters
     ----------

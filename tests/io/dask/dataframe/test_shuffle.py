@@ -32,7 +32,8 @@ def test_hash_bucket(col, num_buckets=5):
 
 
 def test_hashing_determinism():
-    """Make sure that the hashing algorithm used by pandas is independent of any context variables"""
+    """Make sure that the hashing algorithm used by pandas is independent of
+    any context variables."""
     df = pd.DataFrame({"range": np.arange(10)})
     hashed = _hash_bucket(df, ["range"], 5)
     expected = pd.DataFrame(
@@ -108,9 +109,8 @@ def test_update_shuffle_buckets(
     bucket_by,
     func,
 ):
-    """
-    Assert that certain properties are always given for the output dataset
-    no matter how the input data distribution looks like
+    """Assert that certain properties are always given for the output dataset
+    no matter how the input data distribution looks like.
 
     Properties to assert:
     * All partitions have a unique value for its correspondent primary key

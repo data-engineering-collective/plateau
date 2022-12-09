@@ -23,7 +23,6 @@ def no_pickle_store(url):
 
 
 def no_pickle_factory(url):
-
     return partial(no_pickle_store, url)
 
 

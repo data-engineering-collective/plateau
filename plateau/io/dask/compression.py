@@ -51,12 +51,11 @@ def pack_payload_pandas(partition: pd.DataFrame, group_key: List[str]) -> pd.Dat
 
 
 def pack_payload(df: dd.DataFrame, group_key: Union[List[str], str]) -> dd.DataFrame:
-    """
-    Pack all payload columns (everything except of group_key) into a single
+    """Pack all payload columns (everything except of group_key) into a single
     columns. This column will contain a single byte string containing the
-    serialized and compressed payload data. The payload data is just dead weight
-    when reshuffling. By compressing it once before the shuffle starts, this
-    saves a lot of memory and network/disk IO.
+    serialized and compressed payload data. The payload data is just dead
+    weight when reshuffling. By compressing it once before the shuffle starts,
+    this saves a lot of memory and network/disk IO.
 
     Example::
 
@@ -85,7 +84,6 @@ def pack_payload(df: dd.DataFrame, group_key: Union[List[str], str]) -> dd.DataF
 
 
     See also https://github.com/dask/dask/pull/6259
-
     """
 
     if (
@@ -117,8 +115,7 @@ def pack_payload(df: dd.DataFrame, group_key: Union[List[str], str]) -> dd.DataF
 def unpack_payload_pandas(
     partition: pd.DataFrame, unpack_meta: pd.DataFrame
 ) -> pd.DataFrame:
-    """
-    Revert ``pack_payload_pandas`` and restore packed payload
+    """Revert ``pack_payload_pandas`` and restore packed payload.
 
     unpack_meta:
         A dataframe indicating the schema of the unpacked data. This will be returned in case the input is empty
@@ -138,7 +135,8 @@ def unpack_payload_pandas(
 
 
 def unpack_payload(df: dd.DataFrame, unpack_meta: pd.DataFrame) -> dd.DataFrame:
-    """Revert payload packing of ``pack_payload`` and restores full dataframe."""
+    """Revert payload packing of ``pack_payload`` and restores full
+    dataframe."""
 
     if (
         # https://github.com/pandas-dev/pandas/issues/34455

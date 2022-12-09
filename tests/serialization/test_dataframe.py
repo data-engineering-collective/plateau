@@ -148,9 +148,8 @@ def test_filter_query_predicate_exclusion(store):
 
 
 def assert_frame_almost_equal(df_left, df_right):
-    """
-    Be more friendly to some dtypes that are not preserved during the roundtrips.
-    """
+    """Be more friendly to some dtypes that are not preserved during the
+    roundtrips."""
     # FIXME: This needs a better documentation
     for col in df_left.columns:
         if pd.api.types.is_datetime64_dtype(
@@ -226,12 +225,11 @@ def assert_frame_almost_equal(df_left, df_right):
 def test_predicate_pushdown(
     store, df, read_kwargs, predicate_pushdown_to_io, serialiser
 ):
-    """
-    Test predicate pushdown for several types and operations.
+    """Test predicate pushdown for several types and operations.
 
-    The DataFrame parameters all need to be of same length for this test to
-    work universally. Also the values in the DataFrames need to be sorted in
-    ascending order.
+    The DataFrame parameters all need to be of same length for this test
+    to work universally. Also the values in the DataFrames need to be
+    sorted in ascending order.
     """
     # All test dataframes need to have the same length
     assert len(df) == 4

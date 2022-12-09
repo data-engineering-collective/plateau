@@ -1,7 +1,7 @@
-"""
-UUID generation mechanism used in plateau.
+"""UUID generation mechanism used in plateau.
 
-Using these routines ensures compatibility w/ plateau as well as the application of best practices.
+Using these routines ensures compatibility w/ plateau as well as the
+application of best practices.
 """
 
 
@@ -9,8 +9,7 @@ import uuid
 
 
 def gen_uuid() -> str:
-    """
-    Generate new UUID.
+    """Generate new UUID.
 
     Returns
     -------
@@ -21,8 +20,7 @@ def gen_uuid() -> str:
 
 
 def _uuid_hook_object():
-    """
-    Internal UUID function that could easily be overwritten for tests.
+    """Internal UUID function that could easily be overwritten for tests.
 
     Returns
     -------
@@ -33,8 +31,7 @@ def _uuid_hook_object():
 
 
 def _uuid_hook_str() -> str:
-    """
-    Internal UUID function that could easily be overwritten for tests.
+    """Internal UUID function that could easily be overwritten for tests.
 
     Returns
     -------
@@ -45,8 +42,7 @@ def _uuid_hook_str() -> str:
 
 
 def gen_uuid_object():
-    """
-    Generate new UUID.
+    """Generate new UUID.
 
     Returns
     -------

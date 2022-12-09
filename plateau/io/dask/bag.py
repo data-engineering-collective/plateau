@@ -60,8 +60,7 @@ def read_dataset_as_metapartitions_bag(
     dispatch_by=None,
     partition_size=None,
 ):
-    """
-    Retrieve dataset as `dask.bag.Bag` of `MetaPartition` objects.
+    """Retrieve dataset as `dask.bag.Bag` of `MetaPartition` objects.
 
     Parameters
     ----------
@@ -135,8 +134,8 @@ def read_dataset_as_dataframe_bag(
     dispatch_by=None,
     partition_size=None,
 ):
-    """
-    Retrieve data as dataframe from a :class:`dask.bag.Bag` of `MetaPartition` objects
+    """Retrieve data as dataframe from a :class:`dask.bag.Bag` of
+    `MetaPartition` objects.
 
     Parameters
     ----------
@@ -177,9 +176,8 @@ def store_bag_as_dataset(
     secondary_indices=None,
     table_name: str = SINGLE_TABLE,
 ):
-    """
-    Transform and store a dask.bag of dictionaries containing
-    dataframes to a plateau dataset in store.
+    """Transform and store a dask.bag of dictionaries containing dataframes to
+    a plateau dataset in store.
 
     This is the dask.bag-equivalent of
     :func:`~plateau.io.dask.delayed.store_delayed_as_dataset`. See there
@@ -189,7 +187,6 @@ def store_bag_as_dataset(
     ----------
     bag: dask.bag.Bag
         A dask bag containing dictionaries of dataframes or dataframes.
-
     """
     store = lazy_store(store)
     if dataset_uuid is None:
@@ -240,15 +237,14 @@ def build_dataset_indices__bag(
     partition_size: Optional[int] = None,
     factory: Optional[DatasetFactory] = None,
 ) -> Delayed:
-    """
-    Function which builds a :class:`~plateau.core.index.ExplicitSecondaryIndex`.
+    """Function which builds a
+    :class:`~plateau.core.index.ExplicitSecondaryIndex`.
 
     This function loads the dataset, computes the requested indices and writes
     the indices to the dataset. The dataset partitions itself are not mutated.
 
     Parameters
     ----------
-
     """
     ds_factory = _ensure_factory(
         dataset_uuid=dataset_uuid,

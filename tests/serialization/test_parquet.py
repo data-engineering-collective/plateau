@@ -104,7 +104,6 @@ _DATETIME_TYPES = ["datetime64"]
 
 
 def _validate_predicate_pushdown(df, column, value, store, chunk_size):
-
     serialiser = ParquetSerializer(chunk_size=chunk_size)
     key = serialiser.store(store, "prefix", df)
 
@@ -443,7 +442,6 @@ def test_read_empty_categorical(store):
 
 
 def test_read_categorical_empty_dataframe(store):
-
     df = pd.DataFrame({"col": ["a"]}).astype({"col": "category"}).iloc[:0]
     serialiser = ParquetSerializer()
     key = serialiser.store(store, "prefix", df)
@@ -457,7 +455,6 @@ def test_read_categorical_empty_dataframe(store):
 
 
 def test_reset_dict_cols(store):
-
     df = pd.DataFrame({"col": ["a"], "colB": ["b"]}).astype(
         {"col": "category", "colB": "category"}
     )
@@ -477,10 +474,10 @@ def test_reset_dict_cols(store):
 
 
 def test_retry_on_IOError(monkeypatch, caplog, store):
-    """
-    See https://github.com/JDASoftwareGroup/plateau/issues/407 :
-    We are testing a retry-workaround for the above issue here. Once the issue is resolved,
-    this test and the workaround can be removed.
+    """See https://github.com/JDASoftwareGroup/plateau/issues/407 :
+
+    We are testing a retry-workaround for the above issue here. Once the
+    issue is resolved, this test and the workaround can be removed.
     """
 
     df = pd.DataFrame({"A": [0, 1, 2, 3]})
@@ -508,10 +505,10 @@ def test_retry_on_IOError(monkeypatch, caplog, store):
 
 
 def test_retries_on_IOError_logs(monkeypatch, caplog, store):
-    """
-    See https://github.com/JDASoftwareGroup/plateau/issues/407 :
-    We are testing a retry-workaround for the above issue here. Once the issue is resolved,
-    this test and the workaround can be removed.
+    """See https://github.com/JDASoftwareGroup/plateau/issues/407 :
+
+    We are testing a retry-workaround for the above issue here. Once the
+    issue is resolved, this test and the workaround can be removed.
     """
 
     def patched__restore_dataframe(**kwargs):
@@ -534,12 +531,12 @@ def test_retries_on_IOError_logs(monkeypatch, caplog, store):
 
 
 def test_retry_fail_on_other_error(monkeypatch, caplog, store):
-    """
-    See https://github.com/JDASoftwareGroup/plateau/issues/407 :
-    We are testing a retry-workaround for the above issue here. Once the issue is resolved,
-    this test and the workaround can be removed.
+    """See https://github.com/JDASoftwareGroup/plateau/issues/407 : We are
+    testing a retry-workaround for the above issue here. Once the issue is
+    resolved, this test and the workaround can be removed.
 
-    We only want to retry on OSErrors (and inherited exceptions) -- all other exceptions should be raised.
+    We only want to retry on OSErrors (and inherited exceptions) -- all
+    other exceptions should be raised.
     """
 
     df = pd.DataFrame({"A": [0, 1, 2, 3]})

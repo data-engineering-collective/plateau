@@ -783,9 +783,7 @@ def test_partition_on_nested():
 
 
 def test_partition_on_stable_order():
-    """
-    Assert that the partition_on algo is stable wrt to row ordering
-    """
+    """Assert that the partition_on algo is stable wrt to row ordering."""
     unique_values = 3
     total_values = 20
     random_index = np.repeat(
@@ -1113,9 +1111,7 @@ def test_concat_metapartition_categoricals(df_all_types):
     "col", sorted(set(get_dataframe_not_nested().columns) - {"null"})
 )
 def test_partition_on_scalar_intermediate(df_not_nested, col):
-    """
-    Test against a bug where grouping leaves a scalar value
-    """
+    """Test against a bug where grouping leaves a scalar value."""
     assert len(df_not_nested) == 1
     mp = MetaPartition(label="somelabel", data=df_not_nested, metadata_version=4)
     new_mp = mp.partition_on(col)
@@ -1206,10 +1202,8 @@ def test_column_string_cast(df_all_types, store, metadata_version):
 
 
 def test_partition_on_valid_schemas():
-    """
-    Ensure that partitioning is possible even if the output schemas of the
-    sub partitions may be different
-    """
+    """Ensure that partitioning is possible even if the output schemas of the
+    sub partitions may be different."""
     df = pd.DataFrame({"partition_col": [0, 1], "values": [None, "str"]})
     mp = MetaPartition(label="base_label", data=df, metadata_version=4)
     mp = mp.partition_on(["partition_col"])

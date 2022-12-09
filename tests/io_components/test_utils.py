@@ -94,7 +94,6 @@ def test_normalize_args(test_input, expected):
 
 @pytest.mark.parametrize("_type", ["callable", "url", "minimalkv"])
 def test_normalize_store(tmpdir, _type):
-
     store_url = f"hfs://{tmpdir}"
     store = get_store_from_url(store_url)
     store.put("test", b"")
@@ -262,9 +261,8 @@ def test_sort_cateogrical_multiple_cols():
 
 
 def test_sort_categorical_pyarrow_conversion():
-    """
-    Make sure sorting does not introduce indices that end up in the Arrow table.
-    """
+    """Make sure sorting does not introduce indices that end up in the Arrow
+    table."""
     df = pd.DataFrame(dict(a=[3, 2, 1]))
     sorted_df = sort_values_categorical(df, "a")
     table = pa.Table.from_pandas(df)

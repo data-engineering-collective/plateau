@@ -7,7 +7,7 @@ Storage Layout
 plateau structures your data using these concepts:
 
 - One whole unit of data that plateau manages is called a *dataset*.
-- A dataset consists of one or more *tables* that each have a *schema*. 
+- A dataset consists of one or more *tables* that each have a *schema*.
 - Table rows are partitioned by any number of columns: Rows having the same combination
   of values in these columns are grouped together.
 - A partition consists of one or more Parquet files, which contain a chunk of rows that

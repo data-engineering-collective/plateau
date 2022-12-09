@@ -62,8 +62,7 @@ __all__ = (
 @default_docs
 @normalize_args
 def delete_dataset(dataset_uuid=None, store=None, factory=None):
-    """
-    Delete the entire dataset from the store.
+    """Delete the entire dataset from the store.
 
     Parameters
     ----------
@@ -105,8 +104,7 @@ def read_dataset_as_dataframes(
     factory: Optional[DatasetFactory] = None,
     dispatch_by: Optional[List[str]] = None,
 ) -> List[pd.DataFrame]:
-    """
-    Read a dataset as a list of dataframes.
+    """Read a dataset as a list of dataframes.
 
     Every element of the list corresponds to a physical partition.
 
@@ -130,7 +128,6 @@ def read_dataset_as_dataframes(
         >>> store = minimalkv.get_store_from_url('s3://bucket_with_dataset')
 
         >>> dfs = read_dataset_as_dataframes('dataset_uuid', store, 'core')
-
     """
 
     ds_factory = _ensure_factory(
@@ -163,8 +160,8 @@ def read_dataset_as_metapartitions(
     factory=None,
     dispatch_by=None,
 ):
-    """
-    Read a dataset as a list of :class:`plateau.io_components.metapartition.MetaPartition`.
+    """Read a dataset as a list of
+    :class:`plateau.io_components.metapartition.MetaPartition`.
 
     Every element of the list corresponds to a physical partition.
 
@@ -188,7 +185,6 @@ def read_dataset_as_metapartitions(
         >>> store = minimalkv.get_store_from_url('s3://bucket_with_dataset')
 
         >>> list_mps = read_dataset_as_metapartitions('dataset_uuid', store, 'core')
-
     """
 
     ds_factory = _ensure_factory(
@@ -222,9 +218,9 @@ def read_table(
     predicates: Optional[List[List[Tuple[str, str, Any]]]] = None,
     factory: Optional[DatasetFactory] = None,
 ) -> pd.DataFrame:
-    """
-    A utility function to load a single table with multiple partitions as a single dataframe in one go.
-    Mostly useful for smaller tables or datasets where all partitions fit into memory.
+    """A utility function to load a single table with multiple partitions as a
+    single dataframe in one go. Mostly useful for smaller tables or datasets
+    where all partitions fit into memory.
 
     The order of partitions is not guaranteed to be stable in the resulting dataframe.
 
@@ -248,7 +244,6 @@ def read_table(
         >>> store = minimalkv.get_store_from_url('s3://bucket_with_dataset')
 
         >>> df = read_table(store, 'dataset_uuid', 'core')
-
     """
 
     ds_factory = _ensure_factory(
@@ -298,8 +293,8 @@ def commit_dataset(
     factory: Optional[DatasetFactory] = None,
     secondary_indices: Optional[Iterable[str]] = None,
 ):
-    """
-    Commit new state to an existing dataset. This can be used for three distinct operations
+    """Commit new state to an existing dataset. This can be used for three
+    distinct operations.
 
     1. Add previously written partitions to this dataset
 
@@ -367,7 +362,6 @@ def commit_dataset(
     ----------
     new_partitions:
         Input partition to be committed.
-
     """
 
     if not new_partitions and not metadata and not delete_scope:
@@ -454,8 +448,8 @@ def store_dataframes_as_dataset(
     metadata_version=DEFAULT_METADATA_VERSION,
     table_name: str = SINGLE_TABLE,
 ):
-    """
-    Utility function to store a list of dataframes as a partitioned dataset with multiple tables (files).
+    """Utility function to store a list of dataframes as a partitioned dataset
+    with multiple tables (files).
 
     Useful for very small datasets where all data fits into memory.
 
@@ -463,7 +457,6 @@ def store_dataframes_as_dataset(
     ----------
     dfs:
         The dataframe(s) to be stored.
-
     """
     if isinstance(dfs, pd.DataFrame):
         raise TypeError(
@@ -498,9 +491,9 @@ def create_empty_dataset_header(
     metadata_version=DEFAULT_METADATA_VERSION,
     table_name: str = SINGLE_TABLE,
 ):
-    """
-    Create an dataset header without any partitions. This may be used in combination
-    with :func:`~plateau.io.eager.write_single_partition` to create implicitly partitioned datasets.
+    """Create an dataset header without any partitions. This may be used in
+    combination with :func:`~plateau.io.eager.write_single_partition` to create
+    implicitly partitioned datasets.
 
     .. note::
 
@@ -561,9 +554,9 @@ def write_single_partition(
     secondary_indices=None,
     table_name: str = SINGLE_TABLE,
 ):
-    """
-    Write the parquet file(s) for a single partition. This will **not** update the dataset header and can therefore
-    be used for highly concurrent dataset writes.
+    """Write the parquet file(s) for a single partition. This will **not**
+    update the dataset header and can therefore be used for highly concurrent
+    dataset writes.
 
     For datasets with explicit partitions, the dataset header can be updated by calling
     :func:`plateau.io.eager.commit_dataset` with the output of this function.
@@ -639,8 +632,7 @@ def update_dataset_from_dataframes(
     table_name: str = SINGLE_TABLE,
     factory: Optional[DatasetFactory] = None,
 ) -> DatasetMetadata:
-    """
-    Update a plateau dataset in store at once, using a list of dataframes.
+    """Update a plateau dataset in store at once, using a list of dataframes.
 
     Useful for datasets which do not fit into memory.
 
@@ -704,8 +696,8 @@ def update_dataset_from_dataframes(
 @default_docs
 @normalize_args
 def build_dataset_indices(store, dataset_uuid, columns, factory=None):
-    """
-    Function which builds a :class:`~plateau.core.index.ExplicitSecondaryIndex`.
+    """Function which builds a
+    :class:`~plateau.core.index.ExplicitSecondaryIndex`.
 
     This function loads the dataset, computes the requested indices and writes
     the indices to the dataset. The dataset partitions itself are not mutated.
@@ -741,8 +733,7 @@ def build_dataset_indices(store, dataset_uuid, columns, factory=None):
 @default_docs
 @normalize_args
 def garbage_collect_dataset(dataset_uuid=None, store=None, factory=None):
-    """
-    Remove auxiliary files that are no longer tracked by the dataset.
+    """Remove auxiliary files that are no longer tracked by the dataset.
 
     These files include indices that are no longer referenced by the metadata
     as well as files in the directories of the tables that are no longer

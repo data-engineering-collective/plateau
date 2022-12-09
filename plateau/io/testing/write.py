@@ -35,7 +35,6 @@ def no_pickle_store(url):
 
 
 def no_pickle_factory(url):
-
     return partial(no_pickle_store, url)
 
 
@@ -161,8 +160,8 @@ def test_store_dataframes_as_dataset(
 def test_store_dataframes_as_dataset_empty_dataframe(
     store_factory, metadata_version, df_all_types, bound_store_dataframes
 ):
-    """
-    Test that writing an empty column succeeds.
+    """Test that writing an empty column succeeds.
+
     In particular, this may fail due to too strict schema validation.
     """
     df_empty = df_all_types.drop(0)
@@ -300,10 +299,8 @@ def test_store_dataframes_partition_on(store_factory, bound_store_dataframes):
 
 
 def _exception_str(exception):
-    """
-    Extract the exception message, even if this is a re-throw of an exception
-    in distributed.
-    """
+    """Extract the exception message, even if this is a re-throw of an
+    exception in distributed."""
     if isinstance(exception, ValueError) and exception.args[0] == "Long error message":
         return exception.args[1]
     return str(exception)
@@ -418,7 +415,6 @@ def _exception_str(exception):
     ],
 )
 def test_schema_check_write(dfs, ok, store_factory, bound_store_dataframes):
-
     if ok:
         bound_store_dataframes(
             dfs,

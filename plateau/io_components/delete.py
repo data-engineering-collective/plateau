@@ -17,7 +17,6 @@ def delete_indices(dataset_factory):
 
 
 def delete_top_level_metadata(dataset_factory, *args):
-    """
-    The additional arguments allow to schedule this function with delayed objects.
-    """
+    """The additional arguments allow to schedule this function with delayed
+    objects."""
     dataset_factory.store.delete(metadata_key_from_uuid(dataset_factory.dataset_uuid))

@@ -14,9 +14,7 @@ T = TypeVar("T", bound="DatasetFactory")
 
 
 class DatasetFactory(DatasetMetadataBase):
-    """
-    Container holding metadata caching storage access.
-    """
+    """Container holding metadata caching storage access."""
 
     _nullable_attributes = ["_cache_metadata", "_cache_store"]
     _cache_store: Optional["KeyValueStore"]
@@ -28,8 +26,8 @@ class DatasetFactory(DatasetMetadataBase):
         load_schema: bool = True,
         load_all_indices: bool = False,
     ) -> None:
-        """
-        A dataset factory object which can be used to cache dataset load operations. This class should be the primary user entry point when
+        """A dataset factory object which can be used to cache dataset load
+        operations. This class should be the primary user entry point when
         reading datasets.
 
         Example using the eager backend:

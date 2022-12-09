@@ -29,7 +29,6 @@ def test_hash_dataset_subset(dataset_with_index_factory):
 
 
 def test_hash_dataset_group_keys(dataset_with_index_factory):
-
     group_keys = ["L"]
     hh = hash_dataset(
         factory=dataset_with_index_factory, group_key=group_keys
@@ -44,7 +43,6 @@ def test_hash_dataset_group_keys(dataset_with_index_factory):
 
 
 def test_hash_dataset_group_keys_subset(dataset_with_index_factory):
-
     group_keys = ["P"]
     hh = hash_dataset(
         factory=dataset_with_index_factory, group_key=group_keys, subset=["TARGET"]
@@ -59,7 +57,6 @@ def test_hash_dataset_group_keys_subset(dataset_with_index_factory):
 
 
 def test_hash_dataset_group_keys_subset_subset_groupkey(dataset_with_index_factory):
-
     group_keys = ["P"]
     hh = hash_dataset(
         factory=dataset_with_index_factory, group_key=group_keys, subset=["P", "TARGET"]

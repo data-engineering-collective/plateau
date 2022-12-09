@@ -49,9 +49,8 @@ def testunquote_indices():
 
 
 def test_dynamic_partitions(store):
-    """
-    Do not specify partitions in metadata, but read them dynamically from store
-    """
+    """Do not specify partitions in metadata, but read them dynamically from
+    store."""
     partition_suffix = "suffix"
     dataset_uuid = "uuid+namespace-attribute12_underscored"
     partition0_core = create_partition_key(
@@ -117,9 +116,8 @@ def test_dynamic_partitions(store):
 
 
 def test_dynamic_partitions_multiple_indices(store):
-    """
-    Do not specify partitions in metadata, but read them dynamically from store
-    """
+    """Do not specify partitions in metadata, but read them dynamically from
+    store."""
     suffix = "suffix"
     dataset_uuid = "uuid+namespace-attribute12_underscored"
     partition0_core = create_partition_key(
@@ -175,9 +173,8 @@ def test_dynamic_partitions_multiple_indices(store):
 
 
 def test_dynamic_partitions_with_garbage(store):
-    """
-    In case there are unknown files, dataset and indices still load correctly
-    """
+    """In case there are unknown files, dataset and indices still load
+    correctly."""
     dataset_uuid = "uuid+namespace-attribute12_underscored"
     partition_suffix = "suffix"
     partition0_core = create_partition_key(
@@ -252,9 +249,8 @@ def test_dynamic_partitions_with_garbage(store):
 
 
 def test_dynamic_partitions_quote(store, metadata_version):
-    """
-    Do not specify partitions in metadata, but read them dynamically from store
-    """
+    """Do not specify partitions in metadata, but read them dynamically from
+    store."""
     dataset_uuid = "uuid-namespace-attribute12_underscored"
     partition0_core = create_partition_key(
         dataset_uuid, "core", [("location", "München")], "data.parquet"
@@ -295,10 +291,8 @@ def test_dynamic_partitions_quote(store, metadata_version):
 
 
 def test_dask_partitions(metadata_version, tmp_path):
-    """
-    Create partitions for one table with dask
-    and check that it can be read with plateau
-    """
+    """Create partitions for one table with dask and check that it can be read
+    with plateau."""
     import dask.dataframe
 
     dataset_uuid = "uuid+namespace-attribute12_underscored"

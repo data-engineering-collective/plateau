@@ -1,6 +1,4 @@
-"""
-This module is a collection of helper functions
-"""
+"""This module is a collection of helper functions."""
 import collections
 import inspect
 import logging
@@ -21,16 +19,13 @@ LOGGER = logging.getLogger(__name__)
 
 
 class InvalidObject:
-    """
-    Sentinel to mark keys for removal
-    """
+    """Sentinel to mark keys for removal."""
 
     pass
 
 
 def combine_metadata(dataset_metadata: List[Dict], append_to_list: bool = True) -> Dict:
-    """
-    Merge a list of dictionaries
+    """Merge a list of dictionaries.
 
     The merge is performed in such a way, that only keys which
     are present in **all** dictionaries are kept in the final result.
@@ -215,8 +210,7 @@ def normalize_arg(
 
 
 def normalize_arg(arg_name, old_value):
-    """
-    Normalizes an argument according to pre-defined types
+    """Normalizes an argument according to pre-defined types.
 
     Type A:
 
@@ -288,8 +282,7 @@ def normalize_args(function, *args, **kwargs):
 
 
 def extract_duplicates(lst):
-    """
-    Return all items of a list that occur more than once.
+    """Return all items of a list that occur more than once.
 
     Parameters
     ----------
@@ -304,9 +297,9 @@ def extract_duplicates(lst):
 
 
 def align_categories(dfs, categoricals):
-    """
-    Takes a list of dataframes with categorical columns and determines the superset
-    of categories. All specified columns will then be cast to the same `pd.CategoricalDtype`
+    """Takes a list of dataframes with categorical columns and determines the
+    superset of categories. All specified columns will then be cast to the same
+    `pd.CategoricalDtype`
 
     Parameters
     ----------
@@ -376,9 +369,8 @@ def align_categories(dfs, categoricals):
 def sort_values_categorical(
     df: pd.DataFrame, columns: Union[List[str], str]
 ) -> pd.DataFrame:
-    """
-    Sort a dataframe lexicographically by the categories of column `column`
-    """
+    """Sort a dataframe lexicographically by the categories of column
+    `column`"""
     if not isinstance(columns, list):
         columns = [columns]
     for col in columns:

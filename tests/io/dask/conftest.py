@@ -13,9 +13,8 @@ _client = None
 
 @pytest.fixture(autouse=True, scope="session")
 def setup_dask_distributed():
-    """
-    This fixture makes all dask tests effectively use distributed under the hood.
-    """
+    """This fixture makes all dask tests effectively use distributed under the
+    hood."""
     global _client
     with distributed.utils_test.cluster() as (scheduler, workers):
         _client = Client(scheduler["address"])

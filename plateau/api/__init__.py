@@ -1,3 +1,1 @@
-"""
-User-facing APIs
-"""
+"""User-facing APIs."""

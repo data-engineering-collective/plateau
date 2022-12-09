@@ -13,9 +13,7 @@ CATEGORICAL_EFFICIENCY_WARN_LIMIT = 100000
 
 
 def _get_data(mp, table=None):
-    """
-    Task to avoid serialization of lambdas
-    """
+    """Task to avoid serialization of lambdas."""
     return mp.data
 
 
@@ -46,10 +44,8 @@ def _construct_categorical(column, dataset_metadata_factory):
 
 
 def _maybe_get_categoricals_from_index(dataset_metadata_factory, categoricals):
-    """
-    In case a categorical is requested for a column we have an index on,
-    construct the categorical from the index
-    """
+    """In case a categorical is requested for a column we have an index on,
+    construct the categorical from the index."""
     categoricals_from_index = {}
     if categoricals:
         for column in categoricals:

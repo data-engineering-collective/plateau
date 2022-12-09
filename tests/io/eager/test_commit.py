@@ -84,8 +84,9 @@ def test_commit_dataset_from_metapartition(dataset_function, store):
 
 # TODO: document changes for write_single_partition / commit workflow
 def test_commit_dataset_from_nested_metapartition(store):
-    """
-    Check it is possible to use `commit_dataset` with nested metapartitions as input.
+    """Check it is possible to use `commit_dataset` with nested metapartitions
+    as input.
+
     Original issue: https://github.com/JDASoftwareGroup/plateau/issues/40
     """
 
@@ -219,7 +220,6 @@ def test_commit_dataset_add_metadata(store, metadata_version):
 
 
 def test_commit_dataset_raises_no_input(store):
-
     with pytest.raises(ValueError, match="Need to provide either"):
         commit_dataset(store=store, dataset_uuid="something")
 

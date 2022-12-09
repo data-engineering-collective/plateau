@@ -24,10 +24,8 @@ def create_dataset(dataset_uuid, store_factory, metadata_version):
 
 
 def assert_num_row_groups(store, dataset, part_num_rows, part_chunk_size):
-    """
-    Assert that the row groups of each partition match the expectation based on the
-    number of rows and the chunk size
-    """
+    """Assert that the row groups of each partition match the expectation based
+    on the number of rows and the chunk size."""
     # Iterate over the partitions of each index value
     for index, partitions in dataset.indices["p"].index_dct.items():
         for part_key in partitions:

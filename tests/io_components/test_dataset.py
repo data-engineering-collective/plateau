@@ -1,8 +1,5 @@
-"""
-
-This module tests high level dataset API functions which require entire datasets, indices, etc
-
-"""
+"""This module tests high level dataset API functions which require entire
+datasets, indices, etc."""
 from collections import OrderedDict
 
 import pandas as pd
