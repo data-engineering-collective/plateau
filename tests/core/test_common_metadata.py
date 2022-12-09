@@ -390,7 +390,9 @@ def test_validate_different_cats_different_type():
         validate_compatible([meta, meta_2])
 
 
-@pytest.mark.parametrize("index", [pd.Int64Index([0]), pd.RangeIndex(start=0, stop=1)])
+@pytest.mark.parametrize(
+    "index", [pd.Index([0], dtype="int64"), pd.RangeIndex(start=0, stop=1)]
+)
 def test_schema_dataframe_rountrip(index, df_all_types):
     df = pd.DataFrame(df_all_types, index=index)
 

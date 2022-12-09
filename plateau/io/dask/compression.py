@@ -88,11 +88,11 @@ def pack_payload(df: dd.DataFrame, group_key: Union[List[str], str]) -> dd.DataF
 
     if (
         # https://github.com/pandas-dev/pandas/issues/34455
-        isinstance(df._meta.index, pd.Float64Index)
+        df._meta.index.dtype == "float64"
         # TODO: Try to find out what's going on an file a bug report
         # For datetime indices the apply seems to be corrupt
         # s.t. apply(lambda x:x) returns different values
-        or isinstance(df._meta.index, pd.DatetimeIndex)
+        or (df._meta.index.dtype == "datetime64[ns]")
     ):
         return df
     if not HAS_DISTRIBUTED:
@@ -140,11 +140,11 @@ def unpack_payload(df: dd.DataFrame, unpack_meta: pd.DataFrame) -> dd.DataFrame:
 
     if (
         # https://github.com/pandas-dev/pandas/issues/34455
-        isinstance(df._meta.index, pd.Float64Index)
+        (df._meta.index.dtype == "float64")
         # TODO: Try to find out what's going on an file a bug report
         # For datetime indices the apply seems to be corrupt
         # s.t. apply(lambda x:x) returns different values
-        or isinstance(df._meta.index, pd.DatetimeIndex)
+        or df._meta.index.dtype == "datetime64[ns]"
     ):
         return df
 
