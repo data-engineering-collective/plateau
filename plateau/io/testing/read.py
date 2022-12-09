@@ -35,6 +35,7 @@ import pandas as pd
 import pandas.testing as pdt
 import pytest
 from minimalkv import get_store_from_url
+from packaging.version import Version
 
 from plateau.io.eager import store_dataframes_as_dataset
 from plateau.io.iter import store_dataframes_as_dataset__iter
@@ -564,7 +565,10 @@ def test_empty_predicate_pushdown_empty_col_projection(
     else:
         result_dfs = result
     res = pd.concat(result_dfs).reset_index(drop=True)
-    pdt.assert_frame_equal(res, pd.DataFrame(index=pd.RangeIndex(start=0, stop=0)))
+    if Version(pd.__version__) < Version("2.0.0.dev0"):
+        pdt.assert_frame_equal(res, pd.DataFrame(index=pd.RangeIndex(start=0, stop=0)))
+    else:
+        pdt.assert_frame_equal(res, pd.DataFrame(index=pd.Index([], dtype="object")))
 
 
 @pytest.mark.parametrize("partition_on", [["a", "b"], ["c"], ["a", "b", "c"]])
