@@ -119,7 +119,7 @@ def test_missing_column(serialiser, store):
 
 @pytest.mark.parametrize("serialiser", SERLIALISERS)
 def test_dataframe_roundtrip_empty(serialiser, store):
-    df = pd.DataFrame({})
+    df = pd.DataFrame({}, columns=pd.Index([], dtype="int64"))
     key = serialiser.store(store, "prefix", df)
     pdt.assert_frame_equal(DataFrameSerializer.restore_dataframe(store, key), df)
 
