@@ -406,8 +406,7 @@ def test_read_dataset_as_dataframes_dispatch_by_multi_col(
                 data = part
             unique_dispatch = data[list(dispatch_by)].drop_duplicates()
             assert len(unique_dispatch) == 1
-            row = unique_dispatch
-            uniques.append(row)
+            uniques = pd.concat([uniques, unique_dispatch])
         assert not any(uniques.duplicated())
 
 
@@ -565,7 +564,12 @@ def test_empty_predicate_pushdown_empty_col_projection(
     else:
         result_dfs = result
     res = pd.concat(result_dfs).reset_index(drop=True)
-    pdt.assert_frame_equal(res, pd.DataFrame(index=pd.RangeIndex(start=0, stop=0)))
+    assert len(res) == 0
+
+    # Ignore the different types of indices pandas generates after `reset_index`.
+    pdt.assert_frame_equal(
+        res, pd.DataFrame(index=res.index, columns=pd.Index([], dtype="object"))
+    )
 
 
 @pytest.mark.parametrize("partition_on", [["a", "b"], ["c"], ["a", "b", "c"]])

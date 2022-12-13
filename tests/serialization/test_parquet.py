@@ -347,9 +347,9 @@ def test_predicate_not_in_columns(store, chunk_size):
         store, key, columns=[], predicates=[[("col", "==", 1)]]
     )
     if chunk_size:
-        expected_df = pd.DataFrame(index=[0, 1])
+        expected_df = pd.DataFrame(index=[0, 1], columns=pd.Index([], dtype="object"))
     else:
-        expected_df = pd.DataFrame(index=[0, 2])
+        expected_df = pd.DataFrame(index=[0, 2], columns=pd.Index([], dtype="object"))
 
     pdt.assert_frame_equal(restored_df, expected_df)
 

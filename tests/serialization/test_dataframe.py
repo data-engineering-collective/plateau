@@ -8,6 +8,7 @@ import pandas as pd
 import pandas.testing as pdt
 import pyarrow as pa
 import pytest
+from packaging.version import Version
 from pyarrow.parquet import ParquetFile
 
 from plateau.serialization import (
@@ -119,7 +120,11 @@ def test_missing_column(serialiser, store):
 
 @pytest.mark.parametrize("serialiser", SERLIALISERS)
 def test_dataframe_roundtrip_empty(serialiser, store):
-    df = pd.DataFrame({})
+    # Empty column indices vary based on pandas version
+    if Version(pd.__version__) < Version("2.0.0.dev0"):
+        df = pd.DataFrame({}, columns=pd.Index([], dtype="object"))
+    else:
+        df = pd.DataFrame({}, columns=pd.Index([], dtype="int64"))
     key = serialiser.store(store, "prefix", df)
     pdt.assert_frame_equal(DataFrameSerializer.restore_dataframe(store, key), df)
 

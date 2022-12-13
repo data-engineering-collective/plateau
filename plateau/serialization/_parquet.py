@@ -261,8 +261,9 @@ class ParquetSerializer(DataFrameSerializer):
                             .empty_table()
                             .to_pandas(date_as_object=date_as_object)
                         )
-                        index = pd.Int64Index(
-                            pd.RangeIndex(start=0, stop=parquet_file.metadata.num_rows)
+                        index = pd.Index(
+                            pd.RangeIndex(start=0, stop=parquet_file.metadata.num_rows),
+                            dtype="int64",
                         )
                         df = pd.DataFrame(df, index=index)
                         # convert back to table to keep downstream code untouched by this patch
