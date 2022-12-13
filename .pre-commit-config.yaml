@@ -27,10 +27,8 @@ repos:
           - types-decorator
           - types-simplejson
           - hypothesis
-          - numpy=1.22
+          - numpy=1.23
           - minimalkv=1.4.2
-          # Pin Python until we update NumPy
-          - python=3.10
   - repo: https://github.com/Quantco/pre-commit-mirrors-pyupgrade
     rev: 3.3.0
     hooks:
