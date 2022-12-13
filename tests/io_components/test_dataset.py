@@ -4,6 +4,7 @@ from collections import OrderedDict
 
 import pandas as pd
 import pandas.testing as pdt
+from packaging.version import Version
 
 from plateau.core.dataset import DatasetMetadata
 from plateau.core.index import ExplicitSecondaryIndex
@@ -102,9 +103,11 @@ def test_dataset_get_indices_as_dataframe_predicates():
         columns=["l_external_code"],
         predicates=[[("l_external_code", "==", "1"), ("p_external_code", "==", "3")]],
     )
-    expected = pd.DataFrame(
-        columns=["l_external_code"], index=pd.Index([], name="partition")
-    )
+    if Version(pd.__version__) < Version("2.0.0.dev0"):
+        empty_index = pd.Index([], name="partition")
+    else:
+        empty_index = pd.Index([], name="partition", dtype="int64")
+    expected = pd.DataFrame(columns=["l_external_code"], index=empty_index)
     pdt.assert_frame_equal(result, expected)
 
 
