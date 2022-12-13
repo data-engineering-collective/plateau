@@ -120,9 +120,13 @@ def test_dataset_get_indices_as_dataframe_no_index(dataset):
 def test_dataset_get_indices_as_dataframe_with_index(dataset_with_index, store_session):
     assert not dataset_with_index.primary_indices_loaded
     df = dataset_with_index.get_indices_as_dataframe()
+    if Version(pd.__version__) < Version("2.0.0.dev0"):
+        empty_index = pd.Index([], name="partition")
+    else:
+        empty_index = pd.Index([], name="partition", dtype="int64")
     pdt.assert_frame_equal(
         df,
-        pd.DataFrame(columns=["L", "P"], index=pd.Index([], name="partition")).astype(
+        pd.DataFrame(columns=["L", "P"], index=empty_index).astype(
             {"L": "object", "P": "int64"}
         ),
     )
