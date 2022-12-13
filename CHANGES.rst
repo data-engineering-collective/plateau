@@ -2,9 +2,10 @@
 Changelog
 =========
 
-Plateau 4.1.4 (2022-12-09)
+Plateau 4.1.4 (2022-12-XX)
 ==========================
 
+* We no longer package the ``tests`` directory.
 * Test pyarrow 10 and Python 3.11, pandas 1.5
 
 Plateau 4.1.3 (2022-10-24)
