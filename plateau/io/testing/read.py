@@ -562,13 +562,15 @@ def test_empty_predicate_pushdown_empty_col_projection(
 
     if isinstance(probe, MetaPartition):
         result_dfs = [mp.data for mp in result]
+        if Version(pd.__version__) < Version("2.0.0.dev0"):
+            empty_index = pd.RangeIndex(start=0, stop=0)
+        else:
+            empty_index = pd.Index([], dtype="object")
     else:
+        empty_index = pd.RangeIndex(start=0, stop=0)
         result_dfs = result
     res = pd.concat(result_dfs).reset_index(drop=True)
-    if Version(pd.__version__) < Version("2.0.0.dev0"):
-        pdt.assert_frame_equal(res, pd.DataFrame(index=pd.RangeIndex(start=0, stop=0)))
-    else:
-        pdt.assert_frame_equal(res, pd.DataFrame(index=pd.Index([], dtype="object")))
+    pdt.assert_frame_equal(res, pd.DataFrame(index=empty_index))
 
 
 @pytest.mark.parametrize("partition_on", [["a", "b"], ["c"], ["a", "b", "c"]])
