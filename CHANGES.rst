@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Plateau 4.1.5 (2022-12-XX)
+==========================
+
+* We no longer package the ``tests`` directory.
+
 Plateau 4.1.4 (2022-12-09)
 ==========================
 
