@@ -2,7 +2,7 @@
 Changelog
 =========
 
-Plateau 4.1.4 (2022-12-XX)
+Plateau 4.1.4 (2022-12-14)
 ==========================
 
 * We no longer package the ``tests`` directory.
