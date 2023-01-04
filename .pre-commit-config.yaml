@@ -11,12 +11,12 @@ repos:
     hooks:
       - id: flake8-conda
   - repo: https://github.com/Quantco/pre-commit-mirrors-isort
-    rev: 5.10.1
+    rev: 5.11.4
     hooks:
       - id: isort-conda
         additional_dependencies: [-c, conda-forge, toml=0.10.2]
   - repo: https://github.com/Quantco/pre-commit-mirrors-mypy
-    rev: "0.982"
+    rev: "0.991"
     hooks:
       - id: mypy-conda
         files: plateau
@@ -30,7 +30,7 @@ repos:
           - numpy=1.23
           - minimalkv=1.4.2
   - repo: https://github.com/Quantco/pre-commit-mirrors-pyupgrade
-    rev: 3.3.0
+    rev: 3.3.1
     hooks:
       - id: pyupgrade-conda
         args:
