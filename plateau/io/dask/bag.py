@@ -110,7 +110,6 @@ def read_dataset_as_metapartitions_bag(
     )
 
     if categoricals_from_index:
-
         mp_bag = mp_bag.map(
             MetaPartition.apply,
             func=partial(

@@ -3,7 +3,6 @@ from plateau.serialization.testing import get_dataframe_not_nested
 
 
 class TimeFilterDF:
-
     params = ["conjunctions", "disjunctions"]
 
     def setup(self, predicate):
@@ -71,7 +70,6 @@ class TimeFilterArrayIn:
     param_names = ["column", "filter_size", "array_size", "enabled"]
 
     def setup(self, column, filter_size, array_size):
-
         if column == "null":
             raise NotImplementedError()
         ser = (

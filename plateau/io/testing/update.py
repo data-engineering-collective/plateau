@@ -133,7 +133,6 @@ def test_update_dataset_with_partitions_delete_only(
 def test_update_dataset_with_partitions__reducer_partitions(
     store_factory, frozen_time_em, bound_update_dataset
 ):
-
     assert set(store_factory().keys()) == set()
 
     df1 = pd.DataFrame(
