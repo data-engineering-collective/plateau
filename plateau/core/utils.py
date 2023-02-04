@@ -87,7 +87,6 @@ def lazy_store(store: StoreInput) -> StoreFactory:
         ret_val = cast(StoreFactory, ret_val)  # type: ignore
         return ret_val
     else:
-
         if not _is_minimalkv_key_value_store(store):
             raise TypeError(
                 f"Provided incompatible store type. Got {type(store)} but expected {StoreInput}."

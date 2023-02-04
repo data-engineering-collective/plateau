@@ -35,7 +35,6 @@ class TimeMetaPartition(AsvBenchmarkConfig):
         )
 
     def time_reconstruct_index(self, num_rows, dtype):
-
         self.mp._reconstruct_index_columns(
             df=self.df,
             key_indices=[("primary_key", str(dtype[1]))],
