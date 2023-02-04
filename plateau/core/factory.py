@@ -154,7 +154,6 @@ def _ensure_factory(
     factory: Optional[DatasetFactory],
     load_schema: bool = True,
 ) -> DatasetFactory:
-
     if store is None and dataset_uuid is None and factory is not None:
         return factory
     elif store is not None and dataset_uuid is not None and factory is None:

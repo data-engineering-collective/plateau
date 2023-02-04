@@ -19,7 +19,6 @@ class TimeMakeMeta(AsvBenchmarkConfig):
 
 
 class TimeValidateCompatible(AsvBenchmarkConfig):
-
     params = ([2, 10**2, 10**3, 10**4], [True, False])
     timeout = 120.0
 
