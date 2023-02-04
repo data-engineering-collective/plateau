@@ -208,7 +208,6 @@ def read_dataset_as_delayed_metapartitions(
     )
 
     if categoricals_from_index:
-
         mps = map_delayed(
             partial(  # type: ignore
                 MetaPartition.apply,

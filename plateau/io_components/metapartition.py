@@ -1002,7 +1002,6 @@ class MetaPartition(Iterable):
 
         new_indices = {}
         for col in columns:
-
             possible_values: Set[str] = set()
 
             df = self.data

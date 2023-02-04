@@ -97,7 +97,6 @@ def persist_common_metadata(
     dataset_uuid: str,
     table_name: str,
 ):
-
     if not schemas:
         return None
     schemas_set = set(schemas)
