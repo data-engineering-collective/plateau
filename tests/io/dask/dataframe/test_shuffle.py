@@ -1,5 +1,3 @@
-import pickle
-
 import dask.dataframe as dd
 import numpy as np
 import pandas as pd
@@ -159,9 +157,6 @@ def test_update_shuffle_buckets(
         sort_partitions_by="sorted_column",
         partition_on=["primary"],
     )
-
-    s = pickle.dumps(dataset_comp, pickle.HIGHEST_PROTOCOL)
-    dataset_comp = pickle.loads(s)
 
     dataset = dataset_comp.compute()
     dataset = dataset.load_all_indices(store_factory())
