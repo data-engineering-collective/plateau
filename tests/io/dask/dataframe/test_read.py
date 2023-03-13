@@ -161,8 +161,10 @@ def test_reconstruct_dask_index(store_factory, index_type, monkeypatch):
     assert len(ddf.divisions) == 5
     assert ddf.divisions == (1, 2, 3, 4, 4)
 
-    assert_dask_eq(ddf_expected, ddf)
-    assert_dask_eq(ddf_expected_simple, ddf, check_divisions=False)
+    assert_dask_eq(ddf_expected, ddf, scheduler="distributed")
+    assert_dask_eq(
+        ddf_expected_simple, ddf, check_divisions=False, scheduler="distributed"
+    )
 
     assert_frame_equal(ddf_expected.compute(), ddf.compute())
     assert_frame_equal(ddf_expected_simple.compute(), ddf.compute())
