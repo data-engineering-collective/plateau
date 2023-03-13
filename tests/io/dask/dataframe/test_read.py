@@ -243,3 +243,37 @@ def test_reconstruct_dask_index_raise_no_index(store_factory):
             table="table",
             dask_index_on=colA,
         )
+
+
+def test_column_projection(store_factory, monkeypatch):
+    dataset_uuid = "dataset_uuid"
+    df1 = pd.DataFrame({"colA": [1, 2], "colB": ["x", "y"]})
+    fake_called = False
+
+    class FakeParquet:
+        @classmethod
+        def restore_dataframe(cls, store, key, filter_query, columns, *args, **kwargs):
+            nonlocal fake_called
+            fake_called = True
+            assert columns == ["colA"]
+            return df1[columns]
+
+    from plateau.serialization import DataFrameSerializer
+
+    monkeypatch.setitem(
+        DataFrameSerializer._serializers,
+        ".parquet",
+        FakeParquet,
+    )
+    store_dataframes_as_dataset(
+        store=store_factory, dataset_uuid=dataset_uuid, dfs=[df1]
+    )
+    ddf_auto = read_dataset_as_ddf(
+        dataset_uuid=dataset_uuid,
+        store=store_factory,
+    )["colA"]
+    ddf_manual = read_dataset_as_ddf(
+        dataset_uuid=dataset_uuid, store=store_factory, columns=["colA"]
+    )["colA"]
+    assert_dask_eq(ddf_auto, ddf_manual)
+    assert fake_called

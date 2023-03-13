@@ -44,7 +44,6 @@ from plateau.serialization import DataFrameSerializer, PredicatesType
 
 from ._shuffle import shuffle_store_dask_partitions
 from ._utils import _maybe_get_categoricals_from_index
-from .delayed import read_dataset_as_delayed
 
 __all__ = (
     "read_dataset_as_ddf",
@@ -53,6 +52,33 @@ __all__ = (
     "collect_dataset_metadata",
     "hash_dataset",
 )
+from dask.dataframe import from_map
+from dask.dataframe.io.utils import DataFrameIOFunction
+
+
+class ReadPlateauPartition(DataFrameIOFunction):
+    def __init__(
+        self,
+        columns,
+    ) -> None:
+        self._columns = columns
+        super().__init__()
+
+    @property
+    def columns(self):
+        """Return the current column projection."""
+        return self._columns
+
+    def project_columns(self, columns):
+        """Return a new DataFrameIOFunction object with a new column
+        projection."""
+        return type(self)(columns=columns)
+
+    def __call__(self, mps, *args, **kwargs):
+        """Return a new DataFrame partition."""
+        return MetaPartition.concat_metapartitions(
+            [mp.load_dataframes(*args, columns=self.columns, **kwargs) for mp in mps]
+        ).data
 
 
 @default_docs
@@ -110,27 +136,36 @@ def read_dataset_as_ddf(
 
     if columns is None:
         columns = list(meta.columns)
-
-    # that we can use factories instead of dataset_uuids
-    delayed_partitions = read_dataset_as_delayed(
-        factory=ds_factory,
-        columns=columns,
-        predicate_pushdown_to_io=predicate_pushdown_to_io,
-        categoricals=categoricals,
-        dates_as_object=dates_as_object,
-        predicates=predicates,
-        dispatch_by=dask_index_on if dask_index_on else dispatch_by,
+    mps = list(
+        dispatch_metapartitions_from_factory(
+            dataset_factory=ds_factory,
+            predicates=predicates,
+            dispatch_by=dispatch_by or dask_index_on,  # type: ignore
+        )
     )
+    divisions_lst = None
     if dask_index_on:
+        ds_factory.load_index(dask_index_on)
         divisions = ds_factory.indices[dask_index_on].observed_values()
         divisions.sort()
         divisions_lst = list(divisions)
         divisions_lst.append(divisions[-1])
-        return dd.from_delayed(
-            delayed_partitions, meta=meta, divisions=divisions_lst
-        ).set_index(dask_index_on, divisions=divisions_lst, sorted=True)
+    ddf = from_map(
+        ReadPlateauPartition(columns=columns),
+        mps,
+        meta=meta,
+        label="read-plateau",
+        divisions=divisions_lst,
+        store=ds_factory.store_factory,
+        categoricals=categoricals,
+        predicate_pushdown_to_io=predicate_pushdown_to_io,
+        dates_as_object=dates_as_object,
+        predicates=predicates,
+    )
+    if dask_index_on:
+        return ddf.set_index(dask_index_on, divisions=divisions_lst, sorted=True)
     else:
-        return dd.from_delayed(delayed_partitions, meta=meta)
+        return ddf
 
 
 def _get_dask_meta_for_dataset(ds_factory, columns, categoricals, dates_as_object):
