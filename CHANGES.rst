@@ -2,7 +2,7 @@
 Changelog
 =========
 
-Plateau 4.1.5 (2023-03-13)
+Plateau 4.1.5 (2023-03-14)
 ==========================
 
 * Enable dask column projection.
