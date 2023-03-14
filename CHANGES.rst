@@ -7,6 +7,7 @@ Plateau 4.1.5 (2023-03-13)
 
 * Enable dask column projection.
 * Test pyarrow 11
+* Remove usage of ``pkg_resources``.
 
 Plateau 4.1.4 (2022-12-14)
 ==========================
