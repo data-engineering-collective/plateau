@@ -171,7 +171,7 @@ def test_dispatch_metapartitions_complex_or_predicates(store_factory):
         )
     ]
     actual = pd.concat([mp.data for mp in mps])
-    actual = actual.sort_values(by="A", ignore_index=True)
+    actual = actual.sort_values(by="A", ignore_index=True).reset_index(drop=True)
     expected = pd.DataFrame(
         data={
             "A": [0, 1, 2, 3, 5, 7, 9],
@@ -189,7 +189,7 @@ def test_dispatch_metapartitions_complex_or_predicates(store_factory):
         )
     ]
     actual = pd.concat([mp.data for mp in mps])
-    actual = actual.sort_values(by="A", ignore_index=True)
+    actual = actual.sort_values(by="A", ignore_index=True).reset_index(drop=True)
     expected = pd.DataFrame(
         data={"A": [0, 1, 2], "B": ["A", "B", "A"], "C": [-10, -9, -8]}
     )
@@ -203,7 +203,7 @@ def test_dispatch_metapartitions_complex_or_predicates(store_factory):
         )
     ]
     actual = pd.concat([mp.data for mp in mps])
-    actual = actual.sort_values(by="A", ignore_index=True)
+    actual = actual.sort_values(by="A", ignore_index=True).reset_index(drop=True)
     expected = pd.DataFrame(
         data={
             "A": [0, 2, 3, 5, 7, 9],
@@ -221,7 +221,7 @@ def test_dispatch_metapartitions_complex_or_predicates(store_factory):
         )
     ]
     actual = pd.concat([mp.data for mp in mps])
-    actual = actual.sort_values(by="A", ignore_index=True)
+    actual = actual.sort_values(by="A", ignore_index=True).reset_index(drop=True)
     expected = pd.DataFrame(
         data={
             "A": [0, 1, 2, 3, 5, 7, 9],

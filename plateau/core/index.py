@@ -184,7 +184,7 @@ class IndexBase(CopyMixin):
         elif pa.types.is_date(dtype):
             return pd.Timestamp(value).date()
         elif pa.types.is_temporal(dtype):
-            return pd.Timestamp(value).to_datetime64()
+            return pd.Timestamp(value).to_datetime64().astype("datetime64[ns]")
         elif pa.types.is_integer(dtype):
             return int(value)
         elif pa.types.is_floating(dtype):
