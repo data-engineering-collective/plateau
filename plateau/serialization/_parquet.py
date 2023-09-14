@@ -259,7 +259,10 @@ class ParquetSerializer(DataFrameSerializer):
                         df = (
                             parquet_file.schema.to_arrow_schema()
                             .empty_table()
-                            .to_pandas(date_as_object=date_as_object)
+                            .to_pandas(
+                                date_as_object=date_as_object,
+                                coerce_temporal_nanoseconds=True,
+                            )
                         )
                         index = pd.Index(
                             pd.RangeIndex(start=0, stop=parquet_file.metadata.num_rows),
@@ -284,7 +287,9 @@ class ParquetSerializer(DataFrameSerializer):
 
         table = _reset_dictionary_columns(table, exclude=categories)
 
-        df = table.to_pandas(date_as_object=date_as_object)
+        df = table.to_pandas(
+            date_as_object=date_as_object, coerce_temporal_nanoseconds=True
+        )
 
         # XXX: Patch until Pyarrow bug is resolved: https://issues.apache.org/jira/browse/ARROW-18099?filter=-2
         if categories:

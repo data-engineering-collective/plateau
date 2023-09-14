@@ -736,7 +736,9 @@ def _dict_to_binary(dct):
     return simplejson.dumps(dct, sort_keys=True).encode("utf8")
 
 
-def empty_dataframe_from_schema(schema, columns=None, date_as_object=False):
+def empty_dataframe_from_schema(
+    schema, columns=None, date_as_object=False, coerce_temporal_nanoseconds=True
+):
     """Create an empty DataFrame from provided schema.
 
     Parameters
@@ -746,6 +748,10 @@ def empty_dataframe_from_schema(schema, columns=None, date_as_object=False):
     columns: Union[None, List[str]]
         Optional list of columns that should be part of the resulting DataFrame. All columns in that list must also be
         part of the provided schema.
+    date_as_object: bool
+        Cast dates to objects.
+    coerce_temporal_nanoseconds: bool
+        Coerce date32, date64, duration and timestamp units to nanoseconds to retain behaviour of pandas 1.x.
 
     Returns
     -------
@@ -753,7 +759,14 @@ def empty_dataframe_from_schema(schema, columns=None, date_as_object=False):
         Empty DataFrame with requested columns and types.
     """
 
-    df = schema.internal().empty_table().to_pandas(date_as_object=date_as_object)
+    df = (
+        schema.internal()
+        .empty_table()
+        .to_pandas(
+            date_as_object=date_as_object,
+            coerce_temporal_nanoseconds=coerce_temporal_nanoseconds,
+        )
+    )
 
     df.columns = df.columns.map(ensure_string_type)
     if columns is not None:

@@ -85,7 +85,7 @@ class CsvSerializer(DataFrameSerializer):
 
     def store(self, store, key_prefix, df):
         if isinstance(df, pa.Table):
-            df = df.to_pandas()
+            df = df.to_pandas(coerce_temporal_nanoseconds=True)
         key = f"{key_prefix}.csv"
         result_stream = BytesIO()
         iostream: BufferedIOBase
