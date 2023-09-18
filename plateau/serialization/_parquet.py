@@ -23,7 +23,7 @@ from ._generic import (
     filter_df_from_predicates,
 )
 from ._io_buffer import BlockBuffer
-from ._util import ensure_unicode_string_type
+from ._util import ensure_unicode_string_type, schema_metadata_bytes_to_object
 
 try:
     # Only check for BotoStore instance if boto is really installed
@@ -286,6 +286,9 @@ class ParquetSerializer(DataFrameSerializer):
                 )
 
         table = _reset_dictionary_columns(table, exclude=categories)
+
+        # HACK: Cast bytes to object in metadata until Pandas bug is fixed: https://github.com/pandas-dev/pandas/issues/50127
+        table = table.cast(schema_metadata_bytes_to_object(table.schema))
 
         df = table.to_pandas(
             date_as_object=date_as_object, coerce_temporal_nanoseconds=True
