@@ -1,3 +1,4 @@
+import dask
 import dask.dataframe as dd
 import pandas as pd
 import pandas.testing as pdt
@@ -13,9 +14,10 @@ from plateau.io.dask.compression import (
 
 def test_pack_payload(df_all_types):
     # For a single row dataframe the packing actually has a few more bytes
-    df = dd.from_pandas(
-        pd.concat([df_all_types] * 10, ignore_index=True), npartitions=3
-    )
+    with dask.config.set({"dataframe.convert-string": False}):
+        df = dd.from_pandas(
+            pd.concat([df_all_types] * 10, ignore_index=True), npartitions=3
+        )
     size_before = df.memory_usage(deep=True).sum()
 
     packed_df = pack_payload(df, group_key=list(df.columns[-2:]))
@@ -66,7 +68,8 @@ def test_pack_payload_pandas_empty(df_all_types):
 @pytest.mark.parametrize("num_group_cols", [1, 4])
 def test_pack_payload_roundtrip(df_all_types, num_group_cols):
     group_key = list(df_all_types.columns[-num_group_cols:])
-    df_all_types = dd.from_pandas(df_all_types, npartitions=2)
+    with dask.config.set({"dataframe.convert-string": False}):
+        df_all_types = dd.from_pandas(df_all_types, npartitions=2)
     pdt.assert_frame_equal(
         df_all_types.compute(),
         unpack_payload(
