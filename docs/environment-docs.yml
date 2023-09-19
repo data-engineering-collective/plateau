@@ -3,12 +3,12 @@ channels:
   - conda-forge
 dependencies:
   - python>=3.8
-  - dask[dataframe]
+  - dask[dataframe]!=2023.9.2
   - decorator
   - msgpack-python>=0.5.2
   # Currently dask and numpy==1.16.0 clash
   - numpy!=1.15.0,!=1.16.0
-  - pandas>=0.23.0, !=1.0.0
+  - pandas>=0.23.0, !=1.0.0,!=2.1.0
   - pyarrow>=0.17.1,!=1.0.0
   - simplejson
   - minimalkv
