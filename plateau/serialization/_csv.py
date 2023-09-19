@@ -8,6 +8,7 @@ from typing import Any, Dict, Iterable, Optional
 import pandas as pd
 import pyarrow as pa
 from minimalkv import KeyValueStore
+from packaging import version
 from pandas.errors import EmptyDataError
 
 from ._generic import (
@@ -17,6 +18,8 @@ from ._generic import (
     filter_df,
     filter_df_from_predicates,
 )
+
+PYARROW_LT_13 = version.parse(pa.__version__) < version.parse("13")
 
 
 class CsvSerializer(DataFrameSerializer):
@@ -85,7 +88,12 @@ class CsvSerializer(DataFrameSerializer):
 
     def store(self, store, key_prefix, df):
         if isinstance(df, pa.Table):
-            df = df.to_pandas(coerce_temporal_nanoseconds=True)
+            if PYARROW_LT_13:
+                # Prior to pyarrow 13.0.0 coerce_temporal_nanoseconds didn't exist
+                # as it was introduced for backwards compatibility with pandas 1.x
+                df = df.to_pandas()
+            else:
+                df = df.to_pandas(coerce_temporal_nanoseconds=True)
         key = f"{key_prefix}.csv"
         result_stream = BytesIO()
         iostream: BufferedIOBase

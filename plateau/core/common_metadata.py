@@ -10,6 +10,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import simplejson
 from minimalkv import KeyValueStore
+from packaging import version
 
 from plateau.core import naming
 from plateau.core._compat import load_json
@@ -28,6 +29,8 @@ __all__ = (
     "normalize_type",
     "normalize_column_order",
 )
+
+PYARROW_LT_13 = version.parse(pa.__version__) < version.parse("13")
 
 
 class SchemaWrapper:
@@ -753,6 +756,7 @@ def empty_dataframe_from_schema(
         Cast dates to objects.
     coerce_temporal_nanoseconds: bool
         Coerce date32, date64, duration and timestamp units to nanoseconds to retain behaviour of pandas 1.x.
+        Only applicable to pandas version >= 2.0 and PyArrow version >= 13.0.0.
 
     Returns
     -------
@@ -762,10 +766,15 @@ def empty_dataframe_from_schema(
     # HACK: Cast bytes to object in metadata until Pandas bug is fixed: https://github.com/pandas-dev/pandas/issues/50127
     schema = schema_metadata_bytes_to_object(schema.internal())
 
-    df = schema.empty_table().to_pandas(
-        date_as_object=date_as_object,
-        coerce_temporal_nanoseconds=coerce_temporal_nanoseconds,
-    )
+    if PYARROW_LT_13:
+        # Prior to pyarrow 13.0.0 coerce_temporal_nanoseconds didn't exist
+        # as it was introduced for backwards compatibility with pandas 1.x
+        df = schema.empty_table().to_pandas(date_as_object=date_as_object)
+    else:
+        df = schema.empty_table().to_pandas(
+            date_as_object=date_as_object,
+            coerce_temporal_nanoseconds=coerce_temporal_nanoseconds,
+        )
 
     df.columns = df.columns.map(ensure_string_type)
     if columns is not None:

@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
+from packaging import version
 from toolz.itertoolz import partition_all
 
 import plateau.core._time
@@ -36,6 +37,8 @@ __all__ = (
     "ExplicitSecondaryIndex",
     "PartitionIndex",
 )
+
+PYARROW_LT_13 = version.parse(pa.__version__) < version.parse("13")
 
 
 class IndexBase(CopyMixin):
@@ -142,8 +145,13 @@ class IndexBase(CopyMixin):
         """Return an array of all observed values."""
         keys = np.array(list(self.index_dct.keys()))
         labeled_array = pa.array(keys, type=self.dtype)
+
+        # Prior to pyarrow 13.0.0 coerce_temporal_nanoseconds didn't exist
+        # as it was introduced for backwards compatibility with pandas 1.x
         return np.array(
-            labeled_array.to_pandas(
+            labeled_array.to_pandas(date_as_object=date_as_object)
+            if PYARROW_LT_13
+            else labeled_array.to_pandas(
                 date_as_object=date_as_object,
                 coerce_temporal_nanoseconds=coerce_temporal_nanoseconds,
             )
@@ -483,9 +491,14 @@ class IndexBase(CopyMixin):
         table = _index_dct_to_table(
             self.index_dct, column=self.column, dtype=self.dtype
         )
-        df = table.to_pandas(
-            date_as_object=date_as_object, coerce_temporal_nanoseconds=True
-        )
+        if PYARROW_LT_13:
+            # Prior to pyarrow 13.0.0 coerce_temporal_nanoseconds didn't exist
+            # as it was introduced for backwards compatibility with pandas 1.x
+            df = table.to_pandas(date_as_object=date_as_object)
+        else:
+            df = table.to_pandas(
+                date_as_object=date_as_object, coerce_temporal_nanoseconds=True
+            )
 
         if predicates is not None:
             # If there is a conjunction without any reference to the index
@@ -871,7 +884,12 @@ def _parquet_bytes_to_dict(column: str, index_buffer: bytes):
     if column_type == pa.timestamp("us"):
         column_type = pa.timestamp("ns")
 
-    df = table.to_pandas(coerce_temporal_nanoseconds=True)
+    if PYARROW_LT_13:
+        # Prior to pyarrow 13.0.0 coerce_temporal_nanoseconds didn't exist
+        # as it was introduced for backwards compatibility with pandas 1.x
+        df = table.to_pandas()
+    else:
+        df = table.to_pandas(coerce_temporal_nanoseconds=True)
 
     index_dct = dict(
         zip(df[column].values, (list(x) for x in df[_PARTITION_COLUMN_NAME].values))
