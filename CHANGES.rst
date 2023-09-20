@@ -2,6 +2,12 @@
 Changelog
 =========
 
+Plateau 4.2.0 (unreleased)
+==========================
+
+* Support pandas 2
+* No longer test for pyarrow < 8
+
 Plateau 4.1.5 (2023-03-14)
 ==========================
 
