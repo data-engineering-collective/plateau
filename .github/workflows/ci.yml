@@ -30,7 +30,6 @@ jobs:
         include:
           - numfocus_nightly: true
             os: "ubuntu-latest"
-            pandas: "2.0.3" # Avoid due to bug in Pandas 2.1.0 (#55014)
             pyarrow: "13.0.0"
             python: "3.11"
           - numfocus_nightly: false
@@ -97,10 +96,11 @@ jobs:
         # nightlies and the latest release would otherwise work together.
         run: micromamba update -c arrow-nightlies -c conda-forge arrow-cpp pyarrow
         if: matrix.pyarrow == 'nightly'
-      - name: Pip Instal NumFOCUS nightly
+      - name: Pip Install NumFOCUS nightly
         # NumFOCUS nightly wheels, contains numpy and pandas
         # TODO(gh-45): Re-add numpy
-        run: python -m pip install --pre --upgrade --timeout=60 --extra-index-url https://pypi.anaconda.org/scipy-wheels-nightly/simple pandas
+        # TODO: Remove pandas version stipulation once https://github.com/pandas-dev/pandas/issues/55014 is fixed
+        run: python -m pip install --pre --upgrade --timeout=60 --extra-index-url https://pypi.anaconda.org/scipy-wheels-nightly/simple "pandas!=2.1.0.*"
         if: matrix.numfocus_nightly
       - name: Test import
         run: |
