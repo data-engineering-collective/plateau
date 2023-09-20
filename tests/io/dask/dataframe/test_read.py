@@ -277,3 +277,43 @@ def test_column_projection(store_factory, monkeypatch):
     )["colA"]
     assert_dask_eq(ddf_auto, ddf_manual)
     assert fake_called
+
+
+def test_dask_index_on_non_string_raises(store_factory):
+    dataset_uuid = "dataset_uuid"
+    colA = 1
+    df1 = pd.DataFrame({colA: [1, 2]})
+    store_dataframes_as_dataset(
+        store=store_factory, dataset_uuid=dataset_uuid, dfs=[df1]
+    )
+    with pytest.raises(
+        TypeError,
+        match=f"The paramter `dask_index_on` must be a string but got {type(colA)}",
+    ):
+        read_dataset_as_ddf(
+            dataset_uuid=dataset_uuid,
+            store=store_factory,
+            table="table",
+            dask_index_on=colA,
+        )
+
+
+def test_dask_dispatch_by_raises_if_index_on_not_none(store_factory):
+    dataset_uuid = "dataset_uuid"
+    colA = "ColumnA"
+    df1 = pd.DataFrame({colA: [1, 2]})
+    store_dataframes_as_dataset(
+        store=store_factory, dataset_uuid=dataset_uuid, dfs=[df1]
+    )
+    with pytest.raises(
+        ValueError,
+        match="`read_dataset_as_ddf` got parameters `dask_index_on` and `dispatch_by`. "
+        "Note that `dispatch_by` can only be used if `dask_index_on` is None.",
+    ):
+        read_dataset_as_ddf(
+            dataset_uuid=dataset_uuid,
+            store=store_factory,
+            table="table",
+            dask_index_on=colA,
+            dispatch_by=[colA],
+        )
