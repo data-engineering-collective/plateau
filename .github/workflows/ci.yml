@@ -96,7 +96,7 @@ jobs:
         if: matrix.numfocus_nightly
         # TODO: Remove check conda env stage and -vvv from import
       - name: Check conda env
-        run: mamba list
+        run: micromamba list
       - name: Test import
         run: |
           python -c "import plateau"
