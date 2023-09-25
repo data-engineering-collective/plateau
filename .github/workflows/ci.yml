@@ -30,12 +30,28 @@ jobs:
         include:
           - numfocus_nightly: true
             os: "ubuntu-latest"
+            pyarrow: "4.0.1"
+            python: "3.10"
+          - numfocus_nightly: true
+            os: "ubuntu-latest"
             pyarrow: "11.0.0"
             python: "3.11"
           - numfocus_nightly: true
             os: "ubuntu-latest"
             pyarrow: "13.0.0"
             python: "3.11"
+          - numfocus_nightly: false
+            os: "ubuntu-latest"
+            pyarrow: "5.0.0"
+            python: "3.9"
+          - numfocus_nightly: false
+            os: "ubuntu-latest"
+            pyarrow: "6.0.1"
+            python: "3.9"
+          - numfocus_nightly: false
+            os: "ubuntu-latest"
+            pyarrow: "7.0.0"
+            python: "3.10"
           - numfocus_nightly: false
             os: "ubuntu-latest"
             pyarrow: "8.0.1"
@@ -60,6 +76,10 @@ jobs:
             os: "ubuntu-latest"
             pyarrow: "13.0.0"
             python: "3.11"
+          - numfocus_nightly: false
+            os: "macos-latest"
+            pyarrow: "4.0.1"
+            python: "3.8"
           - numfocus_nightly: false
             os: "macos-latest"
             pyarrow: "11.0.0"
@@ -96,7 +116,7 @@ jobs:
       - name: Install repository
         run: python -m pip install --no-build-isolation --no-deps --disable-pip-version-check -e .
       - name: Install Pyarrow (non-nightly)
-        run: micromamba install pyarrow==${{ matrix.pyarrow }}
+        run: micromamba install -y --no-py-pin pyarrow==${{ matrix.pyarrow }} "pandas<2.1.0"
         if: matrix.pyarrow != 'nightly'
       - name: Install Pyarrow (nightly)
         # Install both arrow-cpp and pyarrow to make sure that we have the
@@ -110,15 +130,12 @@ jobs:
         # TODO: Remove pandas version stipulation once https://github.com/pandas-dev/pandas/issues/55014 is fixed
         run: python -m pip install --pre --upgrade --timeout=60 --extra-index-url https://pypi.anaconda.org/scipy-wheels-nightly/simple "pandas<2.1.0"
         if: matrix.numfocus_nightly
-        # TODO: Remove check conda env stage and -vvv from import
-      - name: Check conda env
-        run: micromamba list
       - name: Test import
         run: |
           python -c "import plateau"
           python -c "import plateau.api"
           python -c "import plateau.api.dataset"
-          python -vvv -c "import plateau.api.serialization"
+          python -c "import plateau.api.serialization"
           python -c "import plateau.core"
           python -c "import plateau.io"
           python -c "import plateau.io_components"
