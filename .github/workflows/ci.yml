@@ -24,67 +24,93 @@ jobs:
       fail-fast: false
       matrix:
         numfocus_nightly: [false]
+        backwards_compat: [false]
         os: ["ubuntu-latest"]
         pyarrow: ["nightly"]
         python: ["3.8"]
         include:
           - numfocus_nightly: true
+            backwards_compat: false
             os: "ubuntu-latest"
             pyarrow: "4.0.1"
             python: "3.10"
           - numfocus_nightly: true
+            backwards_compat: false
             os: "ubuntu-latest"
             pyarrow: "11.0.0"
             python: "3.11"
           - numfocus_nightly: true
+            backwards_compat: false
             os: "ubuntu-latest"
             pyarrow: "13.0.0"
             python: "3.11"
           - numfocus_nightly: false
+            backwards_compat: true
+            os: "ubuntu-latest"
+            pyarrow: "11.0.0"
+            python: "3.11"
+          - numfocus_nightly: false
+            backwards_compat: true
+            os: "ubuntu-latest"
+            pyarrow: "13.0.0"
+            python: "3.11"
+          - numfocus_nightly: false
+            backwards_compat: false
             os: "ubuntu-latest"
             pyarrow: "5.0.0"
             python: "3.9"
           - numfocus_nightly: false
+            backwards_compat: false
             os: "ubuntu-latest"
             pyarrow: "6.0.1"
             python: "3.9"
           - numfocus_nightly: false
+            backwards_compat: false
             os: "ubuntu-latest"
             pyarrow: "7.0.0"
             python: "3.10"
           - numfocus_nightly: false
+            backwards_compat: false
             os: "ubuntu-latest"
             pyarrow: "8.0.1"
             python: "3.10"
           - numfocus_nightly: false
+            backwards_compat: false
             os: "ubuntu-latest"
             pyarrow: "9.0.0"
             python: "3.10"
           - numfocus_nightly: false
+            backwards_compat: false
             os: "ubuntu-latest"
             pyarrow: "10.0.1"
             python: "3.11"
           - numfocus_nightly: false
+            backwards_compat: false
             os: "ubuntu-latest"
             pyarrow: "11.0.0"
             python: "3.11"
           - numfocus_nightly: false
+            backwards_compat: false
             os: "ubuntu-latest"
             pyarrow: "12.0.0"
             python: "3.11"
           - numfocus_nightly: false
+            backwards_compat: false
             os: "ubuntu-latest"
             pyarrow: "13.0.0"
             python: "3.11"
           - numfocus_nightly: false
+            backwards_compat: false
             os: "macos-latest"
             pyarrow: "4.0.1"
             python: "3.8"
           - numfocus_nightly: false
+            backwards_compat: false
             os: "macos-latest"
             pyarrow: "11.0.0"
             python: "3.11"
           - numfocus_nightly: false
+            backwards_compat: false
             os: "macos-latest"
             pyarrow: "13.0.0"
             python: "3.11"
@@ -117,7 +143,10 @@ jobs:
         run: python -m pip install --no-build-isolation --no-deps --disable-pip-version-check -e .
       - name: Install Pyarrow (non-nightly)
         run: micromamba install -y --no-py-pin pyarrow==${{ matrix.pyarrow }} "pandas<2.1.0"
-        if: matrix.pyarrow != 'nightly'
+        if: matrix.pyarrow != 'nightly' && !matrix.backwards_compat
+      - name: Downgrade pandas<2 to test backwards compatibility
+        run: micromamba install -y "pandas<2"
+        if: matrix.backwards_compat
       - name: Install Pyarrow (nightly)
         # Install both arrow-cpp and pyarrow to make sure that we have the
         # latest nightly of both packages. It is sadly not guaranteed that the
