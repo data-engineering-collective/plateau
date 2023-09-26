@@ -3,7 +3,7 @@ channels:
   - conda-forge
 dependencies:
   - python>=3.8
-  - dask[dataframe]<2023.9.2
+  - dask[dataframe]!=2023.9.2
   - decorator
   - msgpack-python>=0.5.2
   # Currently dask and numpy==1.16.0 clash
