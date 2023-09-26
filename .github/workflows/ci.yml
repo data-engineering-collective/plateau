@@ -26,7 +26,7 @@ jobs:
         numfocus_nightly: [false]
         os: ["ubuntu-latest"]
         pandas: [""]
-        pyarrow: ["3.0.0", "4.0.1", "nightly"]
+        pyarrow: ["4.0.1", "nightly"]
         python: ["3.8"]
         include:
           - numfocus_nightly: true
