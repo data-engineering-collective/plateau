@@ -132,7 +132,7 @@ jobs:
         run: micromamba update -c arrow-nightlies -c conda-forge arrow-cpp pyarrow
         if: matrix.pyarrow == 'nightly'
       - name: Install Pyarrow (downgrade pandas)
-        run: micromamba install -y pyarrow==${{ matrix.pyarrow }} pandas==${{ matrix.pandas }}
+        run: micromamba install -y --no-py-pin pyarrow==${{ matrix.pyarrow }} pandas==${{ matrix.pandas }}
         if: matrix.pyarrow != 'nightly' && matrix.pandas != ''
       - name: Pip Install NumFOCUS nightly
         # NumFOCUS nightly wheels, contains numpy and pandas
