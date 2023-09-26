@@ -6,7 +6,8 @@ Plateau 4.2.0 (unreleased)
 ==========================
 
 * Support pandas 2
-* No longer test for pyarrow < 8
+* Test pyarrow 12 and 13
+* Prevent dask from casting all object dtypes to strings
 
 Plateau 4.1.5 (2023-03-14)
 ==========================
