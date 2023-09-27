@@ -121,7 +121,8 @@ jobs:
             python=${{ matrix.PYTHON_VERSION }}
       - name: Install Pyarrow (non-nightly)
         # Don't pin python as older versions of pyarrow require older versions of python
-        run: micromamba install -y --no-py-pin pyarrow==${{ matrix.pyarrow }} "pandas<2.1.0"
+        # Pin asv so it doesn't get updated before the benchmarks are run
+        run: micromamba install -y --no-py-pin pyarrow==${{ matrix.pyarrow }} "pandas<2.1.0" "asv<0.6"
         if: matrix.pyarrow != 'nightly' && matrix.pandas == ''
       - name: Install Pyarrow (nightly)
         # Install both arrow-cpp and pyarrow to make sure that we have the
