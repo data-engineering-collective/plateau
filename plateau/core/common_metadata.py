@@ -766,15 +766,12 @@ def empty_dataframe_from_schema(
     # HACK: Cast bytes to object in metadata until Pandas bug is fixed: https://github.com/pandas-dev/pandas/issues/50127
     schema = schema_metadata_bytes_to_object(schema.internal())
 
-    if PYARROW_LT_13:
-        # Prior to pyarrow 13.0.0 coerce_temporal_nanoseconds didn't exist
-        # as it was introduced for backwards compatibility with pandas 1.x
-        df = schema.empty_table().to_pandas(date_as_object=date_as_object)
-    else:
-        df = schema.empty_table().to_pandas(
-            date_as_object=date_as_object,
-            coerce_temporal_nanoseconds=coerce_temporal_nanoseconds,
-        )
+    # Prior to pyarrow 13.0.0 coerce_temporal_nanoseconds didn't exist
+    # as it was introduced for backwards compatibility with pandas 1.x
+    _coerce = {}
+    if not PYARROW_LT_13:
+        _coerce["coerce_temporal_nanoseconds"] = coerce_temporal_nanoseconds
+    df = schema.empty_table().to_pandas(date_as_object=date_as_object, **_coerce)
 
     df.columns = df.columns.map(ensure_string_type)
     if columns is not None:

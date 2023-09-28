@@ -148,13 +148,11 @@ class IndexBase(CopyMixin):
 
         # Prior to pyarrow 13.0.0 coerce_temporal_nanoseconds didn't exist
         # as it was introduced for backwards compatibility with pandas 1.x
+        _coerce = {}
+        if not PYARROW_LT_13:
+            _coerce["coerce_temporal_nanoseconds"] = coerce_temporal_nanoseconds
         return np.array(
-            labeled_array.to_pandas(date_as_object=date_as_object)
-            if PYARROW_LT_13
-            else labeled_array.to_pandas(
-                date_as_object=date_as_object,
-                coerce_temporal_nanoseconds=coerce_temporal_nanoseconds,
-            )
+            labeled_array.to_pandas(date_as_object=date_as_object, **_coerce)
         )
 
     @staticmethod
@@ -491,14 +489,10 @@ class IndexBase(CopyMixin):
         table = _index_dct_to_table(
             self.index_dct, column=self.column, dtype=self.dtype
         )
-        if PYARROW_LT_13:
-            # Prior to pyarrow 13.0.0 coerce_temporal_nanoseconds didn't exist
-            # as it was introduced for backwards compatibility with pandas 1.x
-            df = table.to_pandas(date_as_object=date_as_object)
-        else:
-            df = table.to_pandas(
-                date_as_object=date_as_object, coerce_temporal_nanoseconds=True
-            )
+        # Prior to pyarrow 13.0.0 coerce_temporal_nanoseconds didn't exist
+        # as it was introduced for backwards compatibility with pandas 1.x
+        _coerce = {} if PYARROW_LT_13 else {"coerce_temporal_nanoseconds": True}
+        df = table.to_pandas(date_as_object=date_as_object, **_coerce)
 
         if predicates is not None:
             # If there is a conjunction without any reference to the index
@@ -884,12 +878,10 @@ def _parquet_bytes_to_dict(column: str, index_buffer: bytes):
     if column_type == pa.timestamp("us"):
         column_type = pa.timestamp("ns")
 
-    if PYARROW_LT_13:
-        # Prior to pyarrow 13.0.0 coerce_temporal_nanoseconds didn't exist
-        # as it was introduced for backwards compatibility with pandas 1.x
-        df = table.to_pandas()
-    else:
-        df = table.to_pandas(coerce_temporal_nanoseconds=True)
+    # Prior to pyarrow 13.0.0 coerce_temporal_nanoseconds didn't exist
+    # as it was introduced for backwards compatibility with pandas 1.x
+    _coerce = {} if PYARROW_LT_13 else {"coerce_temporal_nanoseconds": True}
+    df = table.to_pandas(**_coerce)
 
     index_dct = dict(
         zip(df[column].values, (list(x) for x in df[_PARTITION_COLUMN_NAME].values))

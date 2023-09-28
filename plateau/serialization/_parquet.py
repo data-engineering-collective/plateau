@@ -256,24 +256,17 @@ class ParquetSerializer(DataFrameSerializer):
                 else:
                     # ARROW-5139 Column projection with empty columns returns a table w/out index
                     if columns == []:
+                        # Prior to pyarrow 13.0.0 coerce_temporal_nanoseconds didn't exist
+                        # as it was introduced for backwards compatibility with pandas 1.x
+                        _coerce = {}
+                        if not PYARROW_LT_13:
+                            _coerce["coerce_temporal_nanoseconds"] = True
                         # Create an arrow table with expected index length.
-                        if PYARROW_LT_13:
-                            # Prior to pyarrow 13.0.0 coerce_temporal_nanoseconds didn't exist
-                            # as it was introduced for backwards compatibility with pandas 1.x
-                            df = (
-                                parquet_file.schema.to_arrow_schema()
-                                .empty_table()
-                                .to_pandas(date_as_object=date_as_object)
-                            )
-                        else:
-                            df = (
-                                parquet_file.schema.to_arrow_schema()
-                                .empty_table()
-                                .to_pandas(
-                                    date_as_object=date_as_object,
-                                    coerce_temporal_nanoseconds=True,
-                                )
-                            )
+                        df = (
+                            parquet_file.schema.to_arrow_schema()
+                            .empty_table()
+                            .to_pandas(date_as_object=date_as_object, **_coerce)
+                        )
                         index = pd.Index(
                             pd.RangeIndex(start=0, stop=parquet_file.metadata.num_rows),
                             dtype="int64",
@@ -300,14 +293,10 @@ class ParquetSerializer(DataFrameSerializer):
         # HACK: Cast bytes to object in metadata until Pandas bug is fixed: https://github.com/pandas-dev/pandas/issues/50127
         table = table.cast(schema_metadata_bytes_to_object(table.schema))
 
-        if PYARROW_LT_13:
-            # Prior to pyarrow 13.0.0 coerce_temporal_nanoseconds didn't exist
-            # as it was introduced for backwards compatibility with pandas 1.x
-            df = table.to_pandas(date_as_object=date_as_object)
-        else:
-            df = table.to_pandas(
-                date_as_object=date_as_object, coerce_temporal_nanoseconds=True
-            )
+        # Prior to pyarrow 13.0.0 coerce_temporal_nanoseconds didn't exist
+        # as it was introduced for backwards compatibility with pandas 1.x
+        _coerce = {} if PYARROW_LT_13 else {"coerce_temporal_nanoseconds": True}
+        df = table.to_pandas(date_as_object=date_as_object, **_coerce)
 
         # XXX: Patch until Pyarrow bug is resolved: https://issues.apache.org/jira/browse/ARROW-18099?filter=-2
         if categories:

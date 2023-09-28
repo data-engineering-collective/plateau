@@ -88,12 +88,11 @@ class CsvSerializer(DataFrameSerializer):
 
     def store(self, store, key_prefix, df):
         if isinstance(df, pa.Table):
-            if PYARROW_LT_13:
-                # Prior to pyarrow 13.0.0 coerce_temporal_nanoseconds didn't exist
-                # as it was introduced for backwards compatibility with pandas 1.x
-                df = df.to_pandas()
-            else:
-                df = df.to_pandas(coerce_temporal_nanoseconds=True)
+            # Prior to pyarrow 13.0.0 coerce_temporal_nanoseconds didn't exist
+            # as it was introduced for backwards compatibility with pandas 1.x
+            _coerce = {} if PYARROW_LT_13 else {"coerce_temporal_nanoseconds": True}
+            df = df.to_pandas(**_coerce)
+
         key = f"{key_prefix}.csv"
         result_stream = BytesIO()
         iostream: BufferedIOBase
