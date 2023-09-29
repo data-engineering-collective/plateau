@@ -95,7 +95,9 @@ def delete_dataset__delayed(dataset_uuid=None, store=None, factory=None):
         dataset_uuid=dataset_factory.dataset_uuid,
     )
 
-    return delayed(_delete_tl_metadata)(dataset_factory, mps, gc, delayed_dataset_uuid)
+    return delayed(_delete_tl_metadata)(
+        dataset_factory, list(mps), gc, delayed_dataset_uuid
+    )
 
 
 @default_docs
@@ -313,7 +315,7 @@ def update_dataset_from_delayed(
     )
 
     return dask.delayed(update_dataset_from_partitions)(
-        mps,
+        list(mps),
         store_factory=store,
         dataset_uuid=dataset_uuid,
         ds_factory=ds_factory,
@@ -376,7 +378,7 @@ def store_delayed_as_dataset(
     )
 
     return delayed(store_dataset_from_partitions)(
-        mps,
+        list(mps),
         dataset_uuid=dataset_uuid,
         store=store,
         dataset_metadata=metadata,

@@ -119,12 +119,13 @@ def test_reconstruct_dask_index(store_factory, index_type, monkeypatch):
     df2 = pd.DataFrame({colA: [3, 4], colB: ["x", "y"]})
     df_chunks = np.array_split(pd.concat([df1, df2]).reset_index(drop=True), 4)
     df_delayed = [dask.delayed(c) for c in df_chunks]
-    ddf_expected = dd.from_delayed(df_delayed).set_index(
-        colA, divisions=[1, 2, 3, 4, 4]
-    )
-    ddf_expected_simple = dd.from_pandas(
-        pd.concat([df1, df2]), npartitions=2
-    ).set_index(colA)
+    with dask.config.set({"dataframe.shuffle.method": "tasks"}):
+        ddf_expected = dd.from_delayed(df_delayed).set_index(
+            colA, divisions=[1, 2, 3, 4, 4]
+        )
+        ddf_expected_simple = dd.from_pandas(
+            pd.concat([df1, df2]), npartitions=2
+        ).set_index(colA)
 
     if index_type == "secondary":
         secondary_indices = colA

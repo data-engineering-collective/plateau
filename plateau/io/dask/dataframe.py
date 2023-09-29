@@ -332,7 +332,9 @@ def store_dataset_from_ddf(
     if not overwrite:
         raise_if_dataset_exists(dataset_uuid=dataset_uuid, store=store)
 
-    with dask.config.set({"dataframe.convert-string": False}):
+    with dask.config.set(
+        {"dataframe.convert-string": False, "dataframe.shuffle.method": "tasks"}
+    ):
         mp_ser = _write_dataframe_partitions(
             ddf=ddf,
             store=ds_factory.store_factory,
@@ -476,7 +478,9 @@ def update_dataset_from_ddf(
     inferred_indices = _ensure_compatible_indices(ds_factory, secondary_indices)
     del secondary_indices
 
-    with dask.config.set({"dataframe.convert-string": False}):
+    with dask.config.set(
+        {"dataframe.convert-string": False, "dataframe.shuffle.method": "tasks"}
+    ):
         mp_ser = _write_dataframe_partitions(
             ddf=ddf,
             store=ds_factory.store_factory if ds_factory else store,
@@ -659,7 +663,9 @@ def hash_dataset(
         columns=columns,
         dates_as_object=True,
     )
-    with dask.config.set({"dataframe.convert-string": False}):
+    with dask.config.set(
+        {"dataframe.convert-string": False, "dataframe.shuffle.method": "tasks"}
+    ):
         if not group_key:
             return ddf.map_partitions(_hash_partition, meta="uint64").astype("uint64")
         else:
