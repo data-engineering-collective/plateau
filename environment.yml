@@ -3,8 +3,7 @@ channels:
   - conda-forge
   - nodefaults
 dependencies:
-  # TODO: Investigate issue with dask 2023.9.2
-  - dask!=2021.5.1,!=2021.6.0,<2023.9.2  # gh475 - 2021.5.1 and 2021.6.0 broke ci, omit those versions
+  - dask!=2021.5.1,!=2021.6.0 # gh475 - 2021.5.1 and 2021.6.0 broke ci, omit those versions
   - decorator
   - msgpack-python>=0.5.2
   # Currently dask and numpy==1.16.0 clash
