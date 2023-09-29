@@ -122,7 +122,7 @@ jobs:
       - name: Install Pyarrow (non-nightly)
         # Don't pin python as older versions of pyarrow require older versions of python
         # Pin asv so it doesn't get updated before the benchmarks are run
-        run: micromamba install -y --no-py-pin pyarrow==${{ matrix.pyarrow }} "pandas<2.1.0" "asv<0.6"
+        run: micromamba install -y --no-py-pin pyarrow==${{ matrix.pyarrow }} "pandas<2.1.0"
         if: matrix.pyarrow != 'nightly' && matrix.pandas == ''
       - name: Install Pyarrow (nightly)
         # Install both arrow-cpp and pyarrow to make sure that we have the
@@ -161,7 +161,7 @@ jobs:
       - name: Running benchmarks
         run: |
           asv --config ./asv_bench/asv.conf.json machine --machine github --os unknown --arch unknown --cpu unknown --ram unknown
-          asv --config ./asv_bench/asv.conf.json dev | sed "/failed$/ s/^/##[error]/" | tee benchmarks.log
+          asv --config ./asv_bench/asv.conf.json run -E existing:same | sed "/failed$/ s/^/##[error]/" | tee benchmarks.log
           if grep "failed" benchmarks.log > /dev/null ; then
               exit 1
           fi

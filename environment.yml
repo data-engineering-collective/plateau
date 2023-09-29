@@ -37,6 +37,6 @@ dependencies:
   # CLI
   - ipython
   # ASV // Benchmark
-  - asv<0.6
+  - asv
   # Packaging infrastructure
   - python-build
