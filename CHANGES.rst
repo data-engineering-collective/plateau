@@ -2,7 +2,7 @@
 Changelog
 =========
 
-Plateau 4.2.0 (unreleased)
+Plateau 4.2.0 (2023-09-29)
 ==========================
 
 * Support pandas 2
