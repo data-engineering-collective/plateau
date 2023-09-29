@@ -24,13 +24,14 @@ def _id(part):
 def _update_dataset(partitions, *args, **kwargs):
     # TODO: Simplify once parse_input_to_metapartition is removed / obsolete
 
-    if isinstance(partitions, pd.DataFrame):
-        partitions = dd.from_pandas(partitions, npartitions=1)
-    elif partitions is not None:
-        delayed_partitions = [dask.delayed(_id)(part) for part in partitions]
-        partitions = dd.from_delayed(delayed_partitions)
-    else:
-        partitions = None
+    with dask.config.set({"dataframe.convert-string": False}):
+        if isinstance(partitions, pd.DataFrame):
+            partitions = dd.from_pandas(partitions, npartitions=1)
+        elif partitions is not None:
+            delayed_partitions = [dask.delayed(_id)(part) for part in partitions]
+            partitions = dd.from_delayed(delayed_partitions)
+        else:
+            partitions = None
 
     # Replace `table_name` with `table` keyword argument to enable shared test code
     # via `bound_update_dataset` fixture

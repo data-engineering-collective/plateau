@@ -1,3 +1,6 @@
+from pyarrow import Schema
+
+
 def _check_contains_null(val):
     if isinstance(val, bytes):
         for byte in val:
@@ -16,3 +19,8 @@ def ensure_unicode_string_type(obj):
         return obj.decode("utf8")
     else:
         return str(obj)
+
+
+def schema_metadata_bytes_to_object(schema: Schema) -> Schema:
+    meta = schema.metadata[b"pandas"].decode().replace("bytes", "object").encode()
+    return schema.with_metadata({b"pandas": meta})

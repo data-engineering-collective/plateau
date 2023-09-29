@@ -2,6 +2,7 @@ import logging
 from functools import partial
 from typing import List, Union
 
+import dask
 import dask.dataframe as dd
 import pandas as pd
 
@@ -109,7 +110,8 @@ def pack_payload(df: dd.DataFrame, group_key: Union[List[str], str]) -> dd.DataF
 
     _pack_payload = partial(pack_payload_pandas, group_key=group_key)
 
-    return df.map_partitions(_pack_payload, meta=packed_meta)
+    with dask.config.set({"dataframe.convert-string": False}):
+        return df.map_partitions(_pack_payload, meta=packed_meta)
 
 
 def unpack_payload_pandas(
@@ -154,6 +156,7 @@ def unpack_payload(df: dd.DataFrame, unpack_meta: pd.DataFrame) -> dd.DataFrame:
         )
         return df
 
-    return df.map_partitions(
-        unpack_payload_pandas, unpack_meta=unpack_meta, meta=unpack_meta
-    )
+    with dask.config.set({"dataframe.convert-string": False}):
+        return df.map_partitions(
+            unpack_payload_pandas, unpack_meta=unpack_meta, meta=unpack_meta
+        )

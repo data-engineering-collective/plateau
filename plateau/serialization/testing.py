@@ -36,16 +36,16 @@ def get_dataframe_not_nested(n):
             "bool": pd.Series(
                 [1] * int(np.floor(n / 2)) + [0] * int(np.ceil(n / 2)), dtype=np.bool_
             ),
-            "int8": pd.Series(range(n), dtype=np.int8),
-            "int16": pd.Series(range(n), dtype=np.int16),
-            "int32": pd.Series(range(n), dtype=np.int32),
-            "int64": pd.Series(range(n), dtype=np.int64),
-            "uint8": pd.Series(range(n), dtype=np.uint8),
-            "uint16": pd.Series(range(n), dtype=np.uint16),
-            "uint32": pd.Series(range(n), dtype=np.uint32),
-            "uint64": pd.Series(range(n), dtype=np.uint64),
-            "float32": pd.Series([float(x) for x in range(n)], dtype=np.float32),
-            "float64": pd.Series([float(x) for x in range(n)], dtype=np.float64),
+            "int8": pd.Series(range(n)).astype(np.int8),
+            "int16": pd.Series(range(n)).astype(np.int16),
+            "int32": pd.Series(range(n)).astype(np.int32),
+            "int64": pd.Series(range(n)).astype(np.int64),
+            "uint8": pd.Series(range(n)).astype(np.uint8),
+            "uint16": pd.Series(range(n)).astype(np.uint16),
+            "uint32": pd.Series(range(n)).astype(np.uint32),
+            "uint64": pd.Series(range(n)).astype(np.uint64),
+            "float32": pd.Series([float(x) for x in range(n)]).astype(np.float32),
+            "float64": pd.Series([float(x) for x in range(n)]).astype(np.float64),
             "date": pd.Series(
                 [date(2018, 1, x % 31 + 1) for x in range(1, n + 1)], dtype=object
             ),

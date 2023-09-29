@@ -25,43 +25,73 @@ jobs:
       matrix:
         numfocus_nightly: [false]
         os: ["ubuntu-latest"]
-        pyarrow: ["3.0.0", "4.0.1", "nightly"]
+        pandas: [""]
+        pyarrow: ["4.0.1", "nightly"]
         python: ["3.8"]
         include:
           - numfocus_nightly: true
             os: "ubuntu-latest"
+            pandas: ""
             pyarrow: "4.0.1"
             python: "3.10"
           - numfocus_nightly: false
             os: "ubuntu-latest"
+            pandas: "1.5.3"
+            pyarrow: "4.0.1"
+            python: "3.11"
+          - numfocus_nightly: false
+            os: "ubuntu-latest"
+            pandas: "1.5.3"
+            pyarrow: "13.0.0"
+            python: "3.11"
+          - numfocus_nightly: false
+            os: "ubuntu-latest"
+            pandas: ""
             pyarrow: "5.0.0"
             python: "3.9"
           - numfocus_nightly: false
             os: "ubuntu-latest"
+            pandas: ""
             pyarrow: "6.0.1"
             python: "3.9"
           - numfocus_nightly: false
             os: "ubuntu-latest"
+            pandas: ""
             pyarrow: "7.0.0"
             python: "3.10"
           - numfocus_nightly: false
             os: "ubuntu-latest"
+            pandas: ""
             pyarrow: "8.0.1"
             python: "3.10"
           - numfocus_nightly: false
             os: "ubuntu-latest"
+            pandas: ""
             pyarrow: "9.0.0"
             python: "3.10"
           - numfocus_nightly: false
             os: "ubuntu-latest"
+            pandas: ""
             pyarrow: "10.0.1"
             python: "3.11"
           - numfocus_nightly: false
             os: "ubuntu-latest"
+            pandas: ""
             pyarrow: "11.0.0"
             python: "3.11"
           - numfocus_nightly: false
+            os: "ubuntu-latest"
+            pandas: ""
+            pyarrow: "12.0.0"
+            python: "3.11"
+          - numfocus_nightly: false
+            os: "ubuntu-latest"
+            pandas: ""
+            pyarrow: "13.0.0"
+            python: "3.11"
+          - numfocus_nightly: false
             os: "macos-latest"
+            pandas: ""
             pyarrow: "4.0.1"
             python: "3.8"
     continue-on-error: ${{ matrix.numfocus_nightly || matrix.pyarrow == 'nightly' }}
@@ -89,22 +119,28 @@ jobs:
           cache-env: true
           extra-specs: |
             python=${{ matrix.PYTHON_VERSION }}
-      - name: Install repository
-        run: python -m pip install --no-build-isolation --no-deps --disable-pip-version-check -e .
       - name: Install Pyarrow (non-nightly)
-        run: micromamba install pyarrow==${{ matrix.pyarrow }}
-        if: matrix.pyarrow != 'nightly'
+        # Don't pin python as older versions of pyarrow require older versions of python
+        # Pin asv so it doesn't get updated before the benchmarks are run
+        run: micromamba install -y --no-py-pin pyarrow==${{ matrix.pyarrow }} "pandas<2.1.0" "asv<0.6"
+        if: matrix.pyarrow != 'nightly' && matrix.pandas == ''
       - name: Install Pyarrow (nightly)
         # Install both arrow-cpp and pyarrow to make sure that we have the
         # latest nightly of both packages. It is sadly not guaranteed that the
         # nightlies and the latest release would otherwise work together.
         run: micromamba update -c arrow-nightlies -c conda-forge arrow-cpp pyarrow
         if: matrix.pyarrow == 'nightly'
-      - name: Pip Instal NumFOCUS nightly
+      - name: Install Pyarrow (downgrade pandas)
+        run: micromamba install -y --no-py-pin pyarrow==${{ matrix.pyarrow }} pandas==${{ matrix.pandas }}
+        if: matrix.pyarrow != 'nightly' && matrix.pandas != ''
+      - name: Pip Install NumFOCUS nightly
         # NumFOCUS nightly wheels, contains numpy and pandas
         # TODO(gh-45): Re-add numpy
-        run: python -m pip install --pre --upgrade --timeout=60 --extra-index-url https://pypi.anaconda.org/scipy-wheels-nightly/simple pandas
+        # TODO: Remove pandas version pin once https://github.com/pandas-dev/pandas/issues/55014 is fixed
+        run: python -m pip install --pre --upgrade --timeout=60 --extra-index-url https://pypi.anaconda.org/scipy-wheels-nightly/simple "pandas<2.1.0"
         if: matrix.numfocus_nightly
+      - name: Install repository
+        run: python -m pip install --no-build-isolation --no-deps --disable-pip-version-check -e .
       - name: Test import
         run: |
           python -c "import plateau"

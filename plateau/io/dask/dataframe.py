@@ -150,18 +150,20 @@ def read_dataset_as_ddf(
         divisions.sort()
         divisions_lst = list(divisions)
         divisions_lst.append(divisions[-1])
-    ddf = from_map(
-        ReadPlateauPartition(columns=columns),
-        mps,
-        meta=meta,
-        label="read-plateau",
-        divisions=divisions_lst,
-        store=ds_factory.store_factory,
-        categoricals=categoricals,
-        predicate_pushdown_to_io=predicate_pushdown_to_io,
-        dates_as_object=dates_as_object,
-        predicates=predicates,
-    )
+
+    with dask.config.set({"dataframe.convert-string": False}):
+        ddf = from_map(
+            ReadPlateauPartition(columns=columns),
+            mps,
+            meta=meta,
+            label="read-plateau",
+            divisions=divisions_lst,
+            store=ds_factory.store_factory,
+            categoricals=categoricals,
+            predicate_pushdown_to_io=predicate_pushdown_to_io,
+            dates_as_object=dates_as_object,
+            predicates=predicates,
+        )
     if dask_index_on:
         return ddf.set_index(dask_index_on, divisions=divisions_lst, sorted=True)
     else:
@@ -329,21 +331,24 @@ def store_dataset_from_ddf(
 
     if not overwrite:
         raise_if_dataset_exists(dataset_uuid=dataset_uuid, store=store)
-    mp_ser = _write_dataframe_partitions(
-        ddf=ddf,
-        store=ds_factory.store_factory,
-        dataset_uuid=dataset_uuid,
-        table=table,
-        secondary_indices=secondary_indices,
-        shuffle=shuffle,
-        repartition_ratio=repartition_ratio,
-        num_buckets=num_buckets,
-        sort_partitions_by=sort_partitions_by,
-        df_serializer=df_serializer,
-        metadata_version=metadata_version,
-        partition_on=partition_on,
-        bucket_by=bucket_by,
-    )
+
+    with dask.config.set({"dataframe.convert-string": False}):
+        mp_ser = _write_dataframe_partitions(
+            ddf=ddf,
+            store=ds_factory.store_factory,
+            dataset_uuid=dataset_uuid,
+            table=table,
+            secondary_indices=secondary_indices,
+            shuffle=shuffle,
+            repartition_ratio=repartition_ratio,
+            num_buckets=num_buckets,
+            sort_partitions_by=sort_partitions_by,
+            df_serializer=df_serializer,
+            metadata_version=metadata_version,
+            partition_on=partition_on,
+            bucket_by=bucket_by,
+        )
+
     return mp_ser.reduction(
         chunk=_id,
         aggregate=_commit_store_from_reduction,
@@ -471,21 +476,22 @@ def update_dataset_from_ddf(
     inferred_indices = _ensure_compatible_indices(ds_factory, secondary_indices)
     del secondary_indices
 
-    mp_ser = _write_dataframe_partitions(
-        ddf=ddf,
-        store=ds_factory.store_factory if ds_factory else store,
-        dataset_uuid=dataset_uuid or ds_factory.dataset_uuid,
-        table=table,
-        secondary_indices=inferred_indices,
-        shuffle=shuffle,
-        repartition_ratio=repartition_ratio,
-        num_buckets=num_buckets,
-        sort_partitions_by=sort_partitions_by,
-        df_serializer=df_serializer,
-        metadata_version=metadata_version,
-        partition_on=cast(List[str], partition_on),
-        bucket_by=bucket_by,
-    )
+    with dask.config.set({"dataframe.convert-string": False}):
+        mp_ser = _write_dataframe_partitions(
+            ddf=ddf,
+            store=ds_factory.store_factory if ds_factory else store,
+            dataset_uuid=dataset_uuid or ds_factory.dataset_uuid,
+            table=table,
+            secondary_indices=inferred_indices,
+            shuffle=shuffle,
+            repartition_ratio=repartition_ratio,
+            num_buckets=num_buckets,
+            sort_partitions_by=sort_partitions_by,
+            df_serializer=df_serializer,
+            metadata_version=metadata_version,
+            partition_on=cast(List[str], partition_on),
+            bucket_by=bucket_by,
+        )
 
     return mp_ser.reduction(
         chunk=_id,
@@ -567,24 +573,26 @@ def collect_dataset_metadata(
     mps = list(
         dispatch_metapartitions_from_factory(dataset_factory, predicates=predicates)
     )
-    if mps:
-        random.shuffle(mps)
-        # ensure that even with sampling at least one metapartition is returned
-        cutoff_index = max(1, int(len(mps) * frac))
-        mps = mps[:cutoff_index]
-        ddf = dd.from_delayed(
-            [
-                dask.delayed(MetaPartition.get_parquet_metadata)(
-                    mp, store=dataset_factory.store_factory
-                )
-                for mp in mps
-            ],
-            meta=_METADATA_SCHEMA,
-        )
-    else:
-        df = pd.DataFrame(columns=_METADATA_SCHEMA.keys())
-        df = df.astype(_METADATA_SCHEMA)
-        ddf = dd.from_pandas(df, npartitions=1)
+
+    with dask.config.set({"dataframe.convert-string": False}):
+        if mps:
+            random.shuffle(mps)
+            # ensure that even with sampling at least one metapartition is returned
+            cutoff_index = max(1, int(len(mps) * frac))
+            mps = mps[:cutoff_index]
+            ddf = dd.from_delayed(
+                [
+                    dask.delayed(MetaPartition.get_parquet_metadata)(
+                        mp, store=dataset_factory.store_factory
+                    )
+                    for mp in mps
+                ],
+                meta=_METADATA_SCHEMA,
+            )
+        else:
+            df = pd.DataFrame(columns=_METADATA_SCHEMA.keys())
+            df = df.astype(_METADATA_SCHEMA)
+            ddf = dd.from_pandas(df, npartitions=1)
 
     return ddf
 
@@ -651,12 +659,15 @@ def hash_dataset(
         columns=columns,
         dates_as_object=True,
     )
-    if not group_key:
-        return ddf.map_partitions(_hash_partition, meta="uint64").astype("uint64")
-    else:
-        ddf2 = pack_payload(ddf, group_key=group_key)
-        return (
-            ddf2.groupby(group_key)
-            .apply(_unpack_hash, unpack_meta=ddf._meta, subset=subset, meta="uint64")
-            .astype("uint64")
-        )
+    with dask.config.set({"dataframe.convert-string": False}):
+        if not group_key:
+            return ddf.map_partitions(_hash_partition, meta="uint64").astype("uint64")
+        else:
+            ddf2 = pack_payload(ddf, group_key=group_key)
+            return (
+                ddf2.groupby(group_key)
+                .apply(
+                    _unpack_hash, unpack_meta=ddf._meta, subset=subset, meta="uint64"
+                )
+                .astype("uint64")
+            )

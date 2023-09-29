@@ -10,12 +10,14 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import simplejson
 from minimalkv import KeyValueStore
+from packaging import version
 
 from plateau.core import naming
 from plateau.core._compat import load_json
 from plateau.core.naming import SINGLE_TABLE
 from plateau.core.utils import ensure_string_type
 from plateau.serialization._parquet import PARQUET_VERSION
+from plateau.serialization._util import schema_metadata_bytes_to_object
 
 _logger = logging.getLogger()
 
@@ -27,6 +29,8 @@ __all__ = (
     "normalize_type",
     "normalize_column_order",
 )
+
+PYARROW_LT_13 = version.parse(pa.__version__) < version.parse("13")
 
 
 class SchemaWrapper:
@@ -736,7 +740,9 @@ def _dict_to_binary(dct):
     return simplejson.dumps(dct, sort_keys=True).encode("utf8")
 
 
-def empty_dataframe_from_schema(schema, columns=None, date_as_object=False):
+def empty_dataframe_from_schema(
+    schema, columns=None, date_as_object=False, coerce_temporal_nanoseconds=True
+):
     """Create an empty DataFrame from provided schema.
 
     Parameters
@@ -746,14 +752,26 @@ def empty_dataframe_from_schema(schema, columns=None, date_as_object=False):
     columns: Union[None, List[str]]
         Optional list of columns that should be part of the resulting DataFrame. All columns in that list must also be
         part of the provided schema.
+    date_as_object: bool
+        Cast dates to objects.
+    coerce_temporal_nanoseconds: bool
+        Coerce date32, date64, duration and timestamp units to nanoseconds to retain behaviour of pandas 1.x.
+        Only applicable to pandas version >= 2.0 and PyArrow version >= 13.0.0.
 
     Returns
     -------
     DataFrame
         Empty DataFrame with requested columns and types.
     """
+    # HACK: Cast bytes to object in metadata until Pandas bug is fixed: https://github.com/pandas-dev/pandas/issues/50127
+    schema = schema_metadata_bytes_to_object(schema.internal())
 
-    df = schema.internal().empty_table().to_pandas(date_as_object=date_as_object)
+    # Prior to pyarrow 13.0.0 coerce_temporal_nanoseconds didn't exist
+    # as it was introduced for backwards compatibility with pandas 1.x
+    _coerce = {}
+    if not PYARROW_LT_13:
+        _coerce["coerce_temporal_nanoseconds"] = coerce_temporal_nanoseconds
+    df = schema.empty_table().to_pandas(date_as_object=date_as_object, **_coerce)
 
     df.columns = df.columns.map(ensure_string_type)
     if columns is not None:

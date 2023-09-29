@@ -3,14 +3,15 @@ channels:
   - conda-forge
   - nodefaults
 dependencies:
-  - dask!=2021.5.1,!=2021.6.0  # gh475 - 2021.5.1 and 2021.6.0 broke ci, omit those versions
+  # TODO: Investigate issue with dask 2023.9.2
+  - dask!=2021.5.1,!=2021.6.0,<2023.9.2  # gh475 - 2021.5.1 and 2021.6.0 broke ci, omit those versions
   - decorator
   - msgpack-python>=0.5.2
   # Currently dask and numpy==1.16.0 clash
   # TODO: add support for numpy>=1.23
   - numpy!=1.15.0,!=1.16.0
-  - pandas>=0.23.0,!=1.0.0
-  - pyarrow>=0.17.1,!=1.0.0
+  - pandas>=0.23.0,!=1.0.0,<2.1.0
+  - pyarrow>=4
   - simplejson
   - minimalkv>=1.4.2
   - toolz
@@ -36,6 +37,6 @@ dependencies:
   # CLI
   - ipython
   # ASV // Benchmark
-  - asv
+  - asv<0.6
   # Packaging infrastructure
   - python-build
