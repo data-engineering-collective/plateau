@@ -20,11 +20,10 @@ jobs:
         with:
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: Set up Conda env
-        uses: mamba-org/provision-with-micromamba@3c96c0c27676490c63c18bc81f5c51895ac3e0e6
+        uses: mamba-org/setup-micromamba@2b72821d5ad7f6da3c003a3684ce341bf187b46f
         with:
-          environment-file: false
           environment-name: pre-commit
-          extra-specs: |
+          create-args: >-
             -c
             conda-forge
             pre-commit
