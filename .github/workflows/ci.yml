@@ -112,7 +112,7 @@ jobs:
       - name: Is Master Build?
         run: echo $IS_MASTER_BUILD
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set up Conda env
         uses: mamba-org/provision-with-micromamba@3c96c0c27676490c63c18bc81f5c51895ac3e0e6
         with:
