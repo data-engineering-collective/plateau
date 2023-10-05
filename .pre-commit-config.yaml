@@ -27,7 +27,7 @@ repos:
           - types-decorator
           - types-simplejson
           - hypothesis
-          - numpy=1.23
+          - numpy=1.26
           - minimalkv=1.4.2
   - repo: https://github.com/Quantco/pre-commit-mirrors-pyupgrade
     rev: 3.14.0

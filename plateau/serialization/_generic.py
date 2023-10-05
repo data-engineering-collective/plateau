@@ -13,7 +13,7 @@ Available constants
 :meta public:
 """
 
-from typing import Dict, Iterable, List, Optional, Set, Tuple, TypeVar
+from typing import TYPE_CHECKING, Dict, Iterable, List, Optional, Set, Tuple, TypeVar
 
 import numpy as np
 import pandas as pd
@@ -23,6 +23,9 @@ from pandas.api.types import is_list_like
 from plateau.serialization._util import _check_contains_null
 
 from ._util import ensure_unicode_string_type
+
+if TYPE_CHECKING:
+    import numpy.typing as npt
 
 LiteralValue = TypeVar("LiteralValue")
 LiteralType = Tuple[str, str, LiteralValue]
@@ -285,9 +288,9 @@ def filter_df_from_predicates(
     """
     if predicates is None:
         return df
-    indexer = np.zeros(len(df), dtype=bool)
+    indexer: "npt.NDArray[np.bool_]" = np.zeros(len(df), dtype=bool)
     for conjunction in predicates:
-        inner_indexer = np.ones(len(df), dtype=bool)
+        inner_indexer: "npt.NDArray[np.bool_]" = np.ones(len(df), dtype=bool)
         for column, op, value in conjunction:
             column_name = ensure_unicode_string_type(column)
             filter_array_like(
@@ -453,7 +456,7 @@ def filter_array_like(
 
     # In the case of an empty list, don't bother with evaluating types, etc.
     if is_list_like(value) and len(value) == 0:
-        false_arr = np.zeros(len(array_like), dtype=bool)
+        false_arr: "npt.NDArray[np.bool_]" = np.zeros(len(array_like), dtype=bool)
         np.logical_and(false_arr, mask, out=out)
         return out
 

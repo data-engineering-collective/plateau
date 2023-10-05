@@ -7,6 +7,7 @@ import warnings
 from collections import namedtuple
 from functools import wraps
 from typing import (
+    TYPE_CHECKING,
     Any,
     Callable,
     Dict,
@@ -50,6 +51,9 @@ from plateau.serialization import (
     default_serializer,
     filter_df_from_predicates,
 )
+
+if TYPE_CHECKING:
+    import numpy.typing as npt
 
 LOGGER = logging.getLogger(__name__)
 
@@ -391,9 +395,8 @@ class MetaPartition(Iterable):
         logical_conjunction: Optional[List[Tuple[Any, str, Any]]] = None,
         table_name: str = SINGLE_TABLE,
     ):
-        """
-        Transform a plateau :class:`~plateau.core.partition.Partition` into a
-        :class:`~plateau.io_components.metapartition.MetaPartition`.
+        """Transform a plateau :class:`~plateau.core.partition.Partition` into
+        a :class:`~plateau.io_components.metapartition.MetaPartition`.
 
         Parameters
         ----------
@@ -735,7 +738,7 @@ class MetaPartition(Iterable):
             return df
 
         original_columns = list(df.columns)
-        zeros = np.zeros(len(df), dtype=int)
+        zeros: "npt.NDArray[np.int_]" = np.zeros(len(df), dtype=int)
         schema = self.schema
         if schema is None:
             raise ValueError("Cannot reconstruct indices before the schema is loaded.")
@@ -993,8 +996,8 @@ class MetaPartition(Iterable):
         columns. The indices for the passed columns are rebuilt, so exisiting
         index entries in the metapartition are overwritten.
 
-        :param columns: A list of columns from which the indices over all dataframes in the metapartition
-            are overwritten
+        :param columns: A list of columns from which the indices over
+            all dataframes in the metapartition are overwritten
         :return: self
         """
         if self.label is None:

@@ -257,9 +257,8 @@ def test_collect_dataset_metadata_fraction_precision(store_factory):
 
 
 def test_collect_dataset_metadata_at_least_one_partition(store_factory):
-    """
-    Make sure we return at leat one partition, even if none would be returned by rounding frac * n_partitions
-    """
+    """Make sure we return at leat one partition, even if none would be
+    returned by rounding frac * n_partitions."""
     df = pd.DataFrame(data={"A": range(100), "B": range(100)})
 
     store_dataframes_as_dataset(
