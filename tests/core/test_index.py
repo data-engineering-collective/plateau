@@ -557,7 +557,7 @@ def test_index_normalize_value(dtype, value, expected):
     )
     actual = index.normalize_value(index.dtype, value)
     assert actual == expected
-    assert type(actual) == type(expected)
+    assert type(actual) is type(expected)
 
 
 def test_index_normalize_during_init():

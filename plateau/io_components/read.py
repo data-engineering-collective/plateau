@@ -37,10 +37,7 @@ def dispatch_metapartitions_from_factory(
     predicates: PredicatesType = None,
     dispatch_by: Optional[List[str]] = None,
 ) -> Union[Iterator[MetaPartition], Iterator[List[MetaPartition]]]:
-    """
-
-    :meta private:
-    """
+    """:meta private:"""
 
     if dispatch_by is not None and not set(dispatch_by).issubset(
         set(dataset_factory.index_columns)
