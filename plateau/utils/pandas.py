@@ -1,10 +1,13 @@
 """Pandas performance helpers."""
 
 from collections import OrderedDict
-from typing import Any, List, cast
+from typing import TYPE_CHECKING, Any, List, cast
 
 import numpy as np
 import pandas as pd
+
+if TYPE_CHECKING:
+    import numpy.typing as npt
 
 __all__ = (
     "aggregate_to_lists",
@@ -199,10 +202,10 @@ def mask_sorted_duplicates_keep_last(df, columns):
     """
     columns = list(columns)
     rows = len(df)
-    mask = np.zeros(rows, dtype=bool)
+    mask: "npt.NDArray[np.bool_]" = np.zeros(rows, dtype=bool)
 
     if (rows > 1) and columns:
-        sub = np.ones(rows - 1, dtype=bool)
+        sub: "npt.NDArray[np.bool_]" = np.ones(rows - 1, dtype=bool)
         for col in columns:
             data = df[col].values
             sub &= data[:-1] == data[1:]

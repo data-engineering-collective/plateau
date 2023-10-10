@@ -112,12 +112,13 @@ jobs:
       - name: Is Master Build?
         run: echo $IS_MASTER_BUILD
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set up Conda env
-        uses: mamba-org/provision-with-micromamba@3c96c0c27676490c63c18bc81f5c51895ac3e0e6
+        uses: mamba-org/setup-micromamba@2b72821d5ad7f6da3c003a3684ce341bf187b46f
         with:
-          cache-env: true
-          extra-specs: |
+          environment-file: environment.yml
+          cache-environment: true
+          create-args: >-
             python=${{ matrix.PYTHON_VERSION }}
       - name: Install Pyarrow (non-nightly)
         # Don't pin python as older versions of pyarrow require older versions of python

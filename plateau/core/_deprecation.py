@@ -40,8 +40,8 @@ from functools import wraps
 
 
 def deprecate_kwarg(old_arg_name, new_arg_name, mapping=None, stacklevel=2):
-    """
-    Decorator to deprecate a keyword argument of a function.
+    """Decorator to deprecate a keyword argument of a function.
+
     Parameters
     ----------
     old_arg_name : str

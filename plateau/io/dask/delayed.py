@@ -272,13 +272,13 @@ def update_dataset_from_delayed(
     factory=None,
     table_name=SINGLE_TABLE,
 ):
-    """
-    A dask.delayed graph to add and store a list of dictionaries containing
-    dataframes to a plateau dataset in store. The input should be a list
-    (or splitter pipeline) containing
-    :class:`~plateau.io_components.metapartition.MetaPartition`. If you want to use this
-    pipeline step for just deleting partitions without adding new ones you
-    have to give an empty meta partition as input (``[Metapartition(None)]``).
+    """A dask.delayed graph to add and store a list of dictionaries containing
+    dataframes to a plateau dataset in store. The input should be a list (or
+    splitter pipeline) containing
+    :class:`~plateau.io_components.metapartition.MetaPartition`. If you want to
+    use this pipeline step for just deleting partitions without adding new ones
+    you have to give an empty meta partition as input
+    (``[Metapartition(None)]``).
 
     Parameters
     ----------
