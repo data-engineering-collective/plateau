@@ -26,6 +26,7 @@ import numpy as np
 import pandas as pd
 import pyarrow as pa
 from minimalkv import KeyValueStore
+from pandas.api.types import is_datetime64_any_dtype
 
 from plateau.core import naming
 from plateau.core.common_metadata import (
@@ -773,8 +774,9 @@ class MetaPartition(Iterable):
             if isinstance(dtype, type):
                 value = dtype(value)
             elif isinstance(dtype, np.dtype):
-                if dtype == np.dtype("datetime64[ns]"):
-                    value = pd.Timestamp(value)
+                if is_datetime64_any_dtype(dtype):
+                    # Coerce all datetime64 units to nanoseconds maintain consistent behaviour
+                    value = pd.Timestamp(value).as_unit("ns")
                 else:
                     value = dtype.type(value)
             else:
