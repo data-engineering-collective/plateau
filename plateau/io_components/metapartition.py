@@ -775,7 +775,7 @@ class MetaPartition(Iterable):
                 value = dtype(value)
             elif isinstance(dtype, np.dtype):
                 if is_datetime64_any_dtype(dtype):
-                    # Coerce all datetime64 units to nanoseconds maintain consistent behaviour
+                    # Coerce all datetime64 units to nanoseconds to maintain consistency with serializers.
                     value = pd.Timestamp(value).as_unit("ns")
                 else:
                     value = dtype.type(value)
