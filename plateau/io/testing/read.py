@@ -588,7 +588,14 @@ def test_datetime_predicate_with_dates_as_object(
     def _f(b_c):
         b, c = b_c
         df = pd.DataFrame({"a": [1, 1], "b": [b, b], "c": c, "d": [b, b + 1]})
-        return df
+
+        # Account pandas 2.0 change in behaviour in which datetime columns have
+        # their units set to [us] rather than [ns].
+        return (
+            df.astype({"c": "datetime64[ns]"})
+            if df["c"].dtype == "datetime64[us]"
+            else df
+        )
 
     in_partitions = [_f([1, datetype(2000, 1, 1)])]
     dataset_uuid = "partitioned_uuid"
