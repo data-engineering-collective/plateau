@@ -26,6 +26,7 @@ import numpy as np
 import pandas as pd
 import pyarrow as pa
 from minimalkv import KeyValueStore
+from packaging import version
 from pandas.api.types import is_datetime64_any_dtype
 
 from plateau.core import naming
@@ -57,6 +58,8 @@ if TYPE_CHECKING:
     import numpy.typing as npt
 
 LOGGER = logging.getLogger(__name__)
+
+PANDAS_LT_2 = version.parse(pd.__version__) < version.parse("2")
 
 SINGLE_TABLE = "table"
 
@@ -776,7 +779,11 @@ class MetaPartition(Iterable):
             elif isinstance(dtype, np.dtype):
                 if is_datetime64_any_dtype(dtype):
                     # Coerce all datetime64 units to nanoseconds to maintain consistency with serializers.
-                    value = pd.Timestamp(value).as_unit("ns")
+                    value = (
+                        pd.Timestamp(value)
+                        if PANDAS_LT_2
+                        else pd.Timestamp(value).as_unit("ns")
+                    )
                 else:
                     value = dtype.type(value)
             else:
