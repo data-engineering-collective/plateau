@@ -589,8 +589,8 @@ def test_datetime_predicate_with_dates_as_object(
         b, c = b_c
         df = pd.DataFrame({"a": [1, 1], "b": [b, b], "c": c, "d": [b, b + 1]})
 
-        # Account pandas 2.0 change in behaviour in which datetime columns have
-        # their units set to [us] rather than [ns].
+        # Account for pandas 2.1 change in behaviour in which datetime.datetime
+        # columns have their units set to [us] rather than [ns].
         return (
             df.astype({"c": "datetime64[ns]"})
             if df["c"].dtype == "datetime64[us]"
