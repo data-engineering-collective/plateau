@@ -136,7 +136,7 @@ jobs:
       - name: Pip Install NumFOCUS nightly
         # NumFOCUS nightly wheels, contains numpy and pandas
         # TODO(gh-45): Re-add numpy
-        run: python -m pip install --pre --upgrade --timeout=60 --extra-index-url https://pypi.anaconda.org/scipy-wheels-nightly/simple pandas
+        run: python -m pip install --pre --upgrade --timeout=60 --extra-index-url https://pypi.anaconda.org/scientific-python-nightly-wheels/simple/ pandas
         if: matrix.numfocus_nightly
       - name: Install repository
         run: python -m pip install --no-build-isolation --no-deps --disable-pip-version-check -e .
