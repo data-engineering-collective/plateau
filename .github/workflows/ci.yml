@@ -122,7 +122,6 @@ jobs:
             python=${{ matrix.PYTHON_VERSION }}
       - name: Install Pyarrow (non-nightly)
         # Don't pin python as older versions of pyarrow require older versions of python
-        # Pin asv so it doesn't get updated before the benchmarks are run
         run: micromamba install -y --no-py-pin pyarrow==${{ matrix.pyarrow }}
         if: matrix.pyarrow != 'nightly' && matrix.pandas == ''
       - name: Install Pyarrow (nightly)
@@ -137,7 +136,7 @@ jobs:
       - name: Pip Install NumFOCUS nightly
         # NumFOCUS nightly wheels, contains numpy and pandas
         # TODO(gh-45): Re-add numpy
-        run: python -m pip install --pre --upgrade --timeout=60 --extra-index-url https://pypi.anaconda.org/scipy-wheels-nightly/simple
+        run: python -m pip install --pre --upgrade --timeout=60 --extra-index-url https://pypi.anaconda.org/scipy-wheels-nightly/simple pandas
         if: matrix.numfocus_nightly
       - name: Install repository
         run: python -m pip install --no-build-isolation --no-deps --disable-pip-version-check -e .
