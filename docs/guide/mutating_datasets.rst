@@ -90,6 +90,7 @@ If we read the data again, we can see that the ``another_df`` has been appended 
 previous contents.
 
 .. ipython:: python
+    :okwarning:
 
     from plateau.api.dataset import read_table
 
@@ -190,7 +191,7 @@ with one update:
 
     modified_df = another_df.copy()
     # set column E to have value 'train' for all rows in this dataframe
-    modified_df.B = pd.Timestamp("20130103")
+    modified_df.B = pd.Timestamp("20130103").as_unit("ns")
 
     dm = update_dataset_from_dataframes(
         [
@@ -200,7 +201,7 @@ with one update:
         dataset_uuid=dm.uuid,
         partition_on="B",  # don't forget to specify the partitioning column
         delete_scope=[
-            {"B": pd.Timestamp("2013-01-03")}
+            {"B": pd.Timestamp("2013-01-03").as_unit("ns")}
         ],  # specify the partition to be deleted
     )
     sorted(dm.partitions.keys())

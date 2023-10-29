@@ -191,6 +191,7 @@ use :func:`~plateau.io.eager.read_table`. This method returns the complete
 table of the dataset as a pandas DataFrame.
 
 .. ipython:: python
+    :okwarning:
 
     from plateau.api.dataset import read_table
 
@@ -230,6 +231,7 @@ function but returns a collection of ``dask.delayed`` objects.
     How this works is a complex topic, see :ref:`efficient_querying`.
 
     .. ipython:: python
+        :okwarning:
 
         read_table("a_unique_dataset_identifier", store_url, predicates=[[("A", "<", 2.5)]])
 

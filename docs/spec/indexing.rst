@@ -22,6 +22,7 @@ Users typically do not interact with indices directly since querying a dataset w
 All indices implement :class:`~plateau.core.index.IndexBase` which allows the user to interact with the indices in some useful ways.
 
 .. ipython:: python
+    :okwarning:
 
     from plateau.api.dataset import IndexBase
 
