@@ -9,6 +9,7 @@ from plateau.core.dataset import DatasetMetadata
 from plateau.core.index import ExplicitSecondaryIndex
 from plateau.core.testing import TIME_TO_FREEZE_ISO
 from plateau.io_components.metapartition import MetaPartition
+from plateau.io_components.read import dispatch_metapartitions
 from plateau.io_components.write import (
     raise_if_dataset_exists,
     store_dataset_from_partitions,
@@ -127,7 +128,7 @@ def test_raise_if_dataset_exists(store_factory, dataset_function):
 def test_coerce_schema_timestamp_units(store):
     date = pd.Timestamp(2000, 1, 1)
 
-    mps = [
+    mps_original = [
         MetaPartition(label="one", data=pd.DataFrame({"a": date, "b": [date]})),
         MetaPartition(
             label="two",
@@ -135,16 +136,29 @@ def test_coerce_schema_timestamp_units(store):
         ),
     ]
 
-    try:
-        # Expect this not to fail even though the metapartitions have different
-        # timestamp units, because all units should be coerced to nanoseconds.
-        store_dataset_from_partitions(
-            partition_list=mps,
-            dataset_uuid="dataset_uuid",
-            store=store,
-            dataset_metadata={"some": "metadata"},
-        )
-    except ValueError as e:
-        pytest.fail(
-            f"Expected no error when storing partitions with different timestamp units, but got this error: {e}"
-        )
+    mps = map(
+        lambda mp: mp.store_dataframes(store, dataset_uuid="dataset_uuid"), mps_original
+    )
+
+    # Expect this not to fail even though the metapartitions have different
+    # timestamp units, because all units should be coerced to nanoseconds.
+    dataset = store_dataset_from_partitions(
+        partition_list=mps,
+        dataset_uuid="dataset_uuid",
+        store=store,
+        dataset_metadata={"some": "metadata"},
+    )
+
+    # Ensure the dataset can be loaded properly
+    stored_dataset = DatasetMetadata.load_from_store("dataset_uuid", store)
+    assert dataset == stored_dataset
+
+    mps = dispatch_metapartitions("dataset_uuid", store)
+    mps_loaded = map(lambda mp: mp.load_dataframes(store), mps)
+
+    # Ensure the values and dtypes of the loaded datasets are correct
+    for mp in mps_loaded:
+        assert mp.data["a"].dtype == "datetime64[ns]"
+        assert mp.data["b"].dtype == "datetime64[ns]"
+        assert mp.data["a"][0] == date
+        assert mp.data["b"][0] == date
