@@ -2,6 +2,13 @@
 Changelog
 =========
 
+Plateau 4.2.1 (2023-10-31)
+==========================
+
+* Add support for pandas 2.1
+* Fix a bug to do with timestamp dtype conversion
+* Add timestamp unit coercion as Plateau currently only supports nanosecond units on timestamps
+
 Plateau 4.2.0 (2023-10-10)
 ==========================
 
