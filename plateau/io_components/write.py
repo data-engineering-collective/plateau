@@ -1,6 +1,7 @@
 from functools import partial
 from typing import Dict, Iterable, List, Optional, cast
 
+import pyarrow as pa
 from minimalkv import KeyValueStore
 
 from plateau.core import naming
@@ -126,6 +127,17 @@ def persist_common_metadata(
     return result
 
 
+# Currently we only support nanosecond timestamps.
+def coerce_schema_timestamps(wrapper: SchemaWrapper) -> SchemaWrapper:
+    schema = wrapper.internal()
+    fields = []
+    for field in schema:
+        if field.type in [pa.timestamp("s"), pa.timestamp("ms"), pa.timestamp("us")]:
+            field = pa.field(field.name, pa.timestamp("ns"))
+        fields.append(field)
+    return SchemaWrapper(pa.schema(fields, schema.metadata), wrapper.origin)
+
+
 def store_dataset_from_partitions(
     partition_list,
     store: StoreInput,
@@ -161,7 +173,7 @@ def store_dataset_from_partitions(
 
     for mp in partition_list:
         if mp.schema:
-            schemas.add(mp.schema)
+            schemas.add(coerce_schema_timestamps(mp.schema))
 
     dataset_builder.schema = persist_common_metadata(
         schemas=schemas,
