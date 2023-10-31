@@ -3,6 +3,7 @@
 
 import pandas as pd
 import pytest
+from packaging import version
 
 from plateau.core.dataset import DatasetMetadata
 from plateau.core.index import ExplicitSecondaryIndex
@@ -117,3 +118,33 @@ def test_raise_if_dataset_exists(store_factory, dataset_function):
     raise_if_dataset_exists(dataset_uuid="ThisDoesNotExist", store=store_factory)
     with pytest.raises(RuntimeError):
         raise_if_dataset_exists(dataset_uuid=dataset_function.uuid, store=store_factory)
+
+
+@pytest.mark.skipif(
+    version.parse(pd.__version__) < version.parse("2"),
+    reason="Timestamp unit coercion is only relevant in pandas >= 2",
+)
+def test_coerce_schema_timestamp_units(store):
+    date = pd.Timestamp(2000, 1, 1)
+
+    mps = [
+        MetaPartition(label="one", data=pd.DataFrame({"a": date, "b": [date]})),
+        MetaPartition(
+            label="two",
+            data=pd.DataFrame({"a": date.as_unit("ns"), "b": [date.as_unit("ns")]}),
+        ),
+    ]
+
+    try:
+        # Expect this not to fail even though the metapartitions have different
+        # timestamp units, because all units should be coerced to nanoseconds.
+        store_dataset_from_partitions(
+            partition_list=mps,
+            dataset_uuid="dataset_uuid",
+            store=store,
+            dataset_metadata={"some": "metadata"},
+        )
+    except ValueError as e:
+        pytest.fail(
+            f"Expected no error when storing partitions with different timestamp units, but got this error: {e}"
+        )
