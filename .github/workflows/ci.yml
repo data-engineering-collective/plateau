@@ -1,22 +1,21 @@
 name: CI
 
-
 on:
   pull_request:
   push:
     branches:
-      - 'main'
-      - 'pre-commit-autoupdate'
+      - "main"
+      - "pre-commit-autoupdate"
+      - "refactor" # just for testing in my fork
     tags:
-      - '*'
+      - "*"
   schedule:
     # daily (`@daily` not supported, see
     # https://docs.github.com/en/actions/reference/events-that-trigger-workflows#scheduled-events )
     #
     # Runs on default/base branch (see
     # https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#onschedule )
-    - cron: '0 0 * * *'
-
+    - cron: "0 0 * * *"
 
 jobs:
   build:
@@ -27,7 +26,7 @@ jobs:
         os: ["ubuntu-latest"]
         pandas: [""]
         pyarrow: ["4.0.1", "nightly"]
-        python: ["3.8"]
+        python: ["3.8", "3.12"]
         include:
           - numfocus_nightly: true
             os: "ubuntu-latest"
