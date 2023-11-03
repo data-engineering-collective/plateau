@@ -2,6 +2,46 @@
 requires = ['setuptools', 'setuptools-scm', 'wheel']
 
 [tool.setuptools_scm]
+# Do not use version_scheme = "post-release", to be consistent with previous versioning
+
+[project]
+name = "plateau"
+authors = [{ name = "data engineering collective" }]
+dynamic = ["version"]
+readme = "README.md"
+license = { file = "LICENSE.txt" }
+classifiers = [
+    "License :: OSI Approved :: MIT License", # According to LICENSE.txt
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    'dask[dataframe]!=2021.5.1,!=2021.6.0', # gh475 - 2021.5.1 and 2021.6.0 broke ci, omit those versions
+    'decorator',
+    'msgpack>=0.5.2',
+    'numpy!=1.15.0,!=1.16.0',
+    'pandas>=0.23.0,!=1.0.0',
+    'pyarrow>=4',
+    'simplejson',
+    'minimalkv>=1.4.2',
+    'toolz',
+    'urlquote>=1.1.3',
+    'zstandard',
+    'attrs',
+    'click',
+    'prompt-toolkit',
+    'pyyaml'
+]
+requires-python = ">=3.8"
+urls = {Repository = "https://github.com/data-engineering-collective/plateau"}
+
+
+[tool.setuptools.packages.find]
+include = ["plateau"]
 
 [tool.black]
 exclude = '''
@@ -29,3 +69,14 @@ ignore_missing_imports = true
 no_implicit_optional = true
 check_untyped_defs = true
 plugins = "numpy.typing.mypy_plugin"
+
+[tool.pytest.ini_options]
+addopts = "--strict-markers"
+filterwarnings = [
+    "once::DeprecationWarning",
+    "once::PendingDeprecationWarning",
+    "ignore:.*(Generated\\sarray\\selement).*:FutureWarning:hypothesis.extra.numpy"
+]
+markers = [
+    "min_metadata_version(version): specify minimum metadata version this test applies to"
+]
