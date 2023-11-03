@@ -222,7 +222,7 @@ def mock_default_metadata_version(mocker, backend_identifier):
             # Raise a "custom" error to distinguish this error from the error raised
             # by `parse_input_to_metapartition` when the object has not previously
             # passed through this mock function
-            raise AssertionError(f"Traversed through mock. Original error: {e}")
+            raise AssertionError(f"Traversed through mock. Original error: {e}") from e
 
     mocker.patch(
         "plateau.io.{backend_identifier}.parse_input_to_metapartition".format(

@@ -1,7 +1,7 @@
 import pytest
 
 from plateau.io.eager import garbage_collect_dataset
-from plateau.io.testing.gc import *  # noqa: F4
+from plateau.io.testing.gc import *  # noqa: F403, F4
 
 
 @pytest.fixture()

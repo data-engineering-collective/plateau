@@ -136,8 +136,8 @@ def test_coerce_schema_timestamp_units(store):
         ),
     ]
 
-    mps = map(
-        lambda mp: mp.store_dataframes(store, dataset_uuid="dataset_uuid"), mps_original
+    mps = (
+        mp.store_dataframes(store, dataset_uuid="dataset_uuid") for mp in mps_original
     )
 
     # Expect this not to fail even though the metapartitions have different
@@ -154,7 +154,7 @@ def test_coerce_schema_timestamp_units(store):
     assert dataset == stored_dataset
 
     mps = dispatch_metapartitions("dataset_uuid", store)
-    mps_loaded = map(lambda mp: mp.load_dataframes(store), mps)
+    mps_loaded = (mp.load_dataframes(store) for mp in mps)
 
     # Ensure the values and dtypes of the loaded datasets are correct
     for mp in mps_loaded:

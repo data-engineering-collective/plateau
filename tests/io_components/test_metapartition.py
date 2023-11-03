@@ -1016,7 +1016,7 @@ def test_reconstruct_date_index(store, metadata_version, dates_as_object):
 
 
 def test_iter_empty_metapartition():
-    for mp in MetaPartition(None):
+    for _ in MetaPartition(None):
         raise AssertionError(
             "Iterating over an empty MetaPartition should stop immediately"
         )

@@ -452,9 +452,7 @@ class MetaPartition(Iterable):
 
         existing_label = [mp_["label"] for mp_ in self.metapartitions]
 
-        if any(
-            [mp_["label"] in existing_label for mp_ in metapartition.metapartitions]
-        ):
+        if any(mp_["label"] in existing_label for mp_ in metapartition.metapartitions):
             raise RuntimeError(
                 "Duplicate labels for nested metapartitions are not allowed!"
             )
@@ -633,6 +631,7 @@ class MetaPartition(Iterable):
             warnings.warn(
                 "The argument `date_as_object` is set to False. This argument will be deprecated and the future behaviour will be as if the paramere was set to `True`. Please migrate your code accordingly ahead of time.",
                 DeprecationWarning,
+                stacklevel=2,
             )
 
         LOGGER.debug("Loading internal dataframes of %s", self.label)
@@ -833,7 +832,7 @@ class MetaPartition(Iterable):
         except ValueError as e:
             raise ValueError(
                 f"Schemas for dataset '{dataset_uuid}' are not compatible!\n\n{e}"
-            )
+            ) from e
         return self
 
     @_apply_to_list
@@ -1142,7 +1141,7 @@ class MetaPartition(Iterable):
         existing_indices, base_label = cast(
             Tuple[List, str], decode_key(f"uuid/table/{self.label}")[2:]
         )
-        dct: Dict[str, Any] = dict()
+        dct: Dict[str, Any] = {}
         df = self.data
 
         # Check that data sizes do not change. This might happen if the

@@ -266,7 +266,7 @@ def read_table(
     )
     if categoricals:
         empty_df = empty_df.astype({col: "category" for col in categoricals})
-    dfs = [partition_data for partition_data in partitions] + [empty_df]
+    dfs = list(partitions) + [empty_df]
     # require meta 4 otherwise, can't construct types/columns
     if categoricals:
         dfs = align_categories(dfs, categoricals)

@@ -119,7 +119,7 @@ def persist_common_metadata(
             "Schemas for dataset '{dataset_uuid}' are not compatible!\n\n{e}".format(
                 dataset_uuid=dataset_uuid, e=e
             )
-        )
+        ) from e
     if result:
         store_schema_metadata(
             schema=result, dataset_uuid=dataset_uuid, store=store, table=table_name

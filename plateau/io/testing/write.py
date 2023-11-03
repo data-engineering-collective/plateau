@@ -25,7 +25,7 @@ class NoPickle:
 
 
 def mark_nopickle(obj):
-    setattr(obj, "_nopickle", NoPickle())
+    obj._nopickle = NoPickle()
 
 
 def no_pickle_store(url):

@@ -59,7 +59,7 @@ def _azure_bbs_content_md5(block_blob_service, container, key, accept_missing=Fa
         if accept_missing:
             return None
         else:
-            raise KeyError(key)
+            raise KeyError(key) from None
 
 
 def _copy_azure_bbs(keys, src_store, tgt_store):
@@ -127,7 +127,7 @@ def _azure_cc_content_md5(cc, key, accept_missing=False):
         if accept_missing:
             return None
         else:
-            raise KeyError(key)
+            raise KeyError(key) from None
 
 
 def _copy_azure_cc(keys, src_store, tgt_store):

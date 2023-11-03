@@ -36,9 +36,8 @@ def _construct_categorical(column, dataset_metadata_factory):
     values = dataset_metadata.indices[column].index_dct.keys()
     if len(values) > CATEGORICAL_EFFICIENCY_WARN_LIMIT:
         warnings.warn(
-            "Column {} has {} distinct values, reading as categorical may increase memory consumption.",
-            column,
-            len(values),
+            f"Column {column} has {len(values)} distinct values, reading as categorical may increase memory consumption.",
+            stacklevel=2,
         )
     return pd.api.types.CategoricalDtype(values, ordered=False)
 

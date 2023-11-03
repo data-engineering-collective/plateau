@@ -43,13 +43,13 @@ from plateau.utils.converters import (
             # param
             {"foo", b"foo"},
             # expected
-            {"foo", "foo"},
+            {"foo"},
         ),
         (
             # param
             ["foo", b"foo"],
             # expected
-            {"foo", "foo"},
+            {"foo"},
         ),
         (
             # param
@@ -97,13 +97,13 @@ def test_str_set(param, expected):
             # param
             {"foo", b"foo"},
             # expected
-            {"foo", "foo"},
+            {"foo"},
         ),
         (
             # param
             ["foo", b"foo"],
             # expected
-            {"foo", "foo"},
+            {"foo"},
         ),
         (
             # param
