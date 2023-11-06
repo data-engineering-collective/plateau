@@ -9,7 +9,7 @@ from plateau.io.eager import (
     update_dataset_from_dataframes,
     write_single_partition,
 )
-from plateau.io.testing.update import *  # noqa: F40
+from plateau.io.testing.update import *  # noqa: F4, F403
 
 
 @pytest.fixture()

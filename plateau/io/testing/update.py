@@ -489,7 +489,7 @@ def test_raises_on_invalid_input(store_factory, bound_update_dataset):
         dfs=partitions, store=store_factory, dataset_uuid=dataset_uuid
     )
 
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError):
         new_partitions = [({"stuff"}, [("something", {1, 2, 3})])]  # invalid format
         bound_update_dataset(
             new_partitions, store=store_factory, dataset_uuid=dataset_uuid

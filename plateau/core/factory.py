@@ -109,7 +109,7 @@ class DatasetFactory(DatasetMetadataBase):
         if name in self._nullable_attributes:
             return object.__getattribute__(self, name)
         self._instantiate_metadata_cache()
-        ds = getattr(self, "dataset_metadata")
+        ds = self.dataset_metadata
         return getattr(ds, name)
 
     def __getstate__(self):

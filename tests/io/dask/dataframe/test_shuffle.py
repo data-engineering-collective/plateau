@@ -169,10 +169,9 @@ def test_update_shuffle_buckets(
     assert set(dataset.indices["primary"].index_dct.keys()) == set(
         range(unique_primaries)
     )
-    assert (
-        list(map(lambda x: len(x), dataset.indices["primary"].index_dct.values()))
-        <= [num_buckets] * unique_primaries
-    )
+    assert [len(x) for x in dataset.indices["primary"].index_dct.values()] <= [
+        num_buckets
+    ] * unique_primaries
 
     assert set(dataset.indices["secondary"].index_dct.keys()) == set(
         range(unique_secondaries)

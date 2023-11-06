@@ -190,12 +190,10 @@ class DatasetMetadataBase(CopyMixin):
         """
         store = ensure_store(store)
         start_markers = [f"{uuid}.", f"{uuid}/"]
-        return list(
-            sorted(
-                k
-                for k in store.iter_keys(uuid)
-                if any(k.startswith(marker) for marker in start_markers)
-            )
+        return sorted(
+            k
+            for k in store.iter_keys(uuid)
+            if any(k.startswith(marker) for marker in start_markers)
         )
 
     def to_dict(self) -> Dict:
@@ -574,8 +572,10 @@ class DatasetMetadata(DatasetMetadataBase):
             try:
                 value = store.get(key2)
                 metadata = unpackb(value)
-            except KeyError:
-                raise KeyError(f"Dataset does not exist. Tried {key1} and {key2}")
+            except KeyError as e:
+                raise KeyError(
+                    f"Dataset does not exist. Tried {key1} and {key2}"
+                ) from e
 
         ds = DatasetMetadata.load_from_dict(metadata, store, load_schema=load_schema)
         if load_all_indices:
@@ -617,7 +617,7 @@ class DatasetMetadata(DatasetMetadataBase):
             metadata["partitions"] = partitions
 
         if metadata["partitions"]:
-            tables = [tab for tab in list(metadata["partitions"].values())[0]["files"]]
+            tables = list(list(metadata["partitions"].values())[0]["files"])
         else:
             table_set = set()
             if storage_keys is None:
@@ -769,7 +769,7 @@ def _construct_dynamic_index_from_partitions(
         # convert defaultdicts into dicts with deterministically ordered values
         new_indices[col] = PartitionIndex(
             column=col,
-            index_dct={k1: sorted(list(v1)) for k1, v1 in index_dct.items()},
+            index_dct={k1: sorted(v1) for k1, v1 in index_dct.items()},
             dtype=arrow_type,
         )
     return new_indices

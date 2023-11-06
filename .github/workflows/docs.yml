@@ -4,10 +4,10 @@ on:
   pull_request:
   push:
     branches:
-      - 'main'
-      - 'pre-commit-autoupdate'
+      - "main"
+      - "pre-commit-autoupdate"
     tags:
-      - '*'
+      - "*"
 
 jobs:
   build:
@@ -33,5 +33,5 @@ jobs:
       - name: Build docs
         shell: bash -l {0}
         run: |
-            python -m pip install --no-build-isolation --no-deps -e .
-            sphinx-build -b html docs docs/_build
+          python -m pip install --no-build-isolation --no-deps -e .
+          sphinx-build -b html docs docs/_build

@@ -19,7 +19,7 @@ def dispatch_files_to_gc(dataset_uuid, store_factory, chunk_size, factory):
     for index in ds_factory.indices.values():
         index_keys = set()
         # We only add the indices that are saved as explicit indices
-        if getattr(index, "index_storage_key"):
+        if index.index_storage_key:  # type: ignore
             index_keys.add(cast(ExplicitSecondaryIndex, index).index_storage_key)
         remove_index_files -= index_keys
 

@@ -38,8 +38,11 @@ from plateau.core.common_metadata import (
     validate_compatible,
 )
 from plateau.core.docs import default_docs
-from plateau.core.index import ExplicitSecondaryIndex, IndexBase
-from plateau.core.index import merge_indices as merge_indices_algo
+from plateau.core.index import (
+    ExplicitSecondaryIndex,
+    IndexBase,
+    merge_indices as merge_indices_algo,
+)
 from plateau.core.naming import get_partition_file_prefix
 from plateau.core.partition import Partition
 from plateau.core.typing import StoreInput
@@ -153,8 +156,9 @@ def _apply_to_list(method):
                 method_return = method(mp, *method_args, **method_kwargs)
                 if not isinstance(method_return, MetaPartition):
                     raise ValueError(
-                        "Method {} did not return a MetaPartition "
-                        "but {}".format(method.__name__, type(method_return))
+                        "Method {} did not return a MetaPartition but {}".format(
+                            method.__name__, type(method_return)
+                        )
                     )
                 if method_return.is_sentinel:
                     result = method_return
@@ -452,9 +456,7 @@ class MetaPartition(Iterable):
 
         existing_label = [mp_["label"] for mp_ in self.metapartitions]
 
-        if any(
-            [mp_["label"] in existing_label for mp_ in metapartition.metapartitions]
-        ):
+        if any(mp_["label"] in existing_label for mp_ in metapartition.metapartitions):
             raise RuntimeError(
                 "Duplicate labels for nested metapartitions are not allowed!"
             )
@@ -633,6 +635,7 @@ class MetaPartition(Iterable):
             warnings.warn(
                 "The argument `date_as_object` is set to False. This argument will be deprecated and the future behaviour will be as if the paramere was set to `True`. Please migrate your code accordingly ahead of time.",
                 DeprecationWarning,
+                stacklevel=2,
             )
 
         LOGGER.debug("Loading internal dataframes of %s", self.label)
@@ -833,7 +836,7 @@ class MetaPartition(Iterable):
         except ValueError as e:
             raise ValueError(
                 f"Schemas for dataset '{dataset_uuid}' are not compatible!\n\n{e}"
-            )
+            ) from e
         return self
 
     @_apply_to_list
@@ -1142,7 +1145,7 @@ class MetaPartition(Iterable):
         existing_indices, base_label = cast(
             Tuple[List, str], decode_key(f"uuid/table/{self.label}")[2:]
         )
-        dct: Dict[str, Any] = dict()
+        dct: Dict[str, Any] = {}
         df = self.data
 
         # Check that data sizes do not change. This might happen if the

@@ -3,7 +3,7 @@ import pickle
 import pytest
 
 from plateau.io.dask.bag import build_dataset_indices__bag
-from plateau.io.testing.index import *  # noqa: F4
+from plateau.io.testing.index import *  # noqa: F403, F4
 
 
 def _build_indices(*args, **kwargs):

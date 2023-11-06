@@ -68,7 +68,7 @@ class SchemaWrapper:
             if len(index_cols) > 1:
                 raise NotImplementedError("Treatement of MultiIndex not implemented.")
 
-            for ix, col in enumerate(index_cols):
+            for _, col in enumerate(index_cols):
                 # Range index is now serialized using start/end information. This special treatment
                 # removes it from the columns which is fine
                 if isinstance(col, dict):

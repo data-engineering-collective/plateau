@@ -263,7 +263,7 @@ def test_sort_cateogrical_multiple_cols():
 def test_sort_categorical_pyarrow_conversion():
     """Make sure sorting does not introduce indices that end up in the Arrow
     table."""
-    df = pd.DataFrame(dict(a=[3, 2, 1]))
+    df = pd.DataFrame({"a": [3, 2, 1]})
     sorted_df = sort_values_categorical(df, "a")
     table = pa.Table.from_pandas(df)
     sorted_table = pa.Table.from_pandas(sorted_df)

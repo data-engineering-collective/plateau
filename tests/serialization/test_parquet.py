@@ -356,7 +356,7 @@ def test_predicate_not_in_columns(store, chunk_size):
 
 def test_read_empty_file_with_predicates(store):
     ser = ParquetSerializer()
-    df = pd.DataFrame(dict(col=pd.Series([], dtype=str)))
+    df = pd.DataFrame({"col": pd.Series([], dtype=str)})
     key = ser.store(store, "key", df)
     restored_df = ser.restore_dataframe(
         store, key, columns=["col"], predicates=[[("col", "==", "1")]]

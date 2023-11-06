@@ -2,6 +2,14 @@
 Changelog
 =========
 
+Plateau 4.2.2 (2023-11-06)
+==========================
+
+* Include Python 3.12 in CI
+* Migrate setup.cfg to pyproject.toml completely
+* Port to ruff, remove isort, black, and flake8
+
+
 Plateau 4.2.1 (2023-10-31)
 ==========================
 

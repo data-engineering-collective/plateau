@@ -1,20 +1,10 @@
 repos:
-  - repo: https://github.com/Quantco/pre-commit-mirrors-black
-    rev: 23.9.1
+  # Run ruff first because autofix behaviour is enabled
+  - repo: https://github.com/Quantco/pre-commit-mirrors-ruff
+    rev: "0.1.3"
     hooks:
-      - id: black-conda
-        args:
-          - --safe
-          - --target-version=py38
-  - repo: https://github.com/Quantco/pre-commit-mirrors-flake8
-    rev: 6.1.0
-    hooks:
-      - id: flake8-conda
-  - repo: https://github.com/Quantco/pre-commit-mirrors-isort
-    rev: 5.12.0
-    hooks:
-      - id: isort-conda
-        additional_dependencies: [-c, conda-forge, toml=0.10.2]
+     - id: ruff-conda
+     - id: ruff-format-conda
   - repo: https://github.com/Quantco/pre-commit-mirrors-mypy
     rev: "1.5.1"
     hooks:
