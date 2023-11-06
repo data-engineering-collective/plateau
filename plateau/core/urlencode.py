@@ -1,7 +1,9 @@
 from typing import Iterable, List, Tuple, Union
 
-from urlquote import quote as urlquote_quote
-from urlquote import unquote as urlquote_unquote
+from urlquote import (
+    quote as urlquote_quote,
+    unquote as urlquote_unquote,
+)
 from urlquote.quoting import PYTHON_3_7_QUOTING
 
 

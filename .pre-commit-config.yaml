@@ -5,18 +5,10 @@ repos:
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
-  - repo: https://github.com/Quantco/pre-commit-mirrors-black
-    rev: 23.9.1
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.1.4
     hooks:
-      - id: black-conda
-        args:
-          - --safe
-          - --target-version=py38
-  - repo: https://github.com/Quantco/pre-commit-mirrors-isort
-    rev: 5.12.0
-    hooks:
-      - id: isort-conda
-        additional_dependencies: [-c, conda-forge, toml=0.10.2]
+      - id: ruff-format
   - repo: https://github.com/Quantco/pre-commit-mirrors-mypy
     rev: "1.5.1"
     hooks:

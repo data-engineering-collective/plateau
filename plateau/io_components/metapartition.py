@@ -38,8 +38,11 @@ from plateau.core.common_metadata import (
     validate_compatible,
 )
 from plateau.core.docs import default_docs
-from plateau.core.index import ExplicitSecondaryIndex, IndexBase
-from plateau.core.index import merge_indices as merge_indices_algo
+from plateau.core.index import (
+    ExplicitSecondaryIndex,
+    IndexBase,
+    merge_indices as merge_indices_algo,
+)
 from plateau.core.naming import get_partition_file_prefix
 from plateau.core.partition import Partition
 from plateau.core.typing import StoreInput
@@ -153,8 +156,9 @@ def _apply_to_list(method):
                 method_return = method(mp, *method_args, **method_kwargs)
                 if not isinstance(method_return, MetaPartition):
                     raise ValueError(
-                        "Method {} did not return a MetaPartition "
-                        "but {}".format(method.__name__, type(method_return))
+                        "Method {} did not return a MetaPartition but {}".format(
+                            method.__name__, type(method_return)
+                        )
                     )
                 if method_return.is_sentinel:
                     result = method_return
