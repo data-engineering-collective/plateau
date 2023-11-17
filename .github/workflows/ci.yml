@@ -93,6 +93,11 @@ jobs:
             pyarrow: "13.0.0"
             python: "3.12"
           - numfocus_nightly: false
+            os: "ubuntu-latest"
+            pandas: ""
+            pyarrow: "14.0.1"
+            python: "3.12"
+          - numfocus_nightly: false
             os: "macos-latest"
             pandas: ""
             pyarrow: "4.0.1"
