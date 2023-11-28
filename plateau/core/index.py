@@ -537,7 +537,7 @@ class IndexBase(CopyMixin):
         if partitions_as_index:
             result_index = _PARTITION_COLUMN_NAME
             if compact:
-                df = df.groupby(df[result_index]).apply(
+                df = df.groupby(df[result_index], observed=True).apply(
                     lambda x: x[self.column].tolist()
                 )
                 df.name = self.column

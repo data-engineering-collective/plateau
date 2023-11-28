@@ -1103,7 +1103,7 @@ def test_concat_metapartition_categoricals(df_all_types):
     new_mp = MetaPartition.concat_metapartitions([mp1, mp2])
 
     assert new_mp.table_name == "table"
-    assert pd.api.types.is_categorical_dtype(new_mp.data["b"].dtype)
+    assert isinstance(new_mp.data["b"].dtype, pd.CategoricalDtype)
 
 
 # We can't partition on null columns (gh-262)

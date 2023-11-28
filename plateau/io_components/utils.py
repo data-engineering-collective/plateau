@@ -323,7 +323,7 @@ def align_categories(dfs, categoricals):
         largest_df_categories = set()
         for ix, df in enumerate(dfs):
             ser = df[column]
-            if not pd.api.types.is_categorical_dtype(ser):
+            if not isinstance(ser.dtype, pd.CategoricalDtype):
                 cats = ser.dropna().unique()
                 LOGGER.info(
                     "Encountered non-categorical type where categorical was expected\n"
@@ -373,7 +373,7 @@ def sort_values_categorical(
     if not isinstance(columns, list):
         columns = [columns]
     for col in columns:
-        if pd.api.types.is_categorical_dtype(df[col]):
+        if isinstance(df[col].dtype, pd.CategoricalDtype):
             cat_accesor = df[col].cat
             df[col] = cat_accesor.reorder_categories(
                 sorted(cat_accesor.categories), ordered=True
