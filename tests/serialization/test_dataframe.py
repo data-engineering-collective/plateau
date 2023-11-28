@@ -175,9 +175,9 @@ def assert_frame_almost_equal(df_left, df_right):
             ):
                 df_left[col] = pd.to_datetime(df_left[col])
                 df_right[col] = pd.to_datetime(df_right[col])
-        elif pd.api.types.is_object_dtype(
-            df_left[col].dtype
-        ) and pd.api.types.is_categorical_dtype(df_right[col].dtype):
+        elif pd.api.types.is_object_dtype(df_left[col].dtype) and isinstance(
+            df_right[col].dtype, pd.CategoricalDtype
+        ):
             df_left[col] = df_left[col].astype(df_right[col].dtype)
     pdt.assert_frame_equal(
         df_left.reset_index(drop=True), df_right.reset_index(drop=True)

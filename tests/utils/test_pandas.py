@@ -363,9 +363,9 @@ def test_aggregate_to_lists(df_input, by):
         df_expected = df_input
     else:
         if by:
-            df_expected = df_input.groupby(by=by, as_index=False)[data_col].agg(
-                lambda series: list(series.values)
-            )
+            df_expected = df_input.groupby(by=by, as_index=False, observed=True)[
+                data_col
+            ].agg(lambda series: list(series.values))
         else:
             df_expected = pd.DataFrame(
                 {data_col: pd.Series([list(df_input[data_col].values)])}

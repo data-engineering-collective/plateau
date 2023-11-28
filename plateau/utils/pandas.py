@@ -256,6 +256,7 @@ def aggregate_to_lists(df, by, data_col):
         df = df.groupby(
             by=by,
             as_index=False,
+            observed=True,
         )[data_col].agg(lambda series: list(series.values))
 
     Parameters

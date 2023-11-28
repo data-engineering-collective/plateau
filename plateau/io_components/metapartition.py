@@ -1177,7 +1177,9 @@ class MetaPartition(Iterable):
         #     return {}
 
         data_df = df.drop(partition_on, axis="columns")
-        for value, group in data_df.groupby(by=partition_keys, sort=False):
+        for value, group in data_df.groupby(
+            by=partition_keys, observed=True, sort=False
+        ):
             partitioning_info = []
             if pd.api.types.is_scalar(value):
                 value = [value]
@@ -1244,8 +1246,8 @@ class MetaPartition(Iterable):
 
         categoricals = [
             col
-            for col, dtype in data[0].items()
-            if pd.api.types.is_categorical_dtype(dtype)
+            for col, ser in data[0].items()
+            if isinstance(ser.dtype, pd.CategoricalDtype)
         ]
         if categoricals:
             data = align_categories(data, categoricals)
