@@ -197,12 +197,12 @@ def check_predicates(predicates: PredicatesType) -> None:
             if (
                 pd.api.types.is_scalar(val)
                 and pd.isnull(val)
-                and op not in ["==", "!="]
+                and op not in ["==", "!=", "is distinct from"]
             ):
                 raise ValueError(
                     f"Invalid predicates: Clause {clause_idx} in conjunction {conjunction_idx} "
                     f"with null value and operator {op}. Only operators supporting null values "
-                    "are '==', '!=' and 'in'."
+                    "are '==', '!=', 'in' and 'is distinct from'."
                 )
 
 
@@ -467,11 +467,17 @@ def filter_array_like(
 
     with np.errstate(invalid="ignore"):
         if op == "==":
+            # If the RHS is null, carry out a null check instead of equality.
             if pd.isnull(value):
                 np.logical_and(pd.isnull(array_like), mask, out=out)
             else:
                 np.logical_and(array_like == value, mask, out=out)
         elif op == "!=":
+            # != always filters out missing values, i.e. (NaN != X) is always false.
+            np.logical_and(array_like != value, mask, out=out)
+            np.logical_and(~pd.isnull(array_like), mask, out=out)
+        elif op == "is distinct from":
+            # Is distinct from is similar to !=, but doesn't filter out all NaNs.
             if pd.isnull(value):
                 np.logical_and(~pd.isnull(array_like), mask, out=out)
             else:
