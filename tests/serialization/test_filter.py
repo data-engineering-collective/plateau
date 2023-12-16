@@ -24,6 +24,18 @@ def array_like(request):
     return request.param
 
 
+@pytest.fixture
+def df_none():
+    return pd.DataFrame({"A": [True, False, True, True, None, False] * 2})
+
+
+@pytest.fixture
+def df_na():
+    return pd.DataFrame(
+        {"A": [0.0, 0.0, np.nan, np.nan, 1.0, 1.0, 1.0, 1.0, np.nan, 2.0, 2.0]}
+    )
+
+
 def test_filter_array_like_eq(array_like):
     ix = 3
     value = array_like[ix]
@@ -185,8 +197,48 @@ def test_filter_df_from_predicates_bool(op, col):
     actual = filter_df_from_predicates(df, predicates)
     if isinstance(df[col].dtype, pd.CategoricalDtype):
         df[col] = df[col].astype(df[col].cat.as_ordered().dtype)
-    expected = eval(f"df[df[col] {op} value]")
+    expected = eval(f"df[df[col] {op} value].dropna(subset=[col])")
     pdt.assert_frame_equal(actual, expected, check_categorical=False)
+
+
+@pytest.mark.parametrize(
+    "op, value, expected",
+    [
+        ("==", True, "df_none[df_none['A'] == True]"),
+        ("!=", True, "df_none[(df_none['A'] != True) & df_none['A'].notnull()]"),
+        ("is distinct from", True, "df_none[df_none['A'] != True]"),
+        ("==", False, "df_none[df_none['A'] == False]"),
+        ("!=", False, "df_none[(df_none['A'] != False) & df_none['A'].notnull()]"),
+        ("is distinct from", False, "df_none[df_none['A'] != False]"),
+        ("==", None, "df_none[df_none['A'].isnull()]"),
+        ("!=", None, "df_none[df_none['A'].notnull()]"),
+        ("is distinct from", None, "df_none[df_none['A'].notnull()]"),
+    ],
+)
+def test_filter_df_from_predicates_missing_bool(df_none, op, value, expected):
+    predicates = [[("A", op, value)]]
+    actual = filter_df_from_predicates(df_none, predicates)
+    pdt.assert_frame_equal(actual, eval(expected))
+
+
+@pytest.mark.parametrize(
+    "op, value, expected",
+    [
+        ("==", 0.0, "df_na[df_na['A'] == 0.]"),
+        ("!=", 0.0, "df_na[(df_na['A'] != 0.) & df_na['A'].notnull()]"),
+        ("is distinct from", 0.0, "df_na[df_na['A'] != 0.]"),
+        ("==", 1.0, "df_na[df_na['A'] == 1.]"),
+        ("!=", 1.0, "df_na[(df_na['A'] != 1.) & df_na['A'].notnull()]"),
+        ("is distinct from", 1.0, "df_na[df_na['A'] != 1.]"),
+        ("==", np.nan, "df_na[df_na['A'].isnull()]"),
+        ("!=", np.nan, "df_na[df_na['A'].notnull()]"),
+        ("is distinct from", np.nan, "df_na[df_na['A'].notnull()]"),
+    ],
+)
+def test_filter_df_from_predicates_missing_scalar(df_na, op, value, expected):
+    predicates = [[("A", op, value)]]
+    actual = filter_df_from_predicates(df_na, predicates)
+    pdt.assert_frame_equal(actual, eval(expected))
 
 
 @pytest.mark.parametrize(
