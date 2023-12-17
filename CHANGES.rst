@@ -2,10 +2,15 @@
 Changelog
 =========
 
-Plateau 4.2.3 (2023-11-??)
+Plateau 4.3.0 (unreleased)
 ==========================
 
+This minor release includes a slight API change to the behaviour of the ``!=`` predicate operation.
+
+* Add ``is distinct from`` predicate operation. This follows the behaviour of the SQL operation of the same name, i.e. it treats two null values as the same. Previously, this was also the behaviour of the ``!=`` operation.
+* The ``!=`` predicate operation now behaves the same as its SQL counterpart, i.e. it filters out null/missing values. The old behaviour of ``!=`` can now be acheived with ``is distinct from``.
 * Include pyarrow 14.0.1 in CI
+
 
 Plateau 4.2.2 (2023-11-06)
 ==========================
