@@ -225,12 +225,13 @@ def test_filter_df_from_predicates_missing_bool(df_none, op, value, expected):
 @pytest.mark.parametrize(
     "op, value, expected",
     [
-        ("==", 0.0, "df_na[df_na['A'] == 0.]"),
-        ("!=", 0.0, "df_na[df_na['A'] != 0.]"),
-        ("is distinct from", 0.0, "df_na[df_na['A'] != 0.]"),
-        ("==", 1.0, "df_na[df_na['A'] == 1.]"),
-        ("!=", 1.0, "df_na[df_na['A'] != 1.]"),
-        ("is distinct from", 1.0, "df_na[df_na['A'] != 1.]"),
+        # != will be the same as `is distinct from` until 5.0.0.
+        ("==", 0.0, "df_na[df_na['A'] == 0.0]"),
+        ("!=", 0.0, "df_na[df_na['A'] != 0.0]"),
+        ("is distinct from", 0.0, "df_na[df_na['A'] != 0.0]"),
+        ("==", 1.0, "df_na[df_na['A'] == 1.0]"),
+        ("!=", 1.0, "df_na[df_na['A'] != 1.0]"),
+        ("is distinct from", 1.0, "df_na[df_na['A'] != 1.0]"),
         ("==", np.nan, "df_na[df_na['A'].isnull()]"),
         ("!=", np.nan, "df_na[df_na['A'].notnull()]"),
         ("is distinct from", np.nan, "df_na[df_na['A'].notnull()]"),
@@ -240,6 +241,17 @@ def test_filter_df_from_predicates_missing_scalar(df_na, op, value, expected):
     predicates = [[("A", op, value)]]
     actual = filter_df_from_predicates(df_na, predicates)
     pdt.assert_frame_equal(actual, eval(expected))
+
+
+def test_not_equal_predicate_gives_deprecation_warning(df_na):
+    predicates = [[("A", "!=", 1.0)]]
+    msg = (
+        "The current behaviour of the != will be deprecated in version 5.0.0. "
+        "The new behaviour will be SQL-like, i.e. NaN values will be filtered out."
+    )
+    with pytest.deprecated_call(match=msg):
+        actual = filter_df_from_predicates(df_na, predicates)
+    pdt.assert_frame_equal(actual, df_na[df_na["A"] != 1.0])
 
 
 @pytest.mark.parametrize(

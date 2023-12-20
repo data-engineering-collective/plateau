@@ -13,6 +13,7 @@ Available constants
 :meta public:
 """
 
+import warnings
 from typing import TYPE_CHECKING, Dict, Iterable, List, Optional, Set, Tuple, TypeVar
 
 import numpy as np
@@ -473,6 +474,12 @@ def filter_array_like(
             else:
                 np.logical_and(array_like == value, mask, out=out)
         elif op == "!=":
+            warnings.warn(
+                "The current behaviour of the != will be deprecated in version 5.0.0. "
+                "The new behaviour will be SQL-like, i.e. NaN values will be filtered out.",
+                DeprecationWarning,
+                stacklevel=1,
+            )
             if pd.isnull(value):
                 np.logical_and(~pd.isnull(array_like), mask, out=out)
             else:
