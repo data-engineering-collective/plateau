@@ -197,18 +197,19 @@ def test_filter_df_from_predicates_bool(op, col):
     actual = filter_df_from_predicates(df, predicates)
     if isinstance(df[col].dtype, pd.CategoricalDtype):
         df[col] = df[col].astype(df[col].cat.as_ordered().dtype)
-    expected = eval(f"df[df[col] {op} value].dropna(subset=[col])")
+    expected = eval(f"df[df[col] {op} value]")
     pdt.assert_frame_equal(actual, expected, check_categorical=False)
 
 
 @pytest.mark.parametrize(
     "op, value, expected",
     [
+        # != will be the same as `is distinct from` until 5.0.0.
         ("==", True, "df_none[df_none['A'] == True]"),
-        ("!=", True, "df_none[(df_none['A'] != True) & df_none['A'].notnull()]"),
+        ("!=", True, "df_none[df_none['A'] != True]"),
         ("is distinct from", True, "df_none[df_none['A'] != True]"),
         ("==", False, "df_none[df_none['A'] == False]"),
-        ("!=", False, "df_none[(df_none['A'] != False) & df_none['A'].notnull()]"),
+        ("!=", False, "df_none[df_none['A'] != False]"),
         ("is distinct from", False, "df_none[df_none['A'] != False]"),
         ("==", None, "df_none[df_none['A'].isnull()]"),
         ("!=", None, "df_none[df_none['A'].notnull()]"),
@@ -225,10 +226,10 @@ def test_filter_df_from_predicates_missing_bool(df_none, op, value, expected):
     "op, value, expected",
     [
         ("==", 0.0, "df_na[df_na['A'] == 0.]"),
-        ("!=", 0.0, "df_na[(df_na['A'] != 0.) & df_na['A'].notnull()]"),
+        ("!=", 0.0, "df_na[df_na['A'] != 0.]"),
         ("is distinct from", 0.0, "df_na[df_na['A'] != 0.]"),
         ("==", 1.0, "df_na[df_na['A'] == 1.]"),
-        ("!=", 1.0, "df_na[(df_na['A'] != 1.) & df_na['A'].notnull()]"),
+        ("!=", 1.0, "df_na[df_na['A'] != 1.]"),
         ("is distinct from", 1.0, "df_na[df_na['A'] != 1.]"),
         ("==", np.nan, "df_na[df_na['A'].isnull()]"),
         ("!=", np.nan, "df_na[df_na['A'].notnull()]"),

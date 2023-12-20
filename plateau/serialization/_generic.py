@@ -473,11 +473,12 @@ def filter_array_like(
             else:
                 np.logical_and(array_like == value, mask, out=out)
         elif op == "!=":
-            # != always filters out missing values, i.e. (NaN != X) is always false.
-            np.logical_and(array_like != value, mask, out=out)
-            np.logical_and(~pd.isnull(array_like), mask, out=out)
+            if pd.isnull(value):
+                np.logical_and(~pd.isnull(array_like), mask, out=out)
+            else:
+                np.logical_and(array_like != value, mask, out=out)
         elif op == "is distinct from":
-            # Is distinct from is similar to !=, but doesn't filter out all NaNs.
+            # Currently the same as != which will have a change in behaviour in 5.0.
             if pd.isnull(value):
                 np.logical_and(~pd.isnull(array_like), mask, out=out)
             else:
