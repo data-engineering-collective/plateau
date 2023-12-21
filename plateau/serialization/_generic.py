@@ -13,6 +13,7 @@ Available constants
 :meta public:
 """
 
+import warnings
 from typing import TYPE_CHECKING, Dict, Iterable, List, Optional, Set, Tuple, TypeVar
 
 import numpy as np
@@ -197,12 +198,12 @@ def check_predicates(predicates: PredicatesType) -> None:
             if (
                 pd.api.types.is_scalar(val)
                 and pd.isnull(val)
-                and op not in ["==", "!="]
+                and op not in ["==", "!=", "is distinct from"]
             ):
                 raise ValueError(
                     f"Invalid predicates: Clause {clause_idx} in conjunction {conjunction_idx} "
                     f"with null value and operator {op}. Only operators supporting null values "
-                    "are '==', '!=' and 'in'."
+                    "are '==', '!=', 'in' and 'is distinct from'."
                 )
 
 
@@ -467,11 +468,24 @@ def filter_array_like(
 
     with np.errstate(invalid="ignore"):
         if op == "==":
+            # If the RHS is null, carry out a null check instead of equality.
             if pd.isnull(value):
                 np.logical_and(pd.isnull(array_like), mask, out=out)
             else:
                 np.logical_and(array_like == value, mask, out=out)
         elif op == "!=":
+            warnings.warn(
+                "The current behaviour of the != will be deprecated in version 5.0.0. "
+                "The new behaviour will be SQL-like, i.e. NaN values will be filtered out.",
+                DeprecationWarning,
+                stacklevel=1,
+            )
+            if pd.isnull(value):
+                np.logical_and(~pd.isnull(array_like), mask, out=out)
+            else:
+                np.logical_and(array_like != value, mask, out=out)
+        elif op == "is distinct from":
+            # Currently the same as != which will have a change in behaviour in 5.0.
             if pd.isnull(value):
                 np.logical_and(~pd.isnull(array_like), mask, out=out)
             else:
