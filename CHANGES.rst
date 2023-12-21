@@ -2,7 +2,7 @@
 Changelog
 =========
 
-Plateau 4.3.0 (unreleased)
+Plateau 4.3.0 (2023-12-21)
 ==========================
 
 * Add ``is distinct from`` predicate operation. This follows the behaviour of the SQL operation of the same name, i.e. it treats two null values as the same. This is also the current behaviour of the ``!=`` operation.
