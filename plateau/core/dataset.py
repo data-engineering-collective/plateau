@@ -1051,7 +1051,7 @@ class DatasetMetadataBuilder(CopyMixin):
 
 
 def _add_creation_time(
-    dataset_object: Union[DatasetMetadataBase, DatasetMetadataBuilder]
+    dataset_object: Union[DatasetMetadataBase, DatasetMetadataBuilder],
 ):
     if "creation_time" not in dataset_object.metadata:
         creation_time = plateau.core._time.datetime_utcnow().isoformat()
