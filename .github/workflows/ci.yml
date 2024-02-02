@@ -127,7 +127,7 @@ jobs:
           environment-file: environment.yml
           cache-environment: true
           create-args: >-
-            python=${{ matrix.PYTHON_VERSION }}
+            python=${{ matrix.python }}
       - name: Install Pyarrow (non-nightly)
         # Don't pin python as older versions of pyarrow require older versions of python
         run: micromamba install -y --no-py-pin pyarrow==${{ matrix.pyarrow }}
