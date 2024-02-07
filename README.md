@@ -39,7 +39,8 @@ pip install plateau
 ```
 
 ```sh
-# Install with conda/mamba, optionally add conda-forge as a source
+# Install with conda/micromamba, optionally add conda-forge as a source
 # conda config --add channels conda-forge
-mamba install plateau
+conda install plateau
+micromamba install plateau
 ```
