@@ -490,6 +490,10 @@ class DatasetMetadataBase(CopyMixin):
             df_result = df_result.merge(
                 df, left_index=True, right_index=True, copy=False
             )
+        # Backward-compatability: Set dtype to empty if df is empty.
+        # With pandas 2.3, the dtype of the numpy is correctly propagated but changes our API.
+        if len(df_result) == 0:
+            df_result.index = df_result.index.astype("object")
         return df_result
 
 
