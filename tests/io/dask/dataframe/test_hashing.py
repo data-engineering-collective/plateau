@@ -30,9 +30,11 @@ def test_hash_dataset_subset(dataset_with_index_factory):
 
 def test_hash_dataset_group_keys(dataset_with_index_factory):
     group_keys = ["L"]
-    hh = hash_dataset(
-        factory=dataset_with_index_factory, group_key=group_keys
-    ).compute()
+    hh = (
+        hash_dataset(factory=dataset_with_index_factory, group_key=group_keys)
+        .compute()
+        .sort_index()
+    )
 
     expected = pd.Series(
         [11462879952839863487, 12568779102514529673],
@@ -44,9 +46,13 @@ def test_hash_dataset_group_keys(dataset_with_index_factory):
 
 def test_hash_dataset_group_keys_subset(dataset_with_index_factory):
     group_keys = ["P"]
-    hh = hash_dataset(
-        factory=dataset_with_index_factory, group_key=group_keys, subset=["TARGET"]
-    ).compute()
+    hh = (
+        hash_dataset(
+            factory=dataset_with_index_factory, group_key=group_keys, subset=["TARGET"]
+        )
+        .compute()
+        .sort_index()
+    )
 
     expected = pd.Series(
         [11358988112447789330, 826468140851422801],
@@ -58,9 +64,15 @@ def test_hash_dataset_group_keys_subset(dataset_with_index_factory):
 
 def test_hash_dataset_group_keys_subset_subset_groupkey(dataset_with_index_factory):
     group_keys = ["P"]
-    hh = hash_dataset(
-        factory=dataset_with_index_factory, group_key=group_keys, subset=["P", "TARGET"]
-    ).compute()
+    hh = (
+        hash_dataset(
+            factory=dataset_with_index_factory,
+            group_key=group_keys,
+            subset=["P", "TARGET"],
+        )
+        .compute()
+        .sort_index()
+    )
 
     expected = pd.Series(
         [7554402398462747209, 1687604933839263903],

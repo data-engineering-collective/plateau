@@ -6,6 +6,7 @@ Plateau 4.4.0 (2024-XX-XX)
 ==========================
 
 * Include pyarrow 15.0.0 in CI
+* Fix tests for dask 2024.1.1
 
 Plateau 4.3.0 (2023-12-21)
 ==========================
