@@ -102,7 +102,7 @@ def test_dataset_get_indices_as_dataframe_predicates():
         columns=["l_external_code"],
         predicates=[[("l_external_code", "==", "1"), ("p_external_code", "==", "3")]],
     )
-    empty_index = pd.Index([], name="partition", dtype="int")
+    empty_index = pd.Index([], name="partition")
     expected = pd.DataFrame(columns=["l_external_code"], index=empty_index)
     pdt.assert_frame_equal(result, expected)
 
@@ -116,7 +116,7 @@ def test_dataset_get_indices_as_dataframe_no_index(dataset):
 def test_dataset_get_indices_as_dataframe_with_index(dataset_with_index, store_session):
     assert not dataset_with_index.primary_indices_loaded
     df = dataset_with_index.get_indices_as_dataframe()
-    empty_index = pd.Index([], name="partition", dtype="int")
+    empty_index = pd.Index([], name="partition")
     pdt.assert_frame_equal(
         df,
         pd.DataFrame(columns=["L", "P"], index=empty_index).astype(
