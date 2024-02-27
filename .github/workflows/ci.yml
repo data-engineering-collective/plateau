@@ -184,7 +184,7 @@ jobs:
         run: python -m build --no-isolation
 
       - name: Codecov
-        uses: codecov/codecov-action@v4.0.2
+        uses: codecov/codecov-action@v4.1.0
         with:
           # NOTE: `token` is not required, because the plateau repo is public
           file: ./coverage.xml
