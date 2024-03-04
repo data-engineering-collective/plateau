@@ -4,7 +4,6 @@ Using these routines ensures compatibility w/ plateau as well as the
 application of best practices.
 """
 
-
 import uuid
 
 

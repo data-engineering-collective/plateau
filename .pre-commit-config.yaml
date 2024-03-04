@@ -1,7 +1,7 @@
 repos:
   # Run ruff first because autofix behaviour is enabled
   - repo: https://github.com/Quantco/pre-commit-mirrors-ruff
-    rev: "0.2.0"
+    rev: "0.3.0"
     hooks:
      - id: ruff-conda
      - id: ruff-format-conda
@@ -20,13 +20,13 @@ repos:
           - numpy=1.26
           - minimalkv=1.4.2
   - repo: https://github.com/Quantco/pre-commit-mirrors-pyupgrade
-    rev: 3.15.0
+    rev: 3.15.1
     hooks:
       - id: pyupgrade-conda
         args:
           - --py38-plus
   - repo: https://github.com/Quantco/pre-commit-mirrors-prettier
-    rev: 3.2.4
+    rev: 3.2.5
     hooks:
       - id: prettier-conda
         files: "\\.md$"

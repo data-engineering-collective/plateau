@@ -1,4 +1,5 @@
 """This module is a collection of helper functions."""
+
 import collections
 import inspect
 import logging
@@ -183,8 +184,7 @@ def normalize_arg(
         "dispatch_by",
     ],
     old_value: None,
-) -> None:
-    ...
+) -> None: ...
 
 
 @overload
@@ -198,15 +198,13 @@ def normalize_arg(
         "dispatch_by",
     ],
     old_value: Union[str, List[str]],
-) -> List[str]:
-    ...
+) -> List[str]: ...
 
 
 @overload
 def normalize_arg(
     arg_name: Literal["store"], old_value: Optional[StoreInput]
-) -> StoreFactory:
-    ...
+) -> StoreFactory: ...
 
 
 def normalize_arg(arg_name, old_value):

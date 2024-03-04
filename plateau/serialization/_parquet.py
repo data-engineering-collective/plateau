@@ -1,6 +1,5 @@
 """This module contains functionality for persisting/serialising DataFrames."""
 
-
 import datetime
 import logging
 import time
