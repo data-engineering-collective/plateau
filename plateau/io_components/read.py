@@ -18,8 +18,7 @@ def dispatch_metapartitions_from_factory(
     dataset_factory: DatasetFactory,
     predicates: PredicatesType = None,
     dispatch_by: None = None,
-) -> Iterator[MetaPartition]:
-    ...
+) -> Iterator[MetaPartition]: ...
 
 
 @overload
@@ -27,8 +26,7 @@ def dispatch_metapartitions_from_factory(
     dataset_factory: DatasetFactory,
     predicates: PredicatesType,
     dispatch_by: List[str],
-) -> Iterator[List[MetaPartition]]:
-    ...
+) -> Iterator[List[MetaPartition]]: ...
 
 
 @normalize_args

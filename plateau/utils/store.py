@@ -1,4 +1,5 @@
 """Workarounds for limitations of the minimalkv API."""
+
 import logging
 import time
 from urllib.parse import quote
