@@ -186,8 +186,8 @@ jobs:
       - name: Codecov
         uses: codecov/codecov-action@v4.2.0
         with:
-          # NOTE: `token` is not required, because the plateau repo is public
           file: ./coverage.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
           name: pytest-numfocus_nightly_${{ matrix.numfocus_nightly }}-os_${{ matrix.os }}-pyarrow_${{ matrix.pyarrow }}-python_${{ matrix.python }}
 
       # Release
