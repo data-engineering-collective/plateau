@@ -40,6 +40,18 @@ predicate_serialisers = pytest.mark.parametrize(
 )
 
 
+def assert_frame_equal_non_strict(x, y, *args, **kwargs):
+    # assert_X_equal will be stricter with NaN/None equality in Pandas 3
+    # (https://github.com/pandas-dev/pandas/pull/52081). Until the strict_na argument is
+    # introduced (https://github.com/pandas-dev/pandas/pull/58072), cast np.nan to None.
+    if Version(pd.__version__) < Version("3.0.0.dev0"):
+        pdt.assert_frame_equal(x, y, *args, **kwargs)
+    else:
+        pdt.assert_frame_equal(
+            x.replace(np.nan, None), y.replace(np.nan, None), *args, **kwargs
+        )
+
+
 def test_load_df_from_store_unsupported_format(store):
     with pytest.raises(ValueError):
         DataFrameSerializer.restore_dataframe(store, "test.unknown")
@@ -605,7 +617,7 @@ def test_predicate_parsing_null_values(
         predicate_pushdown_to_io=predicate_pushdown_to_io,
         predicates=predicates,
     )
-    pdt.assert_frame_equal(
+    assert_frame_equal_non_strict(
         result.reset_index(drop=True),
         expected.reset_index(drop=True),
         check_dtype=serialiser.type_stable,
