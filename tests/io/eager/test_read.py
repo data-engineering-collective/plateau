@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import pandas.testing as pdt
 import pytest
+from packaging import version
 
 from plateau.io.eager import (
     read_dataset_as_dataframes,
@@ -11,6 +12,8 @@ from plateau.io.eager import (
     store_dataframes_as_dataset,
 )
 from plateau.io.testing.read import *  # noqa
+
+PANDAS_LT_3 = version.parse(pd.__version__) < version.parse("3.0.0.dev")
 
 
 @pytest.fixture(
@@ -28,7 +31,14 @@ def _read_table(*args, **kwargs):
 
     if len(res):
         # Array split conserves dtypes
-        return np.array_split(res, len(res))
+        dfs = np.array_split(res, len(res))
+        # np.array_split on a Pandas 3 DataFrame seems to return an NDArray rather than a DataFrame.
+        if PANDAS_LT_3:
+            return dfs
+        return [
+            pd.DataFrame(data=arr, columns=res.columns).astype(res.dtypes)
+            for arr in dfs
+        ]
     else:
         return [res]
 
