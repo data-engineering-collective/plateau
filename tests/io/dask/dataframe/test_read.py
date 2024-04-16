@@ -122,6 +122,7 @@ def test_reconstruct_dask_index(store_factory, index_type, monkeypatch):
     df2 = pd.DataFrame({colA: [3, 4], colB: ["x", "y"]})
     df_chunks = np.array_split(pd.concat([df1, df2]).reset_index(drop=True), 4)
     if not PANDAS_LT_3:
+        # Workaround for https://github.com/numpy/numpy/issues/24889.
         df_chunks = [
             pd.DataFrame(data=arr, columns=df1.columns).astype(df1.dtypes)
             for arr in df_chunks

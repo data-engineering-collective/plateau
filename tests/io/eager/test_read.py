@@ -32,10 +32,10 @@ def _read_table(*args, **kwargs):
     if len(res):
         # Array split conserves dtypes
         dfs = np.array_split(res, len(res))
-        # np.array_split on a Pandas 3 DataFrame seems to return an NDArray rather than a DataFrame.
         if PANDAS_LT_3:
             return dfs
         return [
+            # Workaround for https://github.com/numpy/numpy/issues/24889.
             pd.DataFrame(data=arr, columns=res.columns).astype(res.dtypes)
             for arr in dfs
         ]
