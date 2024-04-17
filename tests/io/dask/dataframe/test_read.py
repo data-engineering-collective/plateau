@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import pytest
 from dask.dataframe.utils import assert_eq as assert_dask_eq
+from packaging import version
 from pandas import testing as pdt
 from pandas.testing import assert_frame_equal
 
@@ -15,6 +16,8 @@ from plateau.io.dask.dataframe import read_dataset_as_ddf
 from plateau.io.eager import store_dataframes_as_dataset
 from plateau.io.testing.read import *  # noqa
 from plateau.io_components.metapartition import SINGLE_TABLE
+
+PANDAS_LT_3 = version.parse(pd.__version__) < version.parse("3.0.0.dev")
 
 
 @pytest.fixture()
@@ -118,6 +121,12 @@ def test_reconstruct_dask_index(store_factory, index_type, monkeypatch):
     df1 = pd.DataFrame({colA: [1, 2], colB: ["x", "y"]})
     df2 = pd.DataFrame({colA: [3, 4], colB: ["x", "y"]})
     df_chunks = np.array_split(pd.concat([df1, df2]).reset_index(drop=True), 4)
+    if not PANDAS_LT_3:
+        # Workaround for https://github.com/numpy/numpy/issues/24889.
+        df_chunks = [
+            pd.DataFrame(data=arr, columns=df1.columns).astype(df1.dtypes)
+            for arr in df_chunks
+        ]
     df_delayed = [dask.delayed(c) for c in df_chunks]
     with dask.config.set({"dataframe.shuffle.method": "tasks"}):
         ddf_expected = dd.from_delayed(df_delayed).set_index(

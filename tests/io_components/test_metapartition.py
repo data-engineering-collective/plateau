@@ -562,7 +562,7 @@ def test_partition_on_one_level():
         assert len(mp.data) == 1
         assert mp.data is not None
         df = mp.data
-        assert df._is_view
+        assert df._mgr.is_view
 
         # try to be agnostic about the order
         assert len(df) == 1
@@ -596,7 +596,7 @@ def test_partition_on_one_level_ts():
         assert len(mp.data) == 1
         assert mp.data is not None
         df = mp.data
-        assert df._is_view
+        assert df._mgr.is_view
 
         # try to be agnostic about the order
         assert len(df) == 1
@@ -682,7 +682,7 @@ def test_partition_urlencode():
         assert len(mp.data) == 1
         assert mp.data is not None
         df = mp.data
-        assert df._is_view
+        assert df._mgr.is_view
 
         # try to be agnostic about the order
         assert len(df) == 1
@@ -716,7 +716,7 @@ def test_partition_two_level():
         assert len(mp.data) == 1
         assert mp.data is not None
         df = mp.data
-        assert df._is_view
+        assert df._mgr.is_view
 
         # try to be agnostic about the order
         assert len(df) == 1
@@ -758,7 +758,7 @@ def test_partition_on_nested():
         assert len(mp.data) == 1
         assert mp.data is not None
         df = mp.data
-        assert df._is_view
+        assert df._mgr.is_view
 
         # try to be agnostic about the order
         assert len(df) == 1

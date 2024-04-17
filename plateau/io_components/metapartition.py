@@ -560,9 +560,14 @@ class MetaPartition(Iterable):
             pa_dtype = schema[schema.get_field_index(column)].type
             value = IndexBase.normalize_value(pa_dtype, value)
             if pa.types.is_date(pa_dtype):
-                index_df_dct[column] = pd.Series(
-                    pd.to_datetime([value], infer_datetime_format=True)
-                ).dt.date
+                index_df_dct[column] = (
+                    pd.Series(
+                        pd.to_datetime([value], infer_datetime_format=True)
+                    ).dt.date
+                    # As of Pandas 2.0 infer_datetime_format is deprecated and is a no-op.
+                    if PANDAS_LT_2
+                    else pd.Series(pd.to_datetime([value])).dt.date
+                )
             else:
                 dtype = pa_dtype.to_pandas_dtype()
                 index_df_dct[column] = pd.Series([value], dtype=dtype)
