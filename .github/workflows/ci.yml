@@ -184,7 +184,7 @@ jobs:
         run: python -m build --no-isolation
 
       - name: Codecov
-        uses: codecov/codecov-action@v4.3.0
+        uses: codecov/codecov-action@v4.3.1
         with:
           file: ./coverage.xml
           token: ${{ secrets.CODECOV_TOKEN }}
