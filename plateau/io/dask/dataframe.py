@@ -584,7 +584,8 @@ def collect_dataset_metadata(
             # ensure that even with sampling at least one metapartition is returned
             cutoff_index = max(1, int(len(mps) * frac))
             mps = mps[:cutoff_index]
-            ddf = dd.from_delayed(
+            ddf = dd.from_map(
+                lambda x: x.compute(),
                 [
                     dask.delayed(MetaPartition.get_parquet_metadata)(
                         mp, store=dataset_factory.store_factory
