@@ -30,7 +30,7 @@ jobs:
           - numfocus_nightly: true
             os: "ubuntu-latest"
             pandas: ""
-            pyarrow: "4.0.1"
+            pyarrow: "nightly"
             python: "3.10"
           - numfocus_nightly: false
             os: "ubuntu-latest"
@@ -134,8 +134,7 @@ jobs:
           create-args: >-
             python=${{ matrix.python }}
       - name: Install Pyarrow (non-nightly)
-        # Don't pin python as older versions of pyarrow require older versions of python
-        run: micromamba install -y --no-py-pin pyarrow==${{ matrix.pyarrow }}
+        run: micromamba install -y pyarrow==${{ matrix.pyarrow }}
         if: matrix.pyarrow != 'nightly' && matrix.pandas == ''
       - name: Install Pyarrow (nightly)
         # Install both arrow-cpp and pyarrow to make sure that we have the
