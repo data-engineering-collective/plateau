@@ -31,7 +31,7 @@ jobs:
             os: "ubuntu-latest"
             pandas: ""
             pyarrow: "nightly"
-            python: "3.9"
+            python: "3.10"
           - numfocus_nightly: false
             os: "ubuntu-latest"
             pandas: "1.5.3"
