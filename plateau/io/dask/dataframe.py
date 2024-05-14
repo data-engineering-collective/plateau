@@ -585,14 +585,10 @@ def collect_dataset_metadata(
             cutoff_index = max(1, int(len(mps) * frac))
             mps = mps[:cutoff_index]
             ddf = dd.from_map(
-                lambda x: x.compute(),
-                [
-                    dask.delayed(MetaPartition.get_parquet_metadata)(
-                        mp, store=dataset_factory.store_factory
-                    )
-                    for mp in mps
-                ],
+                MetaPartition.get_parquet_metadata,
+                mps,
                 meta=_METADATA_SCHEMA,
+                store=dataset_factory.store_factory,
             )
         else:
             df = pd.DataFrame(columns=_METADATA_SCHEMA.keys())
