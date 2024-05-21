@@ -30,7 +30,7 @@ dependencies:
   - pytest>=4.5.0
   - pytest-cov
   - pytest-mock
-  - setuptools_scm
+  - setuptools_scm>=8.1
   # GitHub CI
   - pandoc
   # CLI
