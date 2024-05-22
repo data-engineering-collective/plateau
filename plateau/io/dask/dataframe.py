@@ -74,10 +74,17 @@ class ReadPlateauPartition(DataFrameIOFunction):
         projection."""
         return type(self)(columns=columns)
 
-    def __call__(self, mps, *args, **kwargs):
+    def __call__(
+        self, mps, *args, columns: Union[Sequence[str], None] = None, **kwargs
+    ):
         """Return a new DataFrame partition."""
+        cols = (
+            self.columns
+            if columns is None
+            else [c for c in columns if c in self.columns]
+        )
         return MetaPartition.concat_metapartitions(
-            [mp.load_dataframes(*args, columns=self.columns, **kwargs) for mp in mps]
+            [mp.load_dataframes(*args, columns=cols, **kwargs) for mp in mps]
         ).data
 
 
@@ -156,6 +163,7 @@ def read_dataset_as_ddf(
             ReadPlateauPartition(columns=columns),
             mps,
             meta=meta,
+            columns=columns,
             label="read-plateau",
             divisions=divisions_lst,
             store=ds_factory.store_factory,
