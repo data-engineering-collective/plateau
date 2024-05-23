@@ -127,9 +127,13 @@ def test_reconstruct_dask_index(store_factory, index_type, monkeypatch):
             pd.DataFrame(data=arr, columns=df1.columns).astype(df1.dtypes)
             for arr in df_chunks
         ]
-    df_delayed = [dask.delayed(c) for c in df_chunks]
-    with dask.config.set({"dataframe.shuffle.method": "tasks"}):
-        ddf_expected = dd.from_delayed(df_delayed).set_index(
+    query_planning = dask.config.get("dataframe.query-planning", True)
+    with dask.config.set(
+        {"dataframe.convert-string": False, "dataframe.shuffle.method": "tasks"}
+        if query_planning or query_planning is None
+        else {"dataframe.shuffle.method": "tasks"}
+    ):
+        ddf_expected = dd.from_map(lambda x: x, df_chunks).set_index(
             colA, divisions=[1, 2, 3, 4, 4]
         )
         ddf_expected_simple = dd.from_pandas(

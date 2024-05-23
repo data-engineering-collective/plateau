@@ -28,8 +28,7 @@ def _update_dataset(partitions, *args, **kwargs):
         if isinstance(partitions, pd.DataFrame):
             partitions = dd.from_pandas(partitions, npartitions=1)
         elif partitions is not None:
-            delayed_partitions = [dask.delayed(_id)(part) for part in partitions]
-            partitions = dd.from_delayed(delayed_partitions)
+            partitions = dd.from_map(_id, partitions)
         else:
             partitions = None
 
@@ -55,7 +54,7 @@ def _return_none():
 def test_update_dataset_from_ddf_empty(store_factory, shuffle):
     with pytest.raises(ValueError) as exc_info:
         update_dataset_from_ddf(
-            dask.dataframe.from_delayed([], meta=(("a", int),)),
+            dd.from_map(lambda x: x, [], meta=(("a", int),)),
             store_factory,
             dataset_uuid="output_dataset_uuid",
             table="core",
@@ -65,8 +64,8 @@ def test_update_dataset_from_ddf_empty(store_factory, shuffle):
     assert (
         str(exc_info.value)
         in [
-            "Cannot store empty datasets",  # dask <= 2021.5.0
             "Cannot store empty datasets, partition_list must not be empty if in store mode.",  # dask > 2021.5.0 + shuffle == True
             "No data left to save outside partition columns",  # dask > 2021.5.0 + shuffle == False
+            "All `iterables` must have a non-zero length",  # dask >= 2024.3.0 + dask-expr used
         ]
     )

@@ -3,7 +3,7 @@ channels:
   - conda-forge
   - nodefaults
 dependencies:
-  - dask!=2021.5.1,!=2021.6.0 # gh475 - 2021.5.1 and 2021.6.0 broke ci, omit those versions
+  - dask>=2022.5.1 # First version with dask.dataframe.from_map.
   - decorator
   - msgpack-python>=0.5.2
   # Currently dask and numpy==1.16.0 clash
@@ -21,7 +21,7 @@ dependencies:
   - prompt-toolkit
   - pyyaml
   # Test Code Dependencies
-  - distributed!=2021.5.1,!=2021.6.0 # gh475 - 2021.5.1 and 2021.6.0 broke ci, omit those versions
+  - distributed>=2022.5.1
   - pytz
   - cloudpickle
   - freezegun
@@ -30,7 +30,7 @@ dependencies:
   - pytest>=4.5.0
   - pytest-cov
   - pytest-mock
-  - setuptools_scm
+  - setuptools_scm>=8.1
   # GitHub CI
   - pandoc
   # CLI
