@@ -672,13 +672,18 @@ def hash_dataset(
         {"dataframe.convert-string": False, "dataframe.shuffle.method": "tasks"}
     ):
         if not group_key:
-            return ddf.map_partitions(_hash_partition, meta="uint64").astype("uint64")
+            return ddf.map_partitions(_hash_partition, meta=(None, "uint64")).astype(
+                "uint64"
+            )
         else:
             ddf2 = pack_payload(ddf, group_key=group_key)
             return (
                 ddf2.groupby(group_key)
                 .apply(
-                    _unpack_hash, unpack_meta=ddf._meta, subset=subset, meta="uint64"
+                    _unpack_hash,
+                    unpack_meta=ddf._meta,
+                    subset=subset,
+                    meta=(None, "uint64"),
                 )
                 .astype("uint64")
             )
