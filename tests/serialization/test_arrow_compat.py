@@ -9,16 +9,6 @@ from plateau.core.testing import get_dataframe_alltypes
 from plateau.serialization import ParquetSerializer
 
 KNOWN_ARROW_VERSIONS = [
-    "0.12.1",
-    "0.13.0",
-    "0.14.1",
-    "0.15.0",
-    "0.16.0",
-    "0.17.1",
-    "1.0.0",
-    "1.0.1",
-    "2.0.0",
-    "3.0.0",
     "4.0.1",
     "5.0.0",
     "6.0.1",
