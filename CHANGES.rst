@@ -2,12 +2,15 @@
 Changelog
 =========
 
-Plateau 4.4.0 (2024-XX-XX)
+Plateau 4.4.0 (2024-05-23)
 ==========================
 
+* Improve support for Dask's query planner.
+* Support column projection when using ``dask-expr``'s ``from_map``.
 * Include pyarrow 15.0.0 in CI
 * Fix tests for dask 2024.1.1
 * Account for breaking changes in nightly builds of Pandas which would have caused issues upon the release of Pandas 3.
+
 
 Plateau 4.3.0 (2023-12-21)
 ==========================
