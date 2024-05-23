@@ -127,7 +127,7 @@ def test_reconstruct_dask_index(store_factory, index_type, monkeypatch):
             pd.DataFrame(data=arr, columns=df1.columns).astype(df1.dtypes)
             for arr in df_chunks
         ]
-    query_planning = dask.config.get("dataframe.query-planning")
+    query_planning = dask.config.get("dataframe.query-planning", True)
     with dask.config.set(
         {"dataframe.convert-string": False, "dataframe.shuffle.method": "tasks"}
         if query_planning or query_planning is None
