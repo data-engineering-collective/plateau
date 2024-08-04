@@ -1,7 +1,7 @@
 repos:
   # Run ruff first because autofix behaviour is enabled
   - repo: https://github.com/Quantco/pre-commit-mirrors-ruff
-    rev: "0.5.0"
+    rev: "0.5.5"
     hooks:
      - id: ruff-conda
      - id: ruff-format-conda
