@@ -44,3 +44,4 @@ jobs:
             This PR updates them to the latest and already ran `pre-commit run -a` for you to fix any changes in formatting.
           branch: pre-commit-autoupdate
           delete-branch: true
+          sign-commits: true
