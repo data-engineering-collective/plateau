@@ -1,6 +1,7 @@
 import logging
+from collections.abc import Iterable
 from copy import copy
-from typing import Any, Dict, Iterable, List, Optional, Set, TypeVar, Union, cast
+from typing import Any, TypeVar, cast
 
 import numpy as np
 import pandas as pd
@@ -26,7 +27,7 @@ from plateau.serialization import (
 )
 
 ValueType = TypeVar("ValueType")
-IndexDictType = Dict[ValueType, List[str]]
+IndexDictType = dict[ValueType, list[str]]
 
 _logger = logging.getLogger(__name__)
 
@@ -62,8 +63,8 @@ class IndexBase(CopyMixin):
     def __init__(
         self,
         column: str,
-        index_dct: Optional[IndexDictType] = None,
-        dtype: Optional[pa.DataType] = None,
+        index_dct: IndexDictType | None = None,
+        dtype: pa.DataType | None = None,
         normalize_dtype: bool = True,
     ):
         if column == _PARTITION_COLUMN_NAME:
@@ -219,7 +220,7 @@ class IndexBase(CopyMixin):
         """Check if the index was already loaded into memory."""
         return self._index_dct_available
 
-    def eval_operator(self, op: str, value: ValueType) -> Set[str]:
+    def eval_operator(self, op: str, value: ValueType) -> set[str]:
         """Evaluates a given operator on the index for a given value and
         returns all partition labels allowed by this index.
 
@@ -258,7 +259,7 @@ class IndexBase(CopyMixin):
             result.update(set(self.index_dct[value]))
         return result
 
-    def query(self, value: ValueType) -> List[str]:
+    def query(self, value: ValueType) -> list[str]:
         """Query this index for a given value. Raises an exception if the index
         is external and not loaded.
 
@@ -333,7 +334,7 @@ class IndexBase(CopyMixin):
         return self.copy(column=self.column, index_dct=new_index_dict, dtype=self.dtype)
 
     def remove_partitions(
-        self, list_of_partitions: List[str], inplace: bool = False
+        self, list_of_partitions: list[str], inplace: bool = False
     ) -> "IndexBase":
         """Removes a partition from the internal index dictionary.
 
@@ -375,7 +376,7 @@ class IndexBase(CopyMixin):
             )
 
     def remove_values(
-        self, list_of_values: List[str], inplace: bool = False
+        self, list_of_values: list[str], inplace: bool = False
     ) -> "IndexBase":
         """Removes a value from the internal index dictionary.
 
@@ -560,7 +561,7 @@ class PartitionIndex(IndexBase):
     def __init__(
         self,
         column: str,
-        index_dct: Optional[IndexDictType] = None,
+        index_dct: IndexDictType | None = None,
         dtype: pa.DataType = None,
         normalize_dtype: bool = True,
     ):
@@ -594,9 +595,9 @@ class ExplicitSecondaryIndex(IndexBase):
     def __init__(
         self,
         column: str,
-        index_dct: Optional[IndexDictType] = None,
-        index_storage_key: Optional[str] = None,
-        dtype: Optional[pa.DataType] = None,
+        index_dct: IndexDictType | None = None,
+        index_storage_key: str | None = None,
+        dtype: pa.DataType | None = None,
         normalize_dtype: bool = True,
     ):
         if (index_dct is None) and not index_storage_key:
@@ -640,7 +641,7 @@ class ExplicitSecondaryIndex(IndexBase):
             return True
 
     @staticmethod
-    def from_v2(column: str, dct_or_str: Union[str, IndexDictType]) -> "IndexBase":
+    def from_v2(column: str, dct_or_str: str | IndexDictType) -> "IndexBase":
         """Create an index instance from a version 2 Python structure.
 
         Parameters
@@ -776,11 +777,11 @@ class ExplicitSecondaryIndex(IndexBase):
         )
 
 
-_MULTI_COLUMN_INDEX_DCT_TYPE = Dict[str, IndexBase]
+_MULTI_COLUMN_INDEX_DCT_TYPE = dict[str, IndexBase]
 
 
 def merge_indices(
-    list_of_indices: List[_MULTI_COLUMN_INDEX_DCT_TYPE],
+    list_of_indices: list[_MULTI_COLUMN_INDEX_DCT_TYPE],
 ) -> _MULTI_COLUMN_INDEX_DCT_TYPE:
     """Merge a list of index dictionaries.
 
@@ -814,7 +815,7 @@ def merge_indices(
 
 
 def remove_partitions_from_indices(
-    index_dict: _MULTI_COLUMN_INDEX_DCT_TYPE, partitions: List[str]
+    index_dict: _MULTI_COLUMN_INDEX_DCT_TYPE, partitions: list[str]
 ):
     """Remove a given list of partitions from a plateau index dictionary.
 
@@ -846,7 +847,7 @@ def filter_indices(index_dict: _MULTI_COLUMN_INDEX_DCT_TYPE, partitions: Iterabl
     """
     index_types = {}
     types = {}
-    temp_index_dct: Dict[str, Dict[Any, List[str]]] = {}
+    temp_index_dct: dict[str, dict[Any, list[str]]] = {}
     for column, index in index_dict.items():
         temp_index_dct[column] = {}
         types[column] = index.dtype
@@ -884,7 +885,11 @@ def _parquet_bytes_to_dict(column: str, index_buffer: bytes):
     df = table.to_pandas(**_coerce)
 
     index_dct = dict(
-        zip(df[column].values, (list(x) for x in df[_PARTITION_COLUMN_NAME].values))
+        zip(
+            df[column].values,
+            (list(x) for x in df[_PARTITION_COLUMN_NAME].values),
+            strict=False,
+        )
     )
     return index_dct, column_type
 
@@ -915,7 +920,7 @@ def _index_dct_to_table(index_dct: IndexDictType, column: str, dtype: pa.DataTyp
 
     # fix pyarrow input
     if dtype is None:
-        keys: Union[np.ndarray, List[Any]] = np.asarray(list(keys_it))
+        keys: np.ndarray | list[Any] = np.asarray(list(keys_it))
     else:
         if pa.types.is_unsigned_integer(dtype):
             # numpy might create object ndarrays here, which pyarrow might (for some reason) convert fo floats

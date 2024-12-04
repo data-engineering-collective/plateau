@@ -1,4 +1,4 @@
-from typing import Iterable, List, Tuple, Union
+from collections.abc import Iterable
 
 from urlquote import (
     quote as urlquote_quote,
@@ -25,7 +25,7 @@ def unquote(value):
 
 def decode_key(
     key: str,
-) -> Union[Tuple[str, str, List, str], Tuple[str, None, List, None]]:
+) -> tuple[str, str, list, str] | tuple[str, None, list, None]:
     """Split a given key into its plateau components
     `{dataset_uuid}/{table}/{key_indices}/{filename}`
 
@@ -51,7 +51,7 @@ def decode_key(
     return dataset_uuid, table, key_indices, file_
 
 
-def quote_indices(indices: Iterable[Tuple[str, str]]) -> List[str]:
+def quote_indices(indices: Iterable[tuple[str, str]]) -> list[str]:
     """Urlencode a list of column-value pairs and encode them as:
 
         `quote(column)=quote(value)`
@@ -73,7 +73,7 @@ def quote_indices(indices: Iterable[Tuple[str, str]]) -> List[str]:
     return quoted_pairs
 
 
-def unquote_indices(index_strings: List[str]) -> List[Tuple[str, str]]:
+def unquote_indices(index_strings: list[str]) -> list[tuple[str, str]]:
     """Take a list of encoded column-value strings and decode them to tuples.
 
     input: `quote(column)=quote(value)`

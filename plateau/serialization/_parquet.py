@@ -3,7 +3,8 @@
 import datetime
 import logging
 import time
-from typing import Any, Iterable, List, Optional
+from collections.abc import Iterable
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -164,7 +165,7 @@ class ParquetSerializer(DataFrameSerializer):
     type_stable = True
 
     def __init__(
-        self, compression: str = "SNAPPY", chunk_size: Optional[int] = None
+        self, compression: str = "SNAPPY", chunk_size: int | None = None
     ) -> None:
         self.compression = compression
 
@@ -195,11 +196,11 @@ class ParquetSerializer(DataFrameSerializer):
     def _restore_dataframe(
         store: KeyValueStore,
         key: str,
-        filter_query: Optional[str] = None,
-        columns: Optional[Iterable[str]] = None,
+        filter_query: str | None = None,
+        columns: Iterable[str] | None = None,
         predicate_pushdown_to_io: bool = True,
-        categories: Optional[Iterable[str]] = None,
-        predicates: Optional[PredicatesType] = None,
+        categories: Iterable[str] | None = None,
+        predicates: PredicatesType | None = None,
         date_as_object: bool = False,
     ) -> pd.DataFrame:
         check_predicates(predicates)
@@ -320,11 +321,11 @@ class ParquetSerializer(DataFrameSerializer):
         cls,
         store: KeyValueStore,
         key: str,
-        filter_query: Optional[str] = None,
-        columns: Optional[Iterable[str]] = None,
+        filter_query: str | None = None,
+        columns: Iterable[str] | None = None,
         predicate_pushdown_to_io: bool = True,
-        categories: Optional[Iterable[str]] = None,
-        predicates: Optional[PredicatesType] = None,
+        categories: Iterable[str] | None = None,
+        predicates: PredicatesType | None = None,
         date_as_object: bool = False,
     ) -> pd.DataFrame:
         # https://github.com/JDASoftwareGroup/plateau/issues/407  We have been seeing weird `IOError`s while reading
@@ -430,14 +431,14 @@ def _read_row_groups_into_tables(parquet_file, columns, predicates_in):
 
 
 def _normalize_predicates(
-    parquet_file, predicates: List[ConjunctionType], for_pushdown
+    parquet_file, predicates: list[ConjunctionType], for_pushdown
 ):
     schema = parquet_file.schema.to_arrow_schema()
 
     normalized_predicates = []
     for conjunction in predicates:
         evaluates_to_false = False
-        new_conjunction: List[Any] = []
+        new_conjunction: list[Any] = []
 
         for literal in conjunction:
             col, op, val = literal

@@ -1,6 +1,5 @@
 import logging
 from functools import partial
-from typing import List, Union
 
 import dask
 import dask.dataframe as dd
@@ -27,7 +26,7 @@ __all__ = (
 )
 
 
-def pack_payload_pandas(partition: pd.DataFrame, group_key: List[str]) -> pd.DataFrame:
+def pack_payload_pandas(partition: pd.DataFrame, group_key: list[str]) -> pd.DataFrame:
     if not HAS_DISTRIBUTED:
         _logger.warning(
             "Shuffle payload columns cannot be compressed since distributed is not installed."
@@ -51,7 +50,7 @@ def pack_payload_pandas(partition: pd.DataFrame, group_key: List[str]) -> pd.Dat
     return res
 
 
-def pack_payload(df: dd.DataFrame, group_key: Union[List[str], str]) -> dd.DataFrame:
+def pack_payload(df: dd.DataFrame, group_key: list[str] | str) -> dd.DataFrame:
     """Pack all payload columns (everything except of group_key) into a single
     columns. This column will contain a single byte string containing the
     serialized and compressed payload data. The payload data is just dead

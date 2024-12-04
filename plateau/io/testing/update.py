@@ -541,7 +541,7 @@ def test_update_first_time_with_secondary_indices(store_factory, bound_update_da
 def test_partition_on_null(store_factory, bound_update_dataset):  # gh-262
     keys = ["a", "b", "c", np.nan]
     values = range(len(keys))
-    d = dict(zip(keys, values))
+    d = dict(zip(keys, values, strict=False))
     df = (
         pd.DataFrame.from_dict(d, orient="index")
         .reset_index()

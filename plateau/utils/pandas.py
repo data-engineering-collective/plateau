@@ -1,7 +1,7 @@
 """Pandas performance helpers."""
 
 from collections import OrderedDict
-from typing import TYPE_CHECKING, Any, List, cast
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 import pandas as pd
@@ -287,12 +287,12 @@ def aggregate_to_lists(df, by, data_col):
     # collect the following data for every group:
     # - by-values
     # - list of values in `data_col`
-    result_idx_data: List[Any] = [[] for _ in by]
-    result_labels: List[List[Any]] = []
+    result_idx_data: list[Any] = [[] for _ in by]
+    result_labels: list[list[Any]] = []
 
     # remember index (aka values in `by`) and list of data values for current group
     group_idx = None  # Tuple[Any, ...]
-    group_values: List[Any] = []
+    group_values: list[Any] = []
 
     def _store_group():
         """Store current group from `group_idx` and `group_values` intro result
@@ -301,15 +301,15 @@ def aggregate_to_lists(df, by, data_col):
             # no group exists yet
             return
 
-        for result_idx_part, idx_part in zip(result_idx_data, group_idx):
+        for result_idx_part, idx_part in zip(result_idx_data, group_idx, strict=False):
             result_idx_part.append(idx_part)
         result_labels.append(group_values)
 
     # create iterator over row-tuples, where every tuple contains values of all by-columns
-    iterator_idx = zip(*(df[col].values for col in by))
+    iterator_idx = zip(*(df[col].values for col in by), strict=False)
 
     # iterate over all rows in DataFrame and collect groups
-    for idx, label in zip(iterator_idx, df[data_col].values):
+    for idx, label in zip(iterator_idx, df[data_col].values, strict=False):
         if (group_idx is None) or (idx != group_idx):
             _store_group()
             group_idx = idx
@@ -321,7 +321,7 @@ def aggregate_to_lists(df, by, data_col):
     _store_group()
 
     # create result DataFrame out of lists
-    data = OrderedDict(zip(by, result_idx_data))
+    data = OrderedDict(zip(by, result_idx_data, strict=False))
     data[data_col] = result_labels
     return pd.DataFrame(data)
 

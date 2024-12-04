@@ -1,9 +1,10 @@
 import difflib
 import logging
 import pprint
+from collections.abc import Sequence
 from copy import copy, deepcopy
 from functools import reduce
-from typing import Any, Dict, List, Optional, Sequence, Set, Tuple, Union
+from typing import Any
 
 import pandas as pd
 import pyarrow as pa
@@ -37,7 +38,7 @@ class SchemaWrapper:
     """Wrapper object for pyarrow.Schema to handle forwards and backwards
     compatibility."""
 
-    def __init__(self, schema, origin: Union[str, Set[str]]):
+    def __init__(self, schema, origin: str | set[str]):
         if isinstance(origin, str):
             origin = {origin}
         elif isinstance(origin, set):
@@ -49,7 +50,7 @@ class SchemaWrapper:
         self.__origin = origin
         self._schema_compat()
 
-    def with_origin(self, origin: Union[str, Set[str]]) -> "SchemaWrapper":
+    def with_origin(self, origin: str | set[str]) -> "SchemaWrapper":
         """Create new SchemaWrapper with given origin.
 
         Parameters
@@ -89,7 +90,7 @@ class SchemaWrapper:
         return self.__schema
 
     @property
-    def origin(self) -> Set[str]:
+    def origin(self) -> set[str]:
         return copy(self.__origin)
 
     def __repr__(self):
@@ -283,10 +284,10 @@ def make_meta(obj, origin, partition_keys=None):
 
 def normalize_type(
     t_pa: pa.DataType,
-    t_pd: Optional[str],
-    t_np: Optional[str],
-    metadata: Optional[Dict[str, Any]],
-) -> Tuple[pa.DataType, Optional[str], Optional[str], Optional[Dict[str, Any]]]:
+    t_pd: str | None,
+    t_np: str | None,
+    metadata: dict[str, Any] | None,
+) -> tuple[pa.DataType, str | None, str | None, dict[str, Any] | None]:
     """This will normalize types as followed:
 
     - all signed integers (``int8``, ``int16``, ``int32``, ``int64``) will be converted to ``int64``
@@ -415,7 +416,7 @@ def _pandas_in_schemas(schemas):
 
 def _determine_schemas_to_compare(
     schemas: Sequence[SchemaWrapper], ignore_pandas: bool
-) -> Tuple[Optional[SchemaWrapper], List[Tuple[SchemaWrapper, List[str]]]]:
+) -> tuple[SchemaWrapper | None, list[tuple[SchemaWrapper, list[str]]]]:
     """Iterate over a list of `pyarrow.Schema` objects and prepares them for
     comparison by picking a reference and determining all null columns.
 
@@ -436,7 +437,7 @@ def _determine_schemas_to_compare(
         must be removed before comparing the schemas
     """
     has_pandas = _pandas_in_schemas(schemas) and not ignore_pandas
-    schemas_to_evaluate: List[Tuple[SchemaWrapper, List[str]]] = []
+    schemas_to_evaluate: list[tuple[SchemaWrapper, list[str]]] = []
     reference = None
     null_cols_in_reference = set()
 
@@ -695,7 +696,7 @@ def validate_shared_columns(schemas, ignore_pandas=False):
     ValueError
         Incompatible columns were found.
     """
-    seen: Dict[str, Any] = {}
+    seen: dict[str, Any] = {}
     has_pandas = _pandas_in_schemas(schemas) and not ignore_pandas
 
     for schema in schemas:

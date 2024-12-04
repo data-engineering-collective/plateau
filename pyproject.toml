@@ -13,8 +13,6 @@ license = { file = "LICENSE.txt" }
 classifiers = [
     "License :: OSI Approved :: MIT License", # According to LICENSE.txt
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -44,7 +42,7 @@ urls = {Repository = "https://github.com/data-engineering-collective/plateau"}
 include = ["plateau"]
 
 [tool.mypy]
-python_version = 3.10
+python_version = "3.10"
 ignore_missing_imports = true
 no_implicit_optional = true
 check_untyped_defs = true
@@ -74,13 +72,13 @@ force-wrap-aliases = true
 combine-as-imports = true
 known-first-party = ["plateau"]
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "tests/*" = ["D101", "D102", "D103", "E402"]
 "tests/io_components/test_metapartition.py" = ["B018"]
 "tests/io_components/test_dataset_metadata_factory.py" = ["B018"]
 "tests/serialization/test_io_buffer.py" = ["B018"]
 
-[tool.ruff.pydocstyle]
+[tool.ruff.lint.pydocstyle]
 convention = "numpy"
 
 [tool.ruff.format]

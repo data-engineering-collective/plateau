@@ -166,9 +166,10 @@ def get_numpy_array_strategy(
 def cm_frozen_time(time_to_freeze):
     """Context manager to monkeypatch plateau.core._time.* to return a fixed
     datetime value `time_to_freeze`."""
-    with mock.patch("plateau.core._time.datetime_now") as mock_now, mock.patch(
-        "plateau.core._time.datetime_utcnow"
-    ) as mock_utcnow:
+    with (
+        mock.patch("plateau.core._time.datetime_now") as mock_now,
+        mock.patch("plateau.core._time.datetime_utcnow") as mock_utcnow,
+    ):
         mock_now.return_value = time_to_freeze
         mock_utcnow.return_value = time_to_freeze
         yield

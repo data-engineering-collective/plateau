@@ -1,6 +1,6 @@
 """Helper module to convert user inputs into normalized forms."""
 
-from typing import Iterable, Optional, Tuple, Union
+from collections.abc import Iterable
 
 import pandas as pd
 import pyarrow as pa
@@ -62,7 +62,7 @@ def converter_str_set_optional(obj):
     return converter_str_set(obj)
 
 
-def converter_str_tupleset(obj: Optional[Union[Iterable[str], str]]) -> Tuple[str, ...]:
+def converter_str_tupleset(obj: Iterable[str] | str | None) -> tuple[str, ...]:
     """Convert input to tuple of unique unicode strings. ``None`` will be
     converted to an empty set.
 

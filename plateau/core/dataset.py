@@ -5,13 +5,7 @@ from collections import OrderedDict, defaultdict
 from typing import (
     TYPE_CHECKING,
     Any,
-    Dict,
-    List,
-    Optional,
-    Set,
-    Tuple,
     TypeVar,
-    Union,
     cast,
 )
 
@@ -44,7 +38,7 @@ if TYPE_CHECKING:
 
 _logger = logging.getLogger(__name__)
 
-TableMetaType = Dict[str, SchemaWrapper]
+TableMetaType = dict[str, SchemaWrapper]
 
 __all__ = ("DatasetMetadata", "DatasetMetadataBase")
 
@@ -53,7 +47,7 @@ def _validate_uuid(uuid: str) -> bool:
     return re.match(r"[a-zA-Z0-9+\-_]+$", uuid) is not None
 
 
-def to_ordinary_dict(dct: Dict) -> Dict:
+def to_ordinary_dict(dct: dict) -> dict:
     new_dct = {}
     for key, value in dct.items():
         if isinstance(value, dict):
@@ -70,14 +64,14 @@ class DatasetMetadataBase(CopyMixin):
     def __init__(
         self,
         uuid: str,
-        partitions: Optional[Dict[str, Partition]] = None,
-        metadata: Optional[Dict] = None,
-        indices: Optional[Dict[str, IndexBase]] = None,
+        partitions: dict[str, Partition] | None = None,
+        metadata: dict | None = None,
+        indices: dict[str, IndexBase] | None = None,
         metadata_version: int = naming.DEFAULT_METADATA_VERSION,
         explicit_partitions: bool = True,
-        partition_keys: Optional[List[str]] = None,
-        schema: Optional[SchemaWrapper] = None,
-        table_name: Optional[str] = SINGLE_TABLE,
+        partition_keys: list[str] | None = None,
+        schema: SchemaWrapper | None = None,
+        table_name: str | None = SINGLE_TABLE,
     ):
         if not _validate_uuid(uuid):
             raise ValueError("UUID contains illegal character")
@@ -137,7 +131,7 @@ class DatasetMetadataBase(CopyMixin):
         return "<Unknown Table>"
 
     @property
-    def tables(self) -> List[str]:
+    def tables(self) -> list[str]:
         tables = list(iter(next(iter(self.partitions.values())).files.keys()))
         if len(tables) > 1:
             raise RuntimeError(
@@ -146,11 +140,11 @@ class DatasetMetadataBase(CopyMixin):
         return tables
 
     @property
-    def index_columns(self) -> Set[str]:
+    def index_columns(self) -> set[str]:
         return set(self.indices.keys()).union(self.partition_keys)
 
     @property
-    def secondary_indices(self) -> Dict[str, ExplicitSecondaryIndex]:
+    def secondary_indices(self) -> dict[str, ExplicitSecondaryIndex]:
         return {
             col: ind
             for col, ind in self.indices.items()
@@ -178,7 +172,7 @@ class DatasetMetadataBase(CopyMixin):
         return key in store
 
     @staticmethod
-    def storage_keys(uuid: str, store: StoreInput) -> List[str]:
+    def storage_keys(uuid: str, store: StoreInput) -> list[str]:
         """Retrieve all keys that belong to the given dataset.
 
         Parameters
@@ -196,7 +190,7 @@ class DatasetMetadataBase(CopyMixin):
             if any(k.startswith(marker) for marker in start_markers)
         )
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         dct = OrderedDict(
             [
                 (naming.METADATA_VERSION_KEY, self.metadata_version),
@@ -327,7 +321,7 @@ class DatasetMetadataBase(CopyMixin):
 
         return ds.load_partition_indices()
 
-    def query(self, indices: Optional[List[IndexBase]] = None, **kwargs) -> List[str]:
+    def query(self, indices: list[IndexBase] | None = None, **kwargs) -> list[str]:
         """Query the dataset for partitions that contain specific values.
         Lookup is performed using the embedded and loaded external indices.
         Additional indices need to operate on the same partitions that the
@@ -362,7 +356,7 @@ class DatasetMetadataBase(CopyMixin):
     @default_docs
     def get_indices_as_dataframe(
         self,
-        columns: Optional[List[str]] = None,
+        columns: list[str] | None = None,
         date_as_object: bool = True,
         predicates: PredicatesType = None,
     ):
@@ -429,7 +423,7 @@ class DatasetMetadataBase(CopyMixin):
         return df
 
     def _evaluate_conjunction(
-        self, columns: List[str], predicates: PredicatesType, date_as_object: bool
+        self, columns: list[str], predicates: PredicatesType, date_as_object: bool
     ) -> pd.DataFrame:
         """Evaluate all predicates related to `columns` to "AND".
 
@@ -588,7 +582,7 @@ class DatasetMetadata(DatasetMetadataBase):
 
     @staticmethod
     def load_from_dict(
-        dct: Dict, store: "KeyValueStore", load_schema: bool = True
+        dct: dict, store: "KeyValueStore", load_schema: bool = True
     ) -> "DatasetMetadata":
         """Load dataset metadata from a dictionary and resolve any external
         includes.
@@ -666,7 +660,7 @@ class DatasetMetadata(DatasetMetadataBase):
         )
 
     @staticmethod
-    def from_dict(dct: Dict, explicit_partitions: bool = True):
+    def from_dict(dct: dict, explicit_partitions: bool = True):
         """Load dataset metadata from a dictionary.
 
         This must have no external references. Otherwise use
@@ -699,9 +693,9 @@ class DatasetMetadata(DatasetMetadataBase):
 
 
 def _get_type_from_meta(
-    schema: Optional[SchemaWrapper],
+    schema: SchemaWrapper | None,
     column: str,
-    default: Optional[pa.DataType],
+    default: pa.DataType | None,
 ) -> pa.DataType:
     # use first schema that provides type information, since write path should ensure that types are normalized and
     # equal
@@ -716,8 +710,8 @@ def _get_type_from_meta(
 
 
 def _empty_partition_indices(
-    partition_keys: List[str],
-    schema: Optional[SchemaWrapper],
+    partition_keys: list[str],
+    schema: SchemaWrapper | None,
     default_dtype: pa.DataType,
 ):
     indices = {}
@@ -728,11 +722,11 @@ def _empty_partition_indices(
 
 
 def _construct_dynamic_index_from_partitions(
-    partitions: Dict[str, Partition],
-    schema: Optional[SchemaWrapper],
+    partitions: dict[str, Partition],
+    schema: SchemaWrapper | None,
     default_dtype: pa.DataType,
-    partition_keys: List[str],
-) -> Dict[str, PartitionIndex]:
+    partition_keys: list[str],
+) -> dict[str, PartitionIndex]:
     if len(partitions) == 0:
         return _empty_partition_indices(partition_keys, schema, default_dtype)
 
@@ -754,7 +748,7 @@ def _construct_dynamic_index_from_partitions(
         (key, _get_files(part)[key_table]) for key, part in partitions.items()
     )
 
-    _key_indices: Dict[str, Dict[str, Set[str]]] = defaultdict(_get_empty_index)
+    _key_indices: dict[str, dict[str, set[str]]] = defaultdict(_get_empty_index)
     depth_indices = None
     for partition_label, key in storage_keys:
         _, _, indices, file_ = decode_key(key)
@@ -807,7 +801,7 @@ def _get_partition_keys_from_partitions(partitions):
 
 
 def _load_partitions_from_filenames(store, storage_keys, metadata_version):
-    partitions: Dict[str, Dict[str, Any]] = defaultdict(_get_empty_partition)
+    partitions: dict[str, dict[str, Any]] = defaultdict(_get_empty_partition)
     depth_indices = None
     for key in storage_keys:
         dataset_uuid, table, indices, file_ = decode_key(key)
@@ -831,7 +825,7 @@ def _get_empty_index():
 def create_partition_key(
     dataset_uuid: str,
     table: str,
-    index_values: List[Tuple[str, str]],
+    index_values: list[tuple[str, str]],
     filename: str = "data",
 ):
     """Create partition key for a plateau partition.
@@ -876,10 +870,10 @@ class DatasetMetadataBuilder(CopyMixin):
         verify_metadata_version(metadata_version)
 
         self.uuid = uuid
-        self.metadata: Dict = OrderedDict()
-        self.indices: Dict[str, IndexBase] = OrderedDict()
+        self.metadata: dict = OrderedDict()
+        self.indices: dict[str, IndexBase] = OrderedDict()
         self.metadata_version = metadata_version
-        self.partitions: Dict[str, Partition] = OrderedDict()
+        self.partitions: dict[str, Partition] = OrderedDict()
         self.partition_keys = partition_keys
         self.schema = schema
         self.explicit_partitions = explicit_partitions
@@ -1026,7 +1020,7 @@ class DatasetMetadataBuilder(CopyMixin):
             simplejson.dumps(self.to_dict()).encode("utf-8"),
         )
 
-    def to_msgpack(self) -> Tuple[str, bytes]:
+    def to_msgpack(self) -> tuple[str, bytes]:
         """Render the dataset to msgpack.
 
         Returns
@@ -1055,7 +1049,7 @@ class DatasetMetadataBuilder(CopyMixin):
 
 
 def _add_creation_time(
-    dataset_object: Union[DatasetMetadataBase, DatasetMetadataBuilder],
+    dataset_object: DatasetMetadataBase | DatasetMetadataBuilder,
 ):
     if "creation_time" not in dataset_object.metadata:
         creation_time = plateau.core._time.datetime_utcnow().isoformat()

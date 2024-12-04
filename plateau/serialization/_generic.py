@@ -14,7 +14,8 @@ Available constants
 """
 
 import warnings
-from typing import TYPE_CHECKING, Dict, Iterable, List, Optional, Set, Tuple, TypeVar
+from collections.abc import Iterable
+from typing import TYPE_CHECKING, Optional, TypeVar
 
 import numpy as np
 import pandas as pd
@@ -29,11 +30,11 @@ if TYPE_CHECKING:
     import numpy.typing as npt
 
 LiteralValue = TypeVar("LiteralValue")
-LiteralType = Tuple[str, str, LiteralValue]
-ConjunctionType = List[LiteralType]
+LiteralType = tuple[str, str, LiteralValue]
+ConjunctionType = list[LiteralType]
 # Optional is part of the actual type since predicate=None
 # is a sential for: All values
-PredicatesType = Optional[List[ConjunctionType]]
+PredicatesType = Optional[list[ConjunctionType]]
 
 
 class DataFrameSerializer:
@@ -43,7 +44,7 @@ class DataFrameSerializer:
     :meta public:
     """
 
-    _serializers: Dict[str, "DataFrameSerializer"] = {}
+    _serializers: dict[str, "DataFrameSerializer"] = {}
     type_stable = False
 
     def __ne__(self, other):
@@ -58,11 +59,11 @@ class DataFrameSerializer:
         cls,
         store: KeyValueStore,
         key: str,
-        filter_query: Optional[str] = None,
-        columns: Optional[Iterable[str]] = None,
+        filter_query: str | None = None,
+        columns: Iterable[str] | None = None,
         predicate_pushdown_to_io: bool = True,
-        categories: Optional[Iterable[str]] = None,
-        predicates: Optional[PredicatesType] = None,
+        categories: Iterable[str] | None = None,
+        predicates: PredicatesType | None = None,
         date_as_object: bool = False,
     ) -> pd.DataFrame:
         """Load a DataFrame from the specified store. The key is also used to
@@ -208,8 +209,8 @@ def check_predicates(predicates: PredicatesType) -> None:
 
 
 def filter_predicates_by_column(
-    predicates: PredicatesType, columns: List[str]
-) -> Optional[PredicatesType]:
+    predicates: PredicatesType, columns: list[str]
+) -> PredicatesType | None:
     """Takes a predicate list and removes all literals which are not
     referencing one of the given column.
 
@@ -245,7 +246,7 @@ def filter_predicates_by_column(
         return None
 
 
-def columns_in_predicates(predicates: PredicatesType) -> Set[str]:
+def columns_in_predicates(predicates: PredicatesType) -> set[str]:
     """Determine all columns which are mentioned in the list of predicates.
 
     Parameters
@@ -266,7 +267,7 @@ def columns_in_predicates(predicates: PredicatesType) -> Set[str]:
 
 def filter_df_from_predicates(
     df: pd.DataFrame,
-    predicates: Optional[PredicatesType],
+    predicates: PredicatesType | None,
     strict_date_types: bool = False,
 ) -> pd.DataFrame:
     """Filter a `pandas.DataFrame` based on predicates in disjunctive normal
@@ -419,7 +420,7 @@ def filter_array_like(
     mask=None,
     out=None,
     strict_date_types: bool = False,
-    column_name: Optional[str] = None,
+    column_name: str | None = None,
 ):
     """Filter an array-like object using operations defined in the predicates.
 

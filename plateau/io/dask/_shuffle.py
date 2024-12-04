@@ -1,5 +1,6 @@
+from collections.abc import Sequence
 from functools import partial
-from typing import List, Optional, Sequence, cast
+from typing import cast
 
 import dask.array as da
 import dask.dataframe as dd
@@ -15,7 +16,7 @@ from plateau.serialization import DataFrameSerializer
 _KTK_HASH_BUCKET = "__KTK_HASH_BUCKET"
 
 
-def _hash_bucket(df: pd.DataFrame, subset: Optional[Sequence[str]], num_buckets: int):
+def _hash_bucket(df: pd.DataFrame, subset: Sequence[str] | None, num_buckets: int):
     """Categorize each row of `df` based on the data in the columns `subset`
     into `num_buckets` values.
 
@@ -36,14 +37,14 @@ def _hash_bucket(df: pd.DataFrame, subset: Optional[Sequence[str]], num_buckets:
 def shuffle_store_dask_partitions(
     ddf: dd.DataFrame,
     table: str,
-    secondary_indices: List[str],
+    secondary_indices: list[str],
     metadata_version: int,
-    partition_on: List[str],
+    partition_on: list[str],
     store_factory: StoreFactory,
-    df_serializer: Optional[DataFrameSerializer],
+    df_serializer: DataFrameSerializer | None,
     dataset_uuid: str,
     num_buckets: int,
-    sort_partitions_by: List[str],
+    sort_partitions_by: list[str],
     bucket_by: Sequence[str],
 ) -> da.Array:
     """Perform a dataset update with dask reshuffling to control partitioning.
@@ -130,13 +131,13 @@ def shuffle_store_dask_partitions(
 
 def _unpack_store_partition(
     df: pd.DataFrame,
-    secondary_indices: List[str],
-    sort_partitions_by: List[str],
+    secondary_indices: list[str],
+    sort_partitions_by: list[str],
     table: str,
     dataset_uuid: str,
-    partition_on: List[str],
+    partition_on: list[str],
     store_factory: StoreFactory,
-    df_serializer: DataFrameSerializer,
+    df_serializer: DataFrameSerializer | None,
     metadata_version: int,
     unpacked_meta: pd.DataFrame,
 ) -> MetaPartition:

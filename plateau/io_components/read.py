@@ -1,4 +1,5 @@
-from typing import Iterator, List, Optional, Set, Union, cast, overload
+from collections.abc import Iterator
+from typing import cast, overload
 
 import pandas as pd
 
@@ -25,16 +26,16 @@ def dispatch_metapartitions_from_factory(
 def dispatch_metapartitions_from_factory(
     dataset_factory: DatasetFactory,
     predicates: PredicatesType,
-    dispatch_by: List[str],
-) -> Iterator[List[MetaPartition]]: ...
+    dispatch_by: list[str],
+) -> Iterator[list[MetaPartition]]: ...
 
 
 @normalize_args
 def dispatch_metapartitions_from_factory(
     dataset_factory: DatasetFactory,
     predicates: PredicatesType = None,
-    dispatch_by: Optional[List[str]] = None,
-) -> Union[Iterator[MetaPartition], Iterator[List[MetaPartition]]]:
+    dispatch_by: list[str] | None = None,
+) -> Iterator[MetaPartition] | Iterator[list[MetaPartition]]:
     """:meta private:"""
 
     if dispatch_by is not None and not set(dispatch_by).issubset(
@@ -46,7 +47,7 @@ def dispatch_metapartitions_from_factory(
     check_predicates(predicates)
 
     # Determine which indices need to be loaded.
-    index_cols: Set[str] = set()
+    index_cols: set[str] = set()
     if dispatch_by:
         index_cols |= set(dispatch_by)
 
@@ -78,7 +79,7 @@ def dispatch_metapartitions_from_factory(
                 group_name = (group_name,)  # type: ignore
             mps = []
             logical_conjunction = list(
-                zip(dispatch_by, ["=="] * len(dispatch_by), group_name)
+                zip(dispatch_by, ["=="] * len(dispatch_by), group_name, strict=False)
             )
             for label in group.index.unique():
                 mps.append(
@@ -109,8 +110,8 @@ def dispatch_metapartitions(
     dataset_uuid: str,
     store: StoreInput,
     predicates: PredicatesType = None,
-    dispatch_by: Optional[List[str]] = None,
-) -> Union[Iterator[MetaPartition], Iterator[List[MetaPartition]]]:
+    dispatch_by: list[str] | None = None,
+) -> Iterator[MetaPartition] | Iterator[list[MetaPartition]]:
     dataset_factory = DatasetFactory(
         dataset_uuid=dataset_uuid,
         store_factory=store,

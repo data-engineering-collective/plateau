@@ -1,5 +1,5 @@
+from collections.abc import Sequence
 from functools import partial
-from typing import Optional, Sequence
 
 import dask.bag as db
 from dask.delayed import Delayed
@@ -230,11 +230,11 @@ def store_bag_as_dataset(
 
 @default_docs
 def build_dataset_indices__bag(
-    store: Optional[StoreInput],
-    dataset_uuid: Optional[str],
+    store: StoreInput | None,
+    dataset_uuid: str | None,
     columns: Sequence[str],
-    partition_size: Optional[int] = None,
-    factory: Optional[DatasetFactory] = None,
+    partition_size: int | None = None,
+    factory: DatasetFactory | None = None,
 ) -> Delayed:
     """Function which builds a
     :class:`~plateau.core.index.ExplicitSecondaryIndex`.

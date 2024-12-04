@@ -2,8 +2,9 @@
 """This module contains functionality for persisting/serialising DataFrames."""
 
 import gzip
+from collections.abc import Iterable
 from io import BufferedIOBase, BytesIO, StringIO
-from typing import Any, Dict, Iterable, Optional
+from typing import Any
 
 import pandas as pd
 import pyarrow as pa
@@ -36,16 +37,16 @@ class CsvSerializer(DataFrameSerializer):
     def restore_dataframe(
         store: KeyValueStore,
         key: str,
-        filter_query: Optional[str] = None,
-        columns: Optional[Iterable[str]] = None,
+        filter_query: str | None = None,
+        columns: Iterable[str] | None = None,
         predicate_pushdown_to_io: Any = None,
-        categories: Optional[Iterable[str]] = None,
-        predicates: Optional[PredicatesType] = None,
+        categories: Iterable[str] | None = None,
+        predicates: PredicatesType | None = None,
         date_as_object: Any = None,
         **kwargs,
     ):
         check_predicates(predicates)
-        compression: Optional[str]
+        compression: str | None
         if key.endswith(".csv.gz"):
             compression = "gzip"
         elif key.endswith(".csv"):
@@ -58,7 +59,7 @@ class CsvSerializer(DataFrameSerializer):
         else:
             project_to_no_cols = False
 
-        dtype: Optional[Dict[str, str]]
+        dtype: dict[str, str] | None
         if categories:
             dtype = {cat: "category" for cat in categories}
         else:
