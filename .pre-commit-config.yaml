@@ -17,14 +17,14 @@ repos:
           - types-decorator
           - types-simplejson
           - hypothesis
-          - numpy=1.26
+          - numpy=2.1.3
           - minimalkv=1.4.2
   - repo: https://github.com/Quantco/pre-commit-mirrors-pyupgrade
     rev: 3.19.0
     hooks:
       - id: pyupgrade-conda
         args:
-          - --py38-plus
+          - --py310-plus
   - repo: https://github.com/Quantco/pre-commit-mirrors-prettier
     rev: 3.4.1
     hooks:
