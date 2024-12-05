@@ -3,6 +3,8 @@ channels:
   - conda-forge
   - nodefaults
 dependencies:
+  - python>=3.10
+  - pip
   - dask>=2022.5.1 # First version with dask.dataframe.from_map.
   - decorator
   - msgpack-python>=0.5.2
