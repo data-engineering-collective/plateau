@@ -35,11 +35,6 @@ jobs:
           - numfocus_nightly: false
             os: "ubuntu-latest"
             pandas: "1.5.3"
-            pyarrow: "4.0.1"
-            python: "3.11"
-          - numfocus_nightly: false
-            os: "ubuntu-latest"
-            pandas: "1.5.3"
             pyarrow: "13.0.0"
             python: "3.11"
           - numfocus_nightly: false
