@@ -478,12 +478,21 @@ def update_dataset_from_ddf(
     inferred_indices = _ensure_compatible_indices(ds_factory, secondary_indices)
     del secondary_indices
 
+    if ds_factory:
+        store_factory: StoreFactory = ds_factory.store_factory
+    else:
+        if not callable(store):
+            raise TypeError(
+                "You must either pass in a DatasetFactory or a StoreFactor via store."
+            )
+        store_factory = store
+
     with dask.config.set(
         {"dataframe.convert-string": False, "dataframe.shuffle.method": "tasks"}
     ):
         mp_ser = _write_dataframe_partitions(
             ddf=ddf,
-            store=ds_factory.store_factory if ds_factory else store,
+            store=store_factory,
             dataset_uuid=dataset_uuid or ds_factory.dataset_uuid,
             table=table,
             secondary_indices=inferred_indices,
