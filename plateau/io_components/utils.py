@@ -3,7 +3,8 @@
 import collections
 import inspect
 import logging
-from typing import Dict, Iterable, List, Literal, Optional, Union, cast, overload
+from collections.abc import Iterable
+from typing import Literal, cast, overload
 
 import decorator
 import pandas as pd
@@ -25,7 +26,7 @@ class InvalidObject:
     pass
 
 
-def combine_metadata(dataset_metadata: List[Dict], append_to_list: bool = True) -> Dict:
+def combine_metadata(dataset_metadata: list[dict], append_to_list: bool = True) -> dict:
     """Merge a list of dictionaries.
 
     The merge is performed in such a way, that only keys which
@@ -101,9 +102,9 @@ def _combine_metadata(dataset_metadata, append_to_list):
 
 
 def _ensure_compatible_indices(
-    dataset: Optional[DatasetMetadataBase],
+    dataset: DatasetMetadataBase | None,
     secondary_indices: Iterable[str],
-) -> List[str]:
+) -> list[str]:
     if dataset:
         ds_secondary_indices = sorted(dataset.secondary_indices.keys())
 
@@ -197,13 +198,13 @@ def normalize_arg(
         "sort_partitions_by",
         "dispatch_by",
     ],
-    old_value: Union[str, List[str]],
-) -> List[str]: ...
+    old_value: str | list[str],
+) -> list[str]: ...
 
 
 @overload
 def normalize_arg(
-    arg_name: Literal["store"], old_value: Optional[StoreInput]
+    arg_name: Literal["store"], old_value: StoreInput | None
 ) -> StoreFactory: ...
 
 
@@ -363,9 +364,7 @@ def align_categories(dfs, categoricals):
     return return_dfs
 
 
-def sort_values_categorical(
-    df: pd.DataFrame, columns: Union[List[str], str]
-) -> pd.DataFrame:
+def sort_values_categorical(df: pd.DataFrame, columns: list[str] | str) -> pd.DataFrame:
     """Sort a dataframe lexicographically by the categories of column
     `column`"""
     if not isinstance(columns, list):

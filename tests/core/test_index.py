@@ -423,7 +423,9 @@ def test_index_store_roundtrip_ts(store, dtype, timestamps):
     storage_key = "dataset_uuid/some_index.parquet"
     index1 = ExplicitSecondaryIndex(
         column="col",
-        index_dct=dict(zip(timestamps, [["part_1", "part_2"], ["part_3"]])),
+        index_dct=dict(
+            zip(timestamps, [["part_1", "part_2"], ["part_3"]], strict=False)
+        ),
         index_storage_key=storage_key,
         dtype=dtype,
     )

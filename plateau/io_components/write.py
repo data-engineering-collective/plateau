@@ -1,5 +1,6 @@
+from collections.abc import Iterable
 from functools import partial
-from typing import Dict, Iterable, List, Optional, cast
+from typing import cast
 
 import pyarrow as pa
 from minimalkv import KeyValueStore
@@ -35,12 +36,12 @@ SINGLE_CATEGORY = SINGLE_TABLE
 
 def write_partition(
     partition_df: MetaPartitionInput,
-    secondary_indices: List[str],
-    sort_partitions_by: List[str],
+    secondary_indices: list[str],
+    sort_partitions_by: list[str],
     dataset_uuid: str,
-    partition_on: List[str],
+    partition_on: list[str],
     store_factory: StoreFactory,
-    df_serializer: Optional[DataFrameSerializer],
+    df_serializer: DataFrameSerializer | None,
     metadata_version: int,
     dataset_table_name: str = SINGLE_TABLE,
 ) -> MetaPartition:
@@ -69,8 +70,8 @@ def write_partition(
 
 
 def persist_indices(
-    store: StoreInput, dataset_uuid: str, indices: Dict[str, IndexBase]
-) -> Dict[str, str]:
+    store: StoreInput, dataset_uuid: str, indices: dict[str, IndexBase]
+) -> dict[str, str]:
     store = ensure_store(store)
     output_filenames = {}
     for column, index in indices.items():
@@ -93,7 +94,7 @@ def persist_indices(
 
 def persist_common_metadata(
     schemas: Iterable[SchemaWrapper],
-    update_dataset: Optional[DatasetFactory],
+    update_dataset: DatasetFactory | None,
     store: KeyValueStore,
     dataset_uuid: str,
     table_name: str,

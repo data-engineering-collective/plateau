@@ -1,5 +1,6 @@
+from collections.abc import Callable, Iterable
 from functools import partial
-from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union, cast
+from typing import Any, cast
 
 import pandas as pd
 from minimalkv import KeyValueStore
@@ -94,16 +95,16 @@ def delete_dataset(dataset_uuid=None, store=None, factory=None):
 
 @default_docs
 def read_dataset_as_dataframes(
-    dataset_uuid: Optional[str] = None,
+    dataset_uuid: str | None = None,
     store=None,
-    columns: Optional[Dict[str, List[str]]] = None,
+    columns: dict[str, list[str]] | None = None,
     predicate_pushdown_to_io: bool = True,
-    categoricals: Optional[List[str]] = None,
+    categoricals: list[str] | None = None,
     dates_as_object: bool = True,
-    predicates: Optional[List[List[Tuple[str, str, Any]]]] = None,
-    factory: Optional[DatasetFactory] = None,
-    dispatch_by: Optional[List[str]] = None,
-) -> List[pd.DataFrame]:
+    predicates: list[list[tuple[str, str, Any]]] | None = None,
+    factory: DatasetFactory | None = None,
+    dispatch_by: list[str] | None = None,
+) -> list[pd.DataFrame]:
     """Read a dataset as a list of dataframes.
 
     Every element of the list corresponds to a physical partition.
@@ -209,14 +210,14 @@ def read_dataset_as_metapartitions(
 
 @default_docs
 def read_table(
-    dataset_uuid: Optional[str] = None,
+    dataset_uuid: str | None = None,
     store=None,
-    columns: Optional[Dict[str, List[str]]] = None,
+    columns: dict[str, list[str]] | None = None,
     predicate_pushdown_to_io: bool = True,
-    categoricals: Optional[List[str]] = None,
+    categoricals: list[str] | None = None,
     dates_as_object: bool = True,
-    predicates: Optional[List[List[Tuple[str, str, Any]]]] = None,
-    factory: Optional[DatasetFactory] = None,
+    predicates: list[list[tuple[str, str, Any]]] | None = None,
+    factory: DatasetFactory | None = None,
 ) -> pd.DataFrame:
     """A utility function to load a single table with multiple partitions as a
     single dataframe in one go. Mostly useful for smaller tables or datasets
@@ -282,16 +283,16 @@ def read_table(
 @default_docs
 @normalize_args
 def commit_dataset(
-    store: Optional[StoreInput] = None,
-    dataset_uuid: Optional[str] = None,
-    new_partitions: Optional[Iterable[MetaPartition]] = None,
-    delete_scope: Optional[Iterable[Dict[str, Any]]] = None,
-    metadata: Optional[Dict[Any, Any]] = None,
-    metadata_merger: Optional[Callable[[List[Dict]], Dict]] = None,
+    store: StoreInput | None = None,
+    dataset_uuid: str | None = None,
+    new_partitions: Iterable[MetaPartition] | None = None,
+    delete_scope: Iterable[dict[str, Any]] | None = None,
+    metadata: dict[Any, Any] | None = None,
+    metadata_merger: Callable[[list[dict]], dict] | None = None,
     default_metadata_version: int = DEFAULT_METADATA_VERSION,
-    partition_on: Optional[Iterable[str]] = None,
-    factory: Optional[DatasetFactory] = None,
-    secondary_indices: Optional[Iterable[str]] = None,
+    partition_on: Iterable[str] | None = None,
+    factory: DatasetFactory | None = None,
+    secondary_indices: Iterable[str] | None = None,
 ):
     """Commit new state to an existing dataset. This can be used for three
     distinct operations.
@@ -438,10 +439,10 @@ def _maybe_infer_files_attribute(metapartition, dataset_uuid):
 def store_dataframes_as_dataset(
     store: KeyValueStore,
     dataset_uuid: str,
-    dfs: List[Union[pd.DataFrame, Dict[str, pd.DataFrame]]],
-    metadata: Optional[Dict[str, Dict[str, Any]]] = None,
-    partition_on: Optional[List[str]] = None,
-    df_serializer: Optional[DataFrameSerializer] = None,
+    dfs: list[pd.DataFrame | dict[str, pd.DataFrame]],
+    metadata: dict[str, dict[str, Any]] | None = None,
+    partition_on: list[str] | None = None,
+    df_serializer: DataFrameSerializer | None = None,
     overwrite: bool = False,
     secondary_indices=None,
     metadata_storage_format=DEFAULT_METADATA_STORAGE_FORMAT,
@@ -544,12 +545,12 @@ def create_empty_dataset_header(
 @default_docs
 @normalize_args
 def write_single_partition(
-    store: Optional[KeyValueStore] = None,
-    dataset_uuid: Optional[str] = None,
+    store: KeyValueStore | None = None,
+    dataset_uuid: str | None = None,
     data=None,
-    df_serializer: Optional[DataFrameSerializer] = None,
+    df_serializer: DataFrameSerializer | None = None,
     metadata_version: int = DEFAULT_METADATA_VERSION,
-    partition_on: Optional[List[str]] = None,
+    partition_on: list[str] | None = None,
     factory=None,
     secondary_indices=None,
     table_name: str = SINGLE_TABLE,
@@ -618,19 +619,19 @@ def write_single_partition(
 @default_docs
 @normalize_args
 def update_dataset_from_dataframes(
-    df_list: List[Union[pd.DataFrame, Dict[str, pd.DataFrame]]],
-    store: Optional[KeyValueStore] = None,
-    dataset_uuid: Optional[str] = None,
+    df_list: list[pd.DataFrame | dict[str, pd.DataFrame]],
+    store: KeyValueStore | None = None,
+    dataset_uuid: str | None = None,
     delete_scope=None,
     metadata=None,
-    df_serializer: Optional[DataFrameSerializer] = None,
-    metadata_merger: Optional[Callable] = None,
+    df_serializer: DataFrameSerializer | None = None,
+    metadata_merger: Callable | None = None,
     default_metadata_version: int = DEFAULT_METADATA_VERSION,
-    partition_on: Optional[List[str]] = None,
-    sort_partitions_by: Optional[str] = None,
-    secondary_indices: Optional[List[str]] = None,
+    partition_on: list[str] | None = None,
+    sort_partitions_by: str | None = None,
+    secondary_indices: list[str] | None = None,
     table_name: str = SINGLE_TABLE,
-    factory: Optional[DatasetFactory] = None,
+    factory: DatasetFactory | None = None,
 ) -> DatasetMetadata:
     """Update a plateau dataset in store at once, using a list of dataframes.
 

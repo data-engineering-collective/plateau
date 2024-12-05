@@ -56,7 +56,7 @@ class DatasetFactory(DatasetMetadataBase):
         load_all_indices
             Load all indices immediately.
         """
-        self._cache_metadata: Optional[DatasetMetadata] = None
+        self._cache_metadata: DatasetMetadata | None = None
         self._cache_store = None
 
         self.store_factory = lazy_store(store_factory)
@@ -149,9 +149,9 @@ class DatasetFactory(DatasetMetadataBase):
 
 
 def _ensure_factory(
-    dataset_uuid: Optional[str],
-    store: Optional[StoreInput],
-    factory: Optional[DatasetFactory],
+    dataset_uuid: str | None,
+    store: StoreInput | None,
+    factory: DatasetFactory | None,
     load_schema: bool = True,
 ) -> DatasetFactory:
     if store is None and dataset_uuid is None and factory is not None:

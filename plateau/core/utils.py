@@ -1,6 +1,6 @@
 import pickle
 from functools import partial
-from typing import Any, Union, cast
+from typing import Any, cast
 
 from minimalkv import KeyValueStore, get_store_from_url
 
@@ -27,7 +27,7 @@ def _verify_metadata_version(metadata_version: int) -> None:
 verify_metadata_version = _verify_metadata_version
 
 
-def ensure_string_type(obj: Union[bytes, str]) -> str:
+def ensure_string_type(obj: bytes | str) -> str:
     """Parse object passed to the function to `str`.
 
     If the object is of type `bytes`, it is decoded, otherwise a generic string representation of the object is

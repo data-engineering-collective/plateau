@@ -8,7 +8,7 @@ inefficient.
 
 import io
 import logging
-from typing import Any, List, Optional
+from typing import Any
 
 _logger = logging.getLogger(__name__)
 
@@ -29,8 +29,8 @@ class BlockBuffer(io.BufferedIOBase):
     def __init__(self, raw, blocksize=1024):
         self._raw = raw
         self._blocksize = blocksize
-        self._size: Optional[int] = None
-        self._cached_blocks: Optional[List[Any]] = None
+        self._size: int | None = None
+        self._cached_blocks: list[Any] | None = None
         self._pos = 0
 
         if self._raw_closed():

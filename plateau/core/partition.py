@@ -1,6 +1,6 @@
-from typing import Any, Dict, Optional, Union
+from typing import Any
 
-PartitionDictType = Dict[str, Dict[str, str]]
+PartitionDictType = dict[str, dict[str, str]]
 
 
 # TODO: purge this. This is just slowing us down by creating many python objects we don't actual
@@ -9,8 +9,8 @@ class Partition:
     def __init__(
         self,
         label: str,
-        files: Optional[Dict[str, str]] = None,
-        metadata: Optional[Dict] = None,
+        files: dict[str, str] | None = None,
+        metadata: dict | None = None,
     ):
         """An object for the internal representation of the metadata of a
         partition.
@@ -39,7 +39,7 @@ class Partition:
         return True
 
     @staticmethod
-    def from_dict(label: str, dct: Union[str, PartitionDictType]):
+    def from_dict(label: str, dct: str | PartitionDictType):
         if isinstance(dct, str):
             raise ValueError(
                 "Trying to load a partition from a string. Probably the dataset file uses the multifile "

@@ -1,13 +1,7 @@
 import random
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from typing import (
-    Callable,
-    Iterable,
-    List,
-    Mapping,
-    Optional,
-    Sequence,
     SupportsFloat,
-    Union,
     cast,
 )
 
@@ -74,9 +68,7 @@ class ReadPlateauPartition(DataFrameIOFunction):
         projection."""
         return type(self)(columns=columns)
 
-    def __call__(
-        self, mps, *args, columns: Union[Sequence[str], None] = None, **kwargs
-    ):
+    def __call__(self, mps, *args, columns: Sequence[str] | None = None, **kwargs):
         """Return a new DataFrame partition."""
         cols = (
             self.columns
@@ -96,7 +88,7 @@ def read_dataset_as_ddf(
     table=SINGLE_TABLE,
     columns=None,
     predicate_pushdown_to_io=True,
-    categoricals: Optional[Sequence[str]] = None,
+    categoricals: Sequence[str] | None = None,
     dates_as_object: bool = True,
     predicates=None,
     factory=None,
@@ -312,25 +304,25 @@ def store_dataset_from_ddf(
     store: StoreInput,
     dataset_uuid: str,
     table: str = SINGLE_TABLE,
-    secondary_indices: Optional[List[str]] = None,
+    secondary_indices: list[str] | None = None,
     shuffle: bool = False,
-    repartition_ratio: Optional[SupportsFloat] = None,
+    repartition_ratio: SupportsFloat | None = None,
     num_buckets: int = 1,
-    sort_partitions_by: Optional[Union[List[str], str]] = None,
-    metadata: Optional[Mapping] = None,
-    df_serializer: Optional[DataFrameSerializer] = None,
-    metadata_merger: Optional[Callable] = None,
+    sort_partitions_by: list[str] | str | None = None,
+    metadata: Mapping | None = None,
+    df_serializer: DataFrameSerializer | None = None,
+    metadata_merger: Callable | None = None,
     metadata_version: int = DEFAULT_METADATA_VERSION,
-    partition_on: Optional[List[str]] = None,
-    bucket_by: Optional[Union[List[str], str]] = None,
+    partition_on: list[str] | None = None,
+    bucket_by: list[str] | str | None = None,
     overwrite: bool = False,
 ):
     """Store a dataset from a dask.dataframe."""
     # normalization done by normalize_args but mypy doesn't recognize this
-    sort_partitions_by = cast(List[str], sort_partitions_by)
-    secondary_indices = cast(List[str], secondary_indices)
-    bucket_by = cast(List[str], bucket_by)
-    partition_on = cast(List[str], partition_on)
+    sort_partitions_by = cast(list[str], sort_partitions_by)
+    secondary_indices = cast(list[str], secondary_indices)
+    bucket_by = cast(list[str], bucket_by)
+    partition_on = cast(list[str], partition_on)
 
     if table is None:
         raise TypeError("The parameter `table` is not optional.")
@@ -379,15 +371,15 @@ def _write_dataframe_partitions(
     store: StoreFactory,
     dataset_uuid: str,
     table: str,
-    secondary_indices: List[str],
+    secondary_indices: list[str],
     shuffle: bool,
-    repartition_ratio: Optional[SupportsFloat],
+    repartition_ratio: SupportsFloat | None,
     num_buckets: int,
-    sort_partitions_by: List[str],
-    df_serializer: Optional[DataFrameSerializer],
+    sort_partitions_by: list[str],
+    df_serializer: DataFrameSerializer | None,
     metadata_version: int,
-    partition_on: List[str],
-    bucket_by: List[str],
+    partition_on: list[str],
+    bucket_by: list[str],
 ) -> dd.Series:
     if repartition_ratio and ddf is not None:
         ddf = ddf.repartition(
@@ -443,22 +435,22 @@ def _write_dataframe_partitions(
 @normalize_args
 def update_dataset_from_ddf(
     ddf: dd.DataFrame,
-    store: Optional[StoreInput] = None,
-    dataset_uuid: Optional[str] = None,
+    store: StoreInput | None = None,
+    dataset_uuid: str | None = None,
     table: str = SINGLE_TABLE,
-    secondary_indices: Optional[List[str]] = None,
+    secondary_indices: list[str] | None = None,
     shuffle: bool = False,
-    repartition_ratio: Optional[SupportsFloat] = None,
+    repartition_ratio: SupportsFloat | None = None,
     num_buckets: int = 1,
-    sort_partitions_by: Optional[Union[List[str], str]] = None,
-    delete_scope: Optional[Iterable[Mapping[str, str]]] = None,
-    metadata: Optional[Mapping] = None,
-    df_serializer: Optional[DataFrameSerializer] = None,
-    metadata_merger: Optional[Callable] = None,
+    sort_partitions_by: list[str] | str | None = None,
+    delete_scope: Iterable[Mapping[str, str]] | None = None,
+    metadata: Mapping | None = None,
+    df_serializer: DataFrameSerializer | None = None,
+    metadata_merger: Callable | None = None,
     default_metadata_version: int = DEFAULT_METADATA_VERSION,
-    partition_on: Optional[List[str]] = None,
-    factory: Optional[DatasetFactory] = None,
-    bucket_by: Optional[Union[List[str], str]] = None,
+    partition_on: list[str] | None = None,
+    factory: DatasetFactory | None = None,
+    bucket_by: list[str] | str | None = None,
 ):
     """Update a dataset from a dask.dataframe.
 
@@ -470,10 +462,10 @@ def update_dataset_from_ddf(
         raise TypeError("The parameter `table` is not optional.")
 
     # normalization done by normalize_args but mypy doesn't recognize this
-    sort_partitions_by = cast(List[str], sort_partitions_by)
-    secondary_indices = cast(List[str], secondary_indices)
-    bucket_by = cast(List[str], bucket_by)
-    partition_on = cast(List[str], partition_on)
+    sort_partitions_by = cast(list[str], sort_partitions_by)
+    secondary_indices = cast(list[str], secondary_indices)
+    bucket_by = cast(list[str], bucket_by)
+    partition_on = cast(list[str], partition_on)
 
     ds_factory, metadata_version, partition_on = validate_partition_keys(
         dataset_uuid=dataset_uuid,
@@ -486,12 +478,21 @@ def update_dataset_from_ddf(
     inferred_indices = _ensure_compatible_indices(ds_factory, secondary_indices)
     del secondary_indices
 
+    if ds_factory:
+        store_factory: StoreFactory = ds_factory.store_factory
+    else:
+        if not callable(store):
+            raise TypeError(
+                "You must either pass in a DatasetFactory or a StoreFactor via store."
+            )
+        store_factory = store
+
     with dask.config.set(
         {"dataframe.convert-string": False, "dataframe.shuffle.method": "tasks"}
     ):
         mp_ser = _write_dataframe_partitions(
             ddf=ddf,
-            store=ds_factory.store_factory if ds_factory else store,
+            store=store_factory,
             dataset_uuid=dataset_uuid or ds_factory.dataset_uuid,
             table=table,
             secondary_indices=inferred_indices,
@@ -501,7 +502,7 @@ def update_dataset_from_ddf(
             sort_partitions_by=sort_partitions_by,
             df_serializer=df_serializer,
             metadata_version=metadata_version,
-            partition_on=cast(List[str], partition_on),
+            partition_on=cast(list[str], partition_on),
             bucket_by=bucket_by,
         )
 
@@ -525,11 +526,11 @@ def update_dataset_from_ddf(
 @default_docs
 @normalize_args
 def collect_dataset_metadata(
-    store: Optional[StoreInput] = None,
-    dataset_uuid: Optional[str] = None,
-    predicates: Optional[PredicatesType] = None,
+    store: StoreInput | None = None,
+    dataset_uuid: str | None = None,
+    predicates: PredicatesType | None = None,
     frac: float = 1.0,
-    factory: Optional[DatasetFactory] = None,
+    factory: DatasetFactory | None = None,
 ) -> dd.DataFrame:
     """Collect parquet metadata of the dataset. The `frac` parameter can be
     used to select a subset of the data.
@@ -620,13 +621,13 @@ def _hash_partition(part):
 @default_docs
 @normalize_args
 def hash_dataset(
-    store: Optional[StoreInput] = None,
-    dataset_uuid: Optional[str] = None,
+    store: StoreInput | None = None,
+    dataset_uuid: str | None = None,
     subset=None,
     group_key=None,
     table: str = SINGLE_TABLE,
-    predicates: Optional[PredicatesType] = None,
-    factory: Optional[DatasetFactory] = None,
+    predicates: PredicatesType | None = None,
+    factory: DatasetFactory | None = None,
 ) -> dd.Series:
     """Calculate a partition wise, or group wise, hash of the dataset.
 

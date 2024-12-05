@@ -3,12 +3,14 @@ channels:
   - conda-forge
   - nodefaults
 dependencies:
+  - python>=3.10
+  - pip
   - dask>=2022.5.1 # First version with dask.dataframe.from_map.
   - decorator
   - msgpack-python>=0.5.2
   # Currently dask and numpy==1.16.0 clash
   # TODO: add support for numpy>=1.23
-  - numpy!=1.15.0,!=1.16.0
+  - numpy!=1.15.0,!=1.16.0,<2
   - pandas>=0.23.0,!=1.0.0
   - pyarrow>=4
   - simplejson

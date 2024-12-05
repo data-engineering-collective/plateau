@@ -5,19 +5,12 @@ import os
 import time
 import warnings
 from collections import namedtuple
+from collections.abc import Callable, Iterable, Iterator, Sequence
 from functools import wraps
 from typing import (
     TYPE_CHECKING,
     Any,
-    Callable,
-    Dict,
-    Iterable,
-    Iterator,
-    List,
     Optional,
-    Sequence,
-    Set,
-    Tuple,
     Union,
     cast,
 )
@@ -213,15 +206,15 @@ class MetaPartition(Iterable):
 
     def __init__(
         self,
-        label: Optional[str],
-        file: Optional[str] = None,
+        label: str | None,
+        file: str | None = None,
         table_name: str = SINGLE_TABLE,
-        data: Optional[pd.DataFrame] = None,
-        indices: Optional[Dict[Any, Any]] = None,
-        metadata_version: Optional[int] = None,
-        schema: Optional[SchemaWrapper] = None,
-        partition_keys: Optional[Sequence[str]] = None,
-        logical_conjunction: Optional[List[Tuple[Any, str, Any]]] = None,
+        data: pd.DataFrame | None = None,
+        indices: dict[Any, Any] | None = None,
+        metadata_version: int | None = None,
+        schema: SchemaWrapper | None = None,
+        partition_keys: Sequence[str] | None = None,
+        logical_conjunction: list[tuple[Any, str, Any]] | None = None,
     ):
         """Initialize the :mod:`plateau.io` base class MetaPartition.
 
@@ -372,6 +365,7 @@ class MetaPartition(Iterable):
             for mp_self, mp_other in zip(
                 sorted(self.metapartitions, key=lambda x: x["label"]),  # type: ignore
                 sorted(other.metapartitions, key=lambda x: x["label"]),  # type: ignore
+                strict=False,  # type: ignore
             ):
                 if mp_self == mp_other:
                     continue
@@ -395,12 +389,12 @@ class MetaPartition(Iterable):
     @staticmethod
     def from_partition(
         partition: Partition,
-        data: Optional[pd.DataFrame] = None,
-        indices: Optional[Dict] = None,
-        metadata_version: Optional[int] = None,
-        schema: Optional[SchemaWrapper] = None,
-        partition_keys: Optional[List[str]] = None,
-        logical_conjunction: Optional[List[Tuple[Any, str, Any]]] = None,
+        data: pd.DataFrame | None = None,
+        indices: dict | None = None,
+        metadata_version: int | None = None,
+        schema: SchemaWrapper | None = None,
+        partition_keys: list[str] | None = None,
+        logical_conjunction: list[tuple[Any, str, Any]] | None = None,
         table_name: str = SINGLE_TABLE,
     ):
         """Transform a plateau :class:`~plateau.core.partition.Partition` into
@@ -600,9 +594,9 @@ class MetaPartition(Iterable):
     def load_dataframes(
         self,
         store: KeyValueStore,
-        columns: Optional[Sequence[str]] = None,
+        columns: Sequence[str] | None = None,
         predicate_pushdown_to_io: bool = True,
-        categoricals: Optional[Sequence[str]] = None,
+        categoricals: Sequence[str] | None = None,
         dates_as_object: bool = True,
         predicates: PredicatesType = None,
     ) -> "MetaPartition":
@@ -849,7 +843,7 @@ class MetaPartition(Iterable):
         self,
         store: StoreInput,
         dataset_uuid: str,
-        df_serializer: Optional[DataFrameSerializer] = None,
+        df_serializer: DataFrameSerializer | None = None,
     ) -> "MetaPartition":
         """Stores all dataframes of the MetaPartitions and registers the saved
         files under the `files` atrribute. The dataframe itself is deleted from
@@ -1022,7 +1016,7 @@ class MetaPartition(Iterable):
 
         new_indices = {}
         for col in columns:
-            possible_values: Set[str] = set()
+            possible_values: set[str] = set()
 
             df = self.data
             if not self.is_sentinel and col not in df:
@@ -1052,7 +1046,7 @@ class MetaPartition(Iterable):
         return self.copy(indices=new_indices)
 
     @_apply_to_list
-    def partition_on(self, partition_on: Union[str, Sequence[str]]):
+    def partition_on(self, partition_on: str | Sequence[str]):
         """Partition all dataframes assigned to this MetaPartition according
         the the given columns.
 
@@ -1148,9 +1142,9 @@ class MetaPartition(Iterable):
 
     def _partition_data(self, partition_on):
         existing_indices, base_label = cast(
-            Tuple[List, str], decode_key(f"uuid/table/{self.label}")[2:]
+            tuple[list, str], decode_key(f"uuid/table/{self.label}")[2:]
         )
-        dct: Dict[str, Any] = {}
+        dct: dict[str, Any] = {}
         df = self.data
 
         # Check that data sizes do not change. This might happen if the
@@ -1190,7 +1184,9 @@ class MetaPartition(Iterable):
                 value = [value]
             if existing_indices:
                 partitioning_info.extend(quote_indices(existing_indices))
-            partitioning_info.extend(quote_indices(zip(partition_on, value)))
+            partitioning_info.extend(
+                quote_indices(zip(partition_on, value, strict=False))
+            )
             partitioning_info.append(base_label)
             new_label = "/".join(partitioning_info)
 
@@ -1339,7 +1335,7 @@ def _unique_label(label_list):
     return label
 
 
-def partition_labels_from_mps(mps: List[MetaPartition]) -> List[str]:
+def partition_labels_from_mps(mps: list[MetaPartition]) -> list[str]:
     """Get a list of partition labels, flattening any nested meta partitions in
     the input and ignoring sentinels."""
     partition_labels = []
@@ -1357,7 +1353,7 @@ def partition_labels_from_mps(mps: List[MetaPartition]) -> List[str]:
 def parse_input_to_metapartition(
     obj: MetaPartitionInput,
     table_name: str = SINGLE_TABLE,
-    metadata_version: Optional[int] = None,
+    metadata_version: int | None = None,
 ) -> MetaPartition:
     """Parses given user input and return a MetaPartition.
 

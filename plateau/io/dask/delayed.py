@@ -1,5 +1,5 @@
+from collections.abc import Sequence
 from functools import partial
-from typing import List, Optional, Sequence
 
 import dask
 from dask import delayed
@@ -103,11 +103,11 @@ def delete_dataset__delayed(dataset_uuid=None, store=None, factory=None):
 @default_docs
 @normalize_args
 def garbage_collect_dataset__delayed(
-    dataset_uuid: Optional[str] = None,
-    store: Optional[StoreInput] = None,
+    dataset_uuid: str | None = None,
+    store: StoreInput | None = None,
     chunk_size: int = 100,
     factory=None,
-) -> List[Delayed]:
+) -> list[Delayed]:
     """Remove auxiliary files that are no longer tracked by the dataset.
 
     These files include indices that are no longer referenced by the metadata
@@ -153,7 +153,7 @@ def read_dataset_as_delayed_metapartitions(
     store=None,
     columns=None,
     predicate_pushdown_to_io=True,
-    categoricals: Optional[Sequence[str]] = None,
+    categoricals: Sequence[str] | None = None,
     dates_as_object: bool = True,
     predicates=None,
     factory=None,
@@ -258,7 +258,7 @@ def read_dataset_as_delayed(
 
 @default_docs
 def update_dataset_from_delayed(
-    delayed_tasks: List[Delayed],
+    delayed_tasks: list[Delayed],
     store=None,
     dataset_uuid=None,
     delete_scope=None,
@@ -328,7 +328,7 @@ def update_dataset_from_delayed(
 @default_docs
 @normalize_args
 def store_delayed_as_dataset(
-    delayed_tasks: List[Delayed],
+    delayed_tasks: list[Delayed],
     store,
     dataset_uuid=None,
     metadata=None,

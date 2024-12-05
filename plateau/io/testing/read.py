@@ -195,7 +195,7 @@ def _perform_read_test(
         expected_df_core_2,
     ]
 
-    for res, expected_df_core in zip(result, expected_dfs):
+    for res, expected_df_core in zip(result, expected_dfs, strict=False):
         if not dates_as_object:
             expected_df_core["DATE"] = pd.to_datetime(expected_df_core["DATE"])
         if use_categoricals:

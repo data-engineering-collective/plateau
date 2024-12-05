@@ -25,7 +25,7 @@ jobs:
         os: ["ubuntu-latest"]
         pandas: [""]
         pyarrow: ["4.0.1", "nightly"]
-        python: ["3.8"]
+        python: ["3.10"]
         include:
           - numfocus_nightly: true
             os: "ubuntu-latest"
@@ -35,23 +35,8 @@ jobs:
           - numfocus_nightly: false
             os: "ubuntu-latest"
             pandas: "1.5.3"
-            pyarrow: "4.0.1"
-            python: "3.11"
-          - numfocus_nightly: false
-            os: "ubuntu-latest"
-            pandas: "1.5.3"
             pyarrow: "13.0.0"
             python: "3.11"
-          - numfocus_nightly: false
-            os: "ubuntu-latest"
-            pandas: ""
-            pyarrow: "5.0.0"
-            python: "3.9"
-          - numfocus_nightly: false
-            os: "ubuntu-latest"
-            pandas: ""
-            pyarrow: "6.0.1"
-            python: "3.9"
           - numfocus_nightly: false
             os: "ubuntu-latest"
             pandas: ""
@@ -103,10 +88,10 @@ jobs:
             pyarrow: "15.0.0"
             python: "3.12"
           - numfocus_nightly: false
-            os: "macos-latest"
+            os: "ubuntu-latest"
             pandas: ""
-            pyarrow: "4.0.1"
-            python: "3.8"
+            pyarrow: "18.1.0"
+            python: "3.12"
     continue-on-error: ${{ matrix.numfocus_nightly || matrix.pyarrow == 'nightly' }}
 
     runs-on: ${{ matrix.os }}

@@ -19,12 +19,12 @@ jobs:
       - name: Setup Conda Environment
         uses: conda-incubator/setup-miniconda@v3
         with:
-          miniforge-variant: Mambaforge
-          miniforge-version: 4.11.0-0
+          miniforge-variant: Miniforge3
+          miniforge-version: 24.9.2-0
           use-mamba: true
           environment-file: docs/environment-docs.yml
           activate-environment: plateau-docs
-          python-version: 3.8
+          python-version: 3.12
 
       - name: List conda
         shell: bash -l {0}
