@@ -29,3 +29,5 @@ _test_worker-*
 build/
 dist/
 venv/
+
+.pixi
