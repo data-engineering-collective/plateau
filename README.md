@@ -50,3 +50,7 @@ can be installed through `pip`:
 ```bash
 pip install plateau
 ```
+
+## Contributing
+
+Find details on how to contribute [here](CONTRIBUTING.md).
