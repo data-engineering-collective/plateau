@@ -3,10 +3,12 @@
 _flat files, flat land_
 
 [![Build Status](https://github.com/data-engineering-collective/plateau/workflows/CI/badge.svg)](https://github.com/data-engineering-collective/plateau/actions?query=branch%3Amain)
+[![conda-forge](https://img.shields.io/conda/vn/conda-forge/minimalkv?logoColor=white&logo=conda-forge)](https://prefix.dev/channels/conda-forge/packages/minimalkv)
+[![pypi-version](https://img.shields.io/pypi/v/minimalkv.svg?logo=pypi&logoColor=white)](https://pypi.org/project/minimalkv)
+[![python-version](https://img.shields.io/pypi/pyversions/minimalkv?logoColor=white&logo=python)](https://pypi.org/project/minimalkv)
 [![Documentation Status](https://readthedocs.org/projects/plateau/badge/?version=stable)](https://plateau.readthedocs.io/en/stable/?badge=stable)
 [![codecov.io](https://codecov.io/github/data-engineering-collective/plateau/coverage.svg?branch=master)](https://codecov.io/github/data-engineering-collective/plateau)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/data-engineering-collective/plateau/blob/master/LICENSE.txt)
-[![Anaconda-Server Badge](https://anaconda.org/conda-forge/plateau/badges/installer/conda.svg)](https://conda.anaconda.org/conda-forge)
 [![Anaconda-Server Badge](https://anaconda.org/conda-forge/plateau/badges/downloads.svg)](https://anaconda.org/conda-forge/plateau)
 
 `plateau` is a Python library to manage (create, read, update, delete) large
@@ -30,17 +32,21 @@ and selects subsets of data transparently.
 
 ## Installation
 
-Installers for the latest released version are availabe at the [Python
-package index](https://pypi.org/project/plateau) and on conda-forge.
+This project is managed by [pixi](https://pixi.sh).
+You can install the package in development mode using:
 
-```sh
-# Install with pip
-pip install plateau
+```bash
+git clone https://github.com/data-engineering-collective/plateau
+cd plateau
+
+pixi run pre-commit-install
+pixi run postinstall
+pixi run test
 ```
 
-```sh
-# Install with conda/micromamba, optionally add conda-forge as a source
-# conda config --add channels conda-forge
-conda install plateau
-micromamba install plateau
+Plateau is also [available on PyPI](http://pypi.python.org/pypi/plateau/) and
+can be installed through `pip`:
+
+```bash
+pip install plateau
 ```
