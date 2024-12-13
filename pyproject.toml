@@ -6,14 +6,16 @@ requires = ['setuptools', 'setuptools-scm', 'wheel']
 
 [project]
 name = "plateau"
-authors = [{ name = "data engineering collective" }]
+description = "A Python library to manage (create, read, update, delete) large amounts of tabular data in a blob store."
+authors = [
+  { name = "Data Engineering Collective", email = "plateau@uwekorn.com" },
+]
 dynamic = ["version"]
 readme = "README.md"
 license = { file = "LICENSE.txt" }
 classifiers = [
-    "License :: OSI Approved :: MIT License", # According to LICENSE.txt
+    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
 ]
@@ -34,7 +36,7 @@ dependencies = [
     'prompt-toolkit',
     'pyyaml'
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 urls = {Repository = "https://github.com/data-engineering-collective/plateau"}
 
 
@@ -42,13 +44,14 @@ urls = {Repository = "https://github.com/data-engineering-collective/plateau"}
 include = ["plateau"]
 
 [tool.mypy]
-python_version = "3.10"
+python_version = "3.11"
 ignore_missing_imports = true
 no_implicit_optional = true
 check_untyped_defs = true
 plugins = "numpy.typing.mypy_plugin"
 
 [tool.pytest.ini_options]
+testpaths = ["tests"]
 addopts = "--strict-markers"
 filterwarnings = [
     "once::DeprecationWarning",
@@ -61,11 +64,11 @@ markers = [
 
 [tool.ruff]
 line-length = 88
-target-version = "py310"
+target-version = "py311"
 
 [tool.ruff.lint]
 ignore = ["E203", "E266", "E501", "C901"]
-select = ["B", "C", "E", "F", "W", "B9", "I001"]
+select = ["B", "C", "E", "F", "W", "B9", "I001", "I", "UP", "N"]
 
 [tool.ruff.lint.isort]
 force-wrap-aliases = true
