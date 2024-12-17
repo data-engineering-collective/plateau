@@ -35,80 +35,59 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        numfocus_nightly: [false]
-        os: ["ubuntu-latest"]
-        pandas: [""]
-        pyarrow: ["4.0.1", "nightly"]
-        python: ["py311"]
         include:
+          # py310
+          - numfocus_nightly: false
+            pyarrow_nightly: false
+            environment: "py310--pyarrow4-0-1"
+          - numfocus_nightly: false
+            pyarrow_nightly: true
+            environment: "py310--pyarrow-nightly"
           - numfocus_nightly: true
-            os: "ubuntu-latest"
-            pandas: ""
-            pyarrow: "nightly"
-            python: "py311"
+            pyarrow_nightly: true
+            environment: "py310--pyarrow-nightly"
           - numfocus_nightly: false
-            os: "ubuntu-latest"
-            pandas: "1.5.3"
-            pyarrow: "13.0.0"
-            python: "py311"
+            pyarrow_nightly: false
+            environment: "py310--pyarrow7-0"
           - numfocus_nightly: false
-            os: "ubuntu-latest"
-            pandas: ""
-            pyarrow: "7.0.0"
-            python: "py311"
+            pyarrow_nightly: false
+            environment: "py310--pyarrow8-0-1"
           - numfocus_nightly: false
-            os: "ubuntu-latest"
-            pandas: ""
-            pyarrow: "8.0.1"
-            python: "py311"
+            pyarrow_nightly: false
+            environment: "py310--pyarrow9-0"
+            # py311
           - numfocus_nightly: false
-            os: "ubuntu-latest"
-            pandas: ""
-            pyarrow: "9.0.0"
-            python: "py311"
+            pyarrow_nightly: false
+            environment: "py311--pyarrow10-0-1"
           - numfocus_nightly: false
-            os: "ubuntu-latest"
-            pandas: ""
-            pyarrow: "10.0.1"
-            python: "py311"
+            pyarrow_nightly: false
+            environment: "py311--pyarrow11-0"
           - numfocus_nightly: false
-            os: "ubuntu-latest"
-            pandas: ""
-            pyarrow: "11.0.0"
-            python: "py311"
+            pyarrow_nightly: false
+            environment: "py311--pyarrow12-0"
           - numfocus_nightly: false
-            os: "ubuntu-latest"
-            pandas: ""
-            pyarrow: "12.0.0"
-            python: "py311"
+            pyarrow_nightly: false
+            environment: "py311--pyarrow13-0"
           - numfocus_nightly: false
-            os: "ubuntu-latest"
-            pandas: ""
-            pyarrow: "13.0.0"
-            python: "py311"
+            pyarrow_nightly: false
+            environment: "py311--pyarrow13-0--pandas1-5-3"
+            # py312
           - numfocus_nightly: false
-            os: "ubuntu-latest"
-            pandas: ""
-            pyarrow: "13.0.0"
-            python: "py312"
+            pyarrow_nightly: false
+            environment: "py312--pyarrow13-0"
           - numfocus_nightly: false
-            os: "ubuntu-latest"
-            pandas: ""
-            pyarrow: "14.0.1"
-            python: "py312"
+            pyarrow_nightly: false
+            environment: "py312--pyarrow14-0-1"
           - numfocus_nightly: false
-            os: "ubuntu-latest"
-            pandas: ""
-            pyarrow: "15.0.0"
-            python: "py312"
+            pyarrow_nightly: false
+            environment: "py312--pyarrow15-0"
           - numfocus_nightly: false
-            os: "ubuntu-latest"
-            pandas: ""
-            pyarrow: "18.1.0"
-            python: "py312"
-    continue-on-error: ${{ matrix.numfocus_nightly || matrix.pyarrow == 'nightly' }}
+            pyarrow_nightly: false
+            environment: "py312--pyarrow18-1"
 
-    runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.numfocus_nightly || matrix.pyarrow_nightly }}
+
+    runs-on: "ubuntu-latest"
 
     defaults:
       run:
@@ -120,20 +99,12 @@ jobs:
       - name: Set up pixi
         uses: prefix-dev/setup-pixi@ba3bb36eb2066252b2363392b7739741bb777659 # v0.8.1
         with:
-          environments: ${{ matrix.python }} # References the environments defined in pixi.toml
-      - name: Install Pyarrow (non-nightly)
-        run: pixi add pyarrow=${{ matrix.pyarrow }}
-        if: matrix.pyarrow != 'nightly' && matrix.pandas == ''
+          environments: ${{ matrix.environment }} # References the environments defined in pixi.toml
       - name: Install Pyarrow (nightly)
-        # Install both arrow-cpp and pyarrow to make sure that we have the
-        # latest nightly of both packages. It is sadly not guaranteed that the
-        # nightlies and the latest release would otherwise work together.
-        # FIXME: The nightlies channel is currently empty: https://github.com/apache/arrow/issues/41856
-        run: pixi update arrow-cpp pyarrow
-        if: matrix.pyarrow == 'nightly'
-      - name: Install Pyarrow (downgrade pandas)
-        run: pixi add pyarrow==${{ matrix.pyarrow }} pandas==${{ matrix.pandas }}
-        if: matrix.pyarrow != 'nightly' && matrix.pandas != ''
+        # The nightlies channel for conda is currently empty: https://github.com/apache/arrow/issues/41856
+        # We therefore rely on the pip nightlies: https://github.com/data-engineering-collective/plateau/pull/184#discussion_r1888429974
+        run: pixi run pip install --extra-index-url https://pypi.fury.io/arrow-nightlies/ --prefer-binary --pre pyarrow
+        if: matrix.pyarrow_nightly
       - name: Pip Install NumFOCUS nightly
         # NumFOCUS nightly wheels, contains numpy and pandas
         # TODO(gh-45): Re-add numpy

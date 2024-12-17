@@ -13,7 +13,7 @@ decorator = "*"
 msgpack-python = ">=0.5.2"
 numpy = ">1.23,<2"
 pandas = ">1.5.0"
-pyarrow = ">=14"
+pyarrow = ">=4.0.1"
 simplejson = "*"
 minimalkv = ">=1.4.2"
 toolz = "*"
@@ -81,15 +81,72 @@ docs = "cd docs && make html"
 readthedocs = "rm -rf $READTHEDOCS_OUTPUT/html && cp -r docs/_build/html $READTHEDOCS_OUTPUT/html"
 
 
-[feature.py311.dependencies]
+[feature.py310-pyarrow4_0_1.dependencies]
+python = "3.10.*"
+pyarrow = "=4.0.1"
+[feature.py310-pyarrow7_0.dependencies]
+python = "3.10.*"
+pyarrow = "=7.0.0"
+[feature.py310-pyarrow8_0_1.dependencies]
+python = "3.10.*"
+pyarrow = "=8.0.1"
+[feature.py310-pyarrow9_0.dependencies]
+python = "3.10.*"
+pyarrow = "=9.0.0"
+[feature.py310-pyarrow_nightly.dependencies]
+python = "3.10.*"
+# let's see how this can be done, perhaps via pip
+
+[feature.py311-pyarrow10_0_1.dependencies]
 python = "3.11.*"
-[feature.py312.dependencies]
+pyarrow = "=10.0.1"
+[feature.py311-pyarrow11_0.dependencies]
+python = "3.11.*"
+pyarrow = "=11.0.0"
+[feature.py311-pyarrow12_0.dependencies]
+python = "3.11.*"
+pyarrow = "=12.0.0"
+[feature.py311-pyarrow13_0.dependencies]
+python = "3.11.*"
+pyarrow = "=13.0.0"
+[feature.py311-pyarrow13_0-pandas1_5_3.dependencies]
+python = "3.11.*"
+pyarrow = "=13.0.0"
+pandas = "=1.5.3"
+
+[feature.py312-pyarrow13_0.dependencies]
 python = "3.12.*"
+pyarrow = "=13.0.0"
+[feature.py312-pyarrow14_0_1.dependencies]
+python = "3.12.*"
+pyarrow = "=14.0.1"
+[feature.py312-pyarrow15_0.dependencies]
+python = "3.12.*"
+pyarrow = "=15.0.0"
+[feature.py312-pyarrow18_1.dependencies]
+python = "3.12.*"
+pyarrow = "=18.1.0"
 
 [environments]
 default = ["test"]
-py311 = ["py311", "test"]
-py312 = ["py312", "test"]
+
+py310--pyarrow4-0-1 = ["py310-pyarrow4_0_1", "test"]
+py310--pyarrow7-0 = ["py310-pyarrow7_0", "test"]
+py310--pyarrow8-0-1 = ["py310-pyarrow8_0_1", "test"]
+py310--pyarrow9-0 = ["py310-pyarrow9_0", "test"]
+py310--pyarrow-nightly = ["py310-pyarrow_nightly", "test"]
+
+py311--pyarrow10-0-1 = ["py311-pyarrow10_0_1", "test"]
+py311--pyarrow11-0 = ["py311-pyarrow11_0", "test"]
+py311--pyarrow12-0 = ["py311-pyarrow12_0", "test"]
+py311--pyarrow13-0 = ["py311-pyarrow13_0", "test"]
+py311--pyarrow13-0--pandas1-5-3 = ["py311-pyarrow13_0-pandas1_5_3", "test"]
+
+py312--pyarrow13-0 = ["py312-pyarrow13_0", "test"]
+py312--pyarrow14-0-1 = ["py312-pyarrow14_0_1", "test"]
+py312--pyarrow15-0 = ["py312-pyarrow15_0", "test"]
+py312--pyarrow18-1 = ["py312-pyarrow18_1", "test"]
+
 build = ["build"]
 benchmark = ["benchmark", "test"]
 docs = ["docs", "test"]
