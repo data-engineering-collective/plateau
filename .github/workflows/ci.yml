@@ -154,8 +154,7 @@ jobs:
           pixi run python -c "import plateau.utils"
 
       - name: Pytest
-        # FIXME: Add `-n auto` again to allow for parallelism here.
-        run: pixi run test-coverage
+        run: pixi run test-coverage -n auto
 
       - name: Codecov
         uses: codecov/codecov-action@v5.1.1
