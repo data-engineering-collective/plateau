@@ -1,10 +1,8 @@
 name: Benchmarks
 
 on:
-  pull_request: # FIXME: remove after testing in active PR
-  # I'll uncomment once this ran successfully at least once in the PR workflow
-  # schedule:
-  #   - cron: "0 0 * * 0" # weekly on Sunday
+  schedule:
+    - cron: "0 0 * * 0" # weekly on Sunday
 
 jobs:
   benchmarks:
