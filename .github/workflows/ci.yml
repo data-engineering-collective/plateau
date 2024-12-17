@@ -35,64 +35,23 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          # py310
-          - numfocus_nightly: false
-            pyarrow_nightly: false
-            environment: "py310--pyarrow4-0-1"
-          - numfocus_nightly: false
-            pyarrow_nightly: true
-            environment: "py310--pyarrow-nightly"
-          - numfocus_nightly: true
-            pyarrow_nightly: true
-            environment: "py310--pyarrow-nightly"
-          - numfocus_nightly: false
-            pyarrow_nightly: false
-            environment: "py310--pyarrow7-0"
-          - numfocus_nightly: false
-            pyarrow_nightly: false
-            environment: "py310--pyarrow8-0-1"
-          - numfocus_nightly: false
-            pyarrow_nightly: false
-            environment: "py310--pyarrow9-0"
-            # py311
-          - numfocus_nightly: false
-            pyarrow_nightly: false
-            environment: "py311--pyarrow10-0-1"
-          - numfocus_nightly: false
-            pyarrow_nightly: false
-            environment: "py311--pyarrow11-0"
-          - numfocus_nightly: false
-            pyarrow_nightly: false
-            environment: "py311--pyarrow12-0"
-          - numfocus_nightly: false
-            pyarrow_nightly: false
-            environment: "py311--pyarrow13-0"
-          - numfocus_nightly: false
-            pyarrow_nightly: false
-            environment: "py311--pyarrow13-0--pandas1-5-3"
-            # py312
-          - numfocus_nightly: false
-            pyarrow_nightly: false
-            environment: "py312--pyarrow13-0"
-          - numfocus_nightly: false
-            pyarrow_nightly: false
-            environment: "py312--pyarrow14-0-1"
-          - numfocus_nightly: false
-            pyarrow_nightly: false
-            environment: "py312--pyarrow15-0"
-          - numfocus_nightly: false
-            pyarrow_nightly: false
-            environment: "py312--pyarrow18-1"
-
-    continue-on-error: ${{ matrix.numfocus_nightly || matrix.pyarrow_nightly }}
+        environment:
+          [
+            "py310-pyarrow15-0-2",
+            "py310-pyarrow16-1",
+            "py310-pyarrow17-0",
+            "py310-pyarrow18-1",
+            "py311-pyarrow15-0-2",
+            "py311-pyarrow16-1",
+            "py311-pyarrow17-0",
+            "py311-pyarrow18-1",
+            "py312-pyarrow15-0-2",
+            "py312-pyarrow16-1",
+            "py312-pyarrow17-0",
+            "py312-pyarrow18-1",
+          ]
 
     runs-on: "ubuntu-latest"
-
-    defaults:
-      run:
-        # see https://github.com/conda-incubator/setup-miniconda/#important
-        shell: bash -l {0}
 
     steps:
       - uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
@@ -100,16 +59,6 @@ jobs:
         uses: prefix-dev/setup-pixi@ba3bb36eb2066252b2363392b7739741bb777659 # v0.8.1
         with:
           environments: ${{ matrix.environment }} # References the environments defined in pixi.toml
-      - name: Install Pyarrow (nightly)
-        # The nightlies channel for conda is currently empty: https://github.com/apache/arrow/issues/41856
-        # We therefore rely on the pip nightlies: https://github.com/data-engineering-collective/plateau/pull/184#discussion_r1888429974
-        run: pixi run pip install --extra-index-url https://pypi.fury.io/arrow-nightlies/ --prefer-binary --pre pyarrow
-        if: matrix.pyarrow_nightly
-      - name: Pip Install NumFOCUS nightly
-        # NumFOCUS nightly wheels, contains numpy and pandas
-        # TODO(gh-45): Re-add numpy
-        run: pixi run python -m pip install --pre --upgrade --timeout=60 --extra-index-url https://pypi.anaconda.org/scientific-python-nightly-wheels/simple/ pandas
-        if: matrix.numfocus_nightly
       - name: Install repository
         run: pixi run postinstall
 
@@ -121,4 +70,4 @@ jobs:
         with:
           file: ./coverage.xml
           token: ${{ secrets.CODECOV_TOKEN }}
-          name: pytest-numfocus_nightly_${{ matrix.numfocus_nightly }}-${{ matrix.environment }}
+          name: pytest-${{ matrix.environment }}

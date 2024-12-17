@@ -23,9 +23,9 @@ dependencies = [
   "dask[dataframe]!=2021.5.1,!=2021.6.0", # gh475 - 2021.5.1 and 2021.6.0 broke ci, omit those versions
   "decorator",
   "msgpack>=0.5.2",
-  "numpy!=1.15.0,!=1.16.0",
-  "pandas>=0.23.0,!=1.0.0",
-  "pyarrow>=4",
+  "numpy>1.23",
+  "pandas>=2",
+  "pyarrow>=14",
   "simplejson",
   "minimalkv>=1.4.2",
   "toolz",
