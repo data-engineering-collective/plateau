@@ -141,17 +141,6 @@ jobs:
         if: matrix.numfocus_nightly
       - name: Install repository
         run: pixi run postinstall
-      - name: Test import
-        run: |
-          pixi run python -c "import plateau"
-          pixi run python -c "import plateau.api"
-          pixi run python -c "import plateau.api.dataset"
-          pixi run python -c "import plateau.api.serialization"
-          pixi run python -c "import plateau.core"
-          pixi run python -c "import plateau.io"
-          pixi run python -c "import plateau.io_components"
-          pixi run python -c "import plateau.serialization"
-          pixi run python -c "import plateau.utils"
 
       - name: Pytest
         run: pixi run test-coverage -n auto
