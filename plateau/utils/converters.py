@@ -80,7 +80,7 @@ def converter_str_tupleset(obj: Iterable[str] | str | None) -> tuple[str, ...]:
     ValueError
         If passed set contains duplicates.
     """
-    if isinstance(obj, (dict, frozenset, set)):
+    if isinstance(obj, dict | frozenset | set):
         raise TypeError(
             f"{obj} which has type {type(obj).__name__} has an unstable iteration order"
         )
@@ -106,7 +106,7 @@ def converter_tuple(obj) -> tuple:
     """
     if obj is None:
         return ()
-    elif hasattr(obj, "__iter__") and not isinstance(obj, (str, bytes)):
+    elif hasattr(obj, "__iter__") and not isinstance(obj, str | bytes):
         return tuple(x for x in obj)
     else:
         return (obj,)

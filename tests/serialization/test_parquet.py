@@ -473,7 +473,7 @@ def test_reset_dict_cols(store):
     assert pa.types.is_dictionary(only_a_reset.field("colB").type)
 
 
-def test_retry_on_IOError(monkeypatch, caplog, store):
+def test_retry_on_IOError(monkeypatch, caplog, store):  # noqa: N802
     """See https://github.com/JDASoftwareGroup/plateau/issues/407 :
 
     We are testing a retry-workaround for the above issue here. Once the
@@ -504,7 +504,7 @@ def test_retry_on_IOError(monkeypatch, caplog, store):
     pdt.assert_frame_equal(df, df_result)
 
 
-def test_retries_on_IOError_logs(monkeypatch, caplog, store):
+def test_retries_on_IOError_logs(monkeypatch, caplog, store):  # noqa: N802
     """See https://github.com/JDASoftwareGroup/plateau/issues/407 :
 
     We are testing a retry-workaround for the above issue here. Once the

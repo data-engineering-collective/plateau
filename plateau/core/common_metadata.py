@@ -531,8 +531,8 @@ def _strip_columns_from_schema(schema, field_names):
             # This is most likely an indicator for incompatible schemas and we refuse to strip the schema
             # to not obfurscate the validation result
             _logger.warning(
-                "Unexpected field `%s` encountered while trying to strip `null` columns.\n"
-                "Schema was:\n\n`%s`" % (name, schema)
+                f"Unexpected field `{name}` encountered while trying to strip `null` columns.\n"
+                f"Schema was:\n\n`{schema}`"
             )
             return schema
     return stripped_schema

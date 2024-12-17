@@ -509,7 +509,7 @@ def _normalize_value(value, pa_type, column_name=None):
         or pa.types.is_boolean(pa_type)
         and pd.api.types.is_bool(value)
         or pa.types.is_timestamp(pa_type)
-        and not isinstance(value, (bytes, str))
+        and not isinstance(value, bytes | str)
         and (
             pd.api.types.is_datetime64_dtype(value)
             or isinstance(value, datetime.datetime)

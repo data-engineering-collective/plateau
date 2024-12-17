@@ -227,11 +227,11 @@ def normalize_arg(arg_name, old_value):
     """
 
     def _make_list(_args):
-        if isinstance(_args, (str, bytes, int, float)):
+        if isinstance(_args, str | bytes | int | float):
             return [_args]
         if _args is None:
             return []
-        if isinstance(_args, (set, frozenset, dict)):
+        if isinstance(_args, set | frozenset | dict):
             raise ValueError(f"{type(_args)} is incompatible for normalisation.")
         return list(_args)
 

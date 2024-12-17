@@ -900,7 +900,7 @@ def _index_dct_to_table(index_dct: IndexDictType, column: str, dtype: pa.DataTyp
             dtype = pa.timestamp(
                 "ns"
             )  # workaround pyarrow type inference bug (ARROW-2554)
-        elif isinstance(probe, (np.bool_, bool)):
+        elif isinstance(probe, np.bool_ | bool):
             dtype = pa.bool_()
 
     # fix pyarrow input

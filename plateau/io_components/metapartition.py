@@ -10,7 +10,6 @@ from functools import wraps
 from typing import (
     TYPE_CHECKING,
     Any,
-    Optional,
     Union,
     cast,
 )
@@ -73,7 +72,7 @@ _METADATA_SCHEMA = {
     "number_rows_per_row_group": np.dtype(int),
 }
 
-MetaPartitionInput = Optional[Union[pd.DataFrame, Sequence, "MetaPartition"]]
+MetaPartitionInput = Union[pd.DataFrame, Sequence, "MetaPartition"] | None
 
 
 def _predicates_to_named(predicates):

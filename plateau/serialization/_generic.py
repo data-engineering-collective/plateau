@@ -15,7 +15,7 @@ Available constants
 
 import warnings
 from collections.abc import Iterable
-from typing import TYPE_CHECKING, Optional, TypeVar
+from typing import TYPE_CHECKING, TypeVar
 
 import numpy as np
 import pandas as pd
@@ -34,7 +34,7 @@ LiteralType = tuple[str, str, LiteralValue]
 ConjunctionType = list[LiteralType]
 # Optional is part of the actual type since predicate=None
 # is a sential for: All values
-PredicatesType = Optional[list[ConjunctionType]]
+PredicatesType = list[ConjunctionType] | None
 
 
 class DataFrameSerializer:
