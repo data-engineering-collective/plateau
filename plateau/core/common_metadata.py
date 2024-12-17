@@ -635,21 +635,16 @@ def validate_compatible(schemas, ignore_pandas=False):
 
         if reference_to_compare != current_to_compare:
             schema_diff = _diff_schemas(reference, current)
-            exception_message = """Schema violation
+            exception_message = f"""Schema violation
 
-Origin schema: {origin_schema}
-Origin reference: {origin_reference}
+Origin schema: {_fmt_origin(current.origin)}
+Origin reference: {_fmt_origin(reference.origin)}
 
 Diff:
 {schema_diff}
 
 Reference schema:
-{reference}""".format(
-                schema_diff=schema_diff,
-                reference=str(reference),
-                origin_schema=_fmt_origin(current.origin),
-                origin_reference=_fmt_origin(reference.origin),
-            )
+{str(reference)}"""
             raise ValueError(exception_message)
 
     # add all origins to result AFTER error checking, otherwise the error message would be pretty misleading due to the
@@ -729,9 +724,7 @@ def validate_shared_columns(schemas, ignore_pandas=False):
                     continue
                 if ref != obj:
                     raise ValueError(
-                        'Found incompatible entries for column "{}"\n{}\n{}'.format(
-                            col, ref, obj
-                        )
+                        f'Found incompatible entries for column "{col}"\n{ref}\n{obj}'
                     )
             else:
                 seen[col] = obj

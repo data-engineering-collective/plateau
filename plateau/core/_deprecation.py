@@ -105,10 +105,10 @@ def deprecate_kwarg(old_arg_name, new_arg_name, mapping=None, stacklevel=2):
 
             if new_arg_name is None and old_arg_value is not None:
                 msg = (
-                    "the '{old_name}' keyword is deprecated and will be "
+                    f"the '{old_arg_name}' keyword is deprecated and will be "
                     "removed in a future version. "
-                    "Please take steps to stop the use of '{old_name}'"
-                ).format(old_name=old_arg_name)
+                    f"Please take steps to stop the use of '{old_arg_name}'"
+                )
                 warnings.warn(msg, FutureWarning, stacklevel=stacklevel)
                 kwargs[old_arg_name] = old_arg_value
                 return func(*args, **kwargs)
@@ -120,26 +120,22 @@ def deprecate_kwarg(old_arg_name, new_arg_name, mapping=None, stacklevel=2):
                     else:
                         new_arg_value = mapping(old_arg_value)
                     msg = (
-                        "the {old_name}={old_val!r} keyword is deprecated, "
-                        "use {new_name}={new_val!r} instead"
-                    ).format(
-                        old_name=old_arg_name,
-                        old_val=old_arg_value,
-                        new_name=new_arg_name,
-                        new_val=new_arg_value,
+                        f"the {old_arg_name}={old_arg_value!r} keyword is deprecated, "
+                        f"use {new_arg_name}={new_arg_value!r} instead"
                     )
                 else:
                     new_arg_value = old_arg_value
                     msg = (
-                        "the '{old_name}' keyword is deprecated, "
-                        "use '{new_name}' instead"
-                    ).format(old_name=old_arg_name, new_name=new_arg_name)
+                        f"the '{old_arg_name}' keyword is deprecated, "
+                        f"use '{new_arg_name}' instead"
+                    )
 
                 warnings.warn(msg, FutureWarning, stacklevel=stacklevel)
                 if kwargs.get(new_arg_name, None) is not None:
                     msg = (
-                        "Can only specify '{old_name}' or '{new_name}', " "not both"
-                    ).format(old_name=old_arg_name, new_name=new_arg_name)
+                        f"Can only specify '{old_arg_name}' or '{new_arg_name}', "
+                        "not both"
+                    )
                     raise TypeError(msg)
                 else:
                     kwargs[new_arg_name] = new_arg_value

@@ -149,9 +149,7 @@ def _apply_to_list(method):
                 method_return = method(mp, *method_args, **method_kwargs)
                 if not isinstance(method_return, MetaPartition):
                     raise ValueError(
-                        "Method {} did not return a MetaPartition but {}".format(
-                            method.__name__, type(method_return)
-                        )
+                        f"Method {method.__name__} did not return a MetaPartition but {type(method_return)}"
                     )
                 if method_return.is_sentinel:
                     result = method_return
@@ -160,9 +158,7 @@ def _apply_to_list(method):
                         result = result.add_metapartition(mp, schema_validation=False)
         if not isinstance(result, MetaPartition):
             raise ValueError(
-                "Result for method {} is not a `MetaPartition` but {}".format(
-                    method.__name__, type(method_return)
-                )
+                f"Result for method {method.__name__} is not a `MetaPartition` but {type(method_return)}"
             )
         return result
 
@@ -286,9 +282,7 @@ class MetaPartition(Iterable):
             label = f"NESTED ({len(self.metapartitions)})"
         else:
             label = self.label
-        return "<{_class} v{version} | {label} >".format(
-            version=self.metadata_version, _class=self.__class__.__name__, label=label
-        )
+        return f"<{self.__class__.__name__} v{self.metadata_version} | {label} >"
 
     def __len__(self):
         return len(self.metapartitions)
@@ -744,7 +738,7 @@ class MetaPartition(Iterable):
             return df
 
         original_columns = list(df.columns)
-        zeros: "npt.NDArray[np.int_]" = np.zeros(len(df), dtype=int)
+        zeros: npt.NDArray[np.int_] = np.zeros(len(df), dtype=int)
         schema = self.schema
         if schema is None:
             raise ValueError("Cannot reconstruct indices before the schema is loaded.")
@@ -790,9 +784,7 @@ class MetaPartition(Iterable):
                     value = dtype.type(value)
             else:
                 raise RuntimeError(
-                    "Unexepected object encountered: ({}, {})".format(
-                        dtype, type(dtype)
-                    )
+                    f"Unexepected object encountered: ({dtype}, {type(dtype)})"
                 )
             if categories and primary_key in categories:
                 if convert_to_date:
@@ -1021,9 +1013,7 @@ class MetaPartition(Iterable):
             df = self.data
             if not self.is_sentinel and col not in df:
                 raise RuntimeError(
-                    "Column `{corrupt_col}` could not be found in the partition `{partition_label}` Please check for any typos and validate your dataset.".format(
-                        corrupt_col=col, partition_label=self.label
-                    )
+                    f"Column `{col}` could not be found in the partition `{self.label}` Please check for any typos and validate your dataset."
                 )
 
             possible_values = possible_values | set(df[col].dropna().unique())
@@ -1134,10 +1124,8 @@ class MetaPartition(Iterable):
             raise ValueError(
                 "Incompatible partitioning encountered. `partition_on` needs to include the already "
                 "existing partition keys and must preserve their order.\n"
-                "Current partition keys: `{}`\n"
-                "Partition on called with: `{}`".format(
-                    self.partition_keys, partition_on
-                )
+                f"Current partition keys: `{self.partition_keys}`\n"
+                f"Partition on called with: `{partition_on}`"
             )
 
     def _partition_data(self, partition_on):

@@ -182,9 +182,7 @@ def test_str_tupleset_fail_duplicates():
 def test_str_tupleset_fail_unstable(param):
     with pytest.raises(
         TypeError,
-        match="which has type {} has an unstable iteration order".format(
-            type(param).__name__
-        ),
+        match=f"which has type {type(param).__name__} has an unstable iteration order",
     ):
         converter_str_tupleset(param)
 

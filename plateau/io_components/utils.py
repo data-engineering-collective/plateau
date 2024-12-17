@@ -142,9 +142,7 @@ def validate_partition_keys(
             if partition_on != ds_factory.partition_keys:
                 raise ValueError(
                     "Incompatible set of partition keys encountered. "
-                    "Input partitioning was `{}` while actual dataset was `{}`".format(
-                        partition_on, ds_factory.partition_keys
-                    )
+                    f"Input partitioning was `{partition_on}` while actual dataset was `{ds_factory.partition_keys}`"
                 )
         else:
             partition_on = ds_factory.partition_keys
@@ -326,8 +324,8 @@ def align_categories(dfs, categoricals):
                 cats = ser.dropna().unique()
                 LOGGER.info(
                     "Encountered non-categorical type where categorical was expected\n"
-                    "Found at index position {ix} for column {col}\n"
-                    "Dtypes: {dtypes}".format(ix=ix, col=column, dtypes=df.dtypes)
+                    f"Found at index position {ix} for column {column}\n"
+                    f"Dtypes: {df.dtypes}"
                 )
             else:
                 cats = ser.cat.categories

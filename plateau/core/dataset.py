@@ -496,19 +496,12 @@ class DatasetMetadata(DatasetMetadataBase):
 
     def __repr__(self):
         return (
-            "DatasetMetadata(uuid={uuid}, "
-            "table_name={table_name}, "
-            "partition_keys={partition_keys}, "
-            "metadata_version={metadata_version}, "
-            "indices={indices}, "
-            "explicit_partitions={explicit_partitions})"
-        ).format(
-            uuid=self.uuid,
-            table_name=self.table_name,
-            partition_keys=self.partition_keys,
-            metadata_version=self.metadata_version,
-            indices=list(self.indices.keys()),
-            explicit_partitions=self.explicit_partitions,
+            f"DatasetMetadata(uuid={self.uuid}, "
+            f"table_name={self.table_name}, "
+            f"partition_keys={self.partition_keys}, "
+            f"metadata_version={self.metadata_version}, "
+            f"indices={list(self.indices.keys())}, "
+            f"explicit_partitions={self.explicit_partitions})"
         )
 
     @staticmethod

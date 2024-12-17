@@ -188,9 +188,7 @@ class ParquetSerializer(DataFrameSerializer):
         )
 
     def __repr__(self):
-        return "ParquetSerializer(compression={compression!r}, chunk_size={chunk_size!r})".format(
-            compression=self.compression, chunk_size=self.chunk_size
-        )
+        return f"ParquetSerializer(compression={self.compression!r}, chunk_size={self.chunk_size!r})"
 
     @staticmethod
     def _restore_dataframe(

@@ -279,14 +279,8 @@ def test_load_partition_indices_types(store):
         "dataset_metadata_version": 4,
         "dataset_uuid": dataset_uuid,
         "partitions": {
-            "{index_name}={index_value}/part_1".format(
-                index_name=index_name, index_value=index_value
-            ): {
-                "files": {
-                    table: "{dataset_uuid}/{table}/location_id=1/part_1.parquet".format(
-                        dataset_uuid=dataset_uuid, table=table
-                    )
-                }
+            f"{index_name}={index_value}/part_1": {
+                "files": {table: f"{dataset_uuid}/{table}/location_id=1/part_1.parquet"}
             }
         },
     }

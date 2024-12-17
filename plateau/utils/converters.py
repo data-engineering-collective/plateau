@@ -82,9 +82,7 @@ def converter_str_tupleset(obj: Iterable[str] | str | None) -> tuple[str, ...]:
     """
     if isinstance(obj, (dict, frozenset, set)):
         raise TypeError(
-            "{obj} which has type {tname} has an unstable iteration order".format(
-                obj=obj, tname=type(obj).__name__
-            )
+            f"{obj} which has type {type(obj).__name__} has an unstable iteration order"
         )
     result = converter_tuple(obj)
     result = tuple(converter_str(x) for x in result)
@@ -137,11 +135,7 @@ def converter_str(obj) -> str:
     elif isinstance(obj, bytes):
         return obj.decode("utf-8")
     else:
-        raise TypeError(
-            "Object of type {type} is not a string: {obj}".format(
-                obj=obj, type=type(obj).__name__
-            )
-        )
+        raise TypeError(f"Object of type {type(obj).__name__} is not a string: {obj}")
 
 
 def get_str_to_python_converter(pa_type):

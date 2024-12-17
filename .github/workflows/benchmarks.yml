@@ -20,8 +20,8 @@ jobs:
         run: pixi run -e benchmark postinstall
       - name: Running benchmarks
         run: |
-            pixi run -e benchmark asv --config ./asv_bench/asv.conf.json machine --machine github --os unknown --arch unknown --cpu unknown --ram unknown
-            pixi run -e benchmark asv --config ./asv_bench/asv.conf.json run -E existing:same | sed "/failed$/ s/^/##[error]/" | tee benchmarks.log
-            if grep "failed" benchmarks.log > /dev/null ; then
-                exit 1
-            fi
+          pixi run -e benchmark asv --config ./asv_bench/asv.conf.json machine --machine github --os unknown --arch unknown --cpu unknown --ram unknown
+          pixi run -e benchmark asv --config ./asv_bench/asv.conf.json run -E existing:same | sed "/failed$/ s/^/##[error]/" | tee benchmarks.log
+          if grep "failed" benchmarks.log > /dev/null ; then
+              exit 1
+          fi

@@ -380,9 +380,7 @@ def test_overlap_keyspace(store, metadata_version):
 
     for dataset_uuid in (dataset_uuid1, dataset_uuid2):
         partition0_label = "location=L-0/data"
-        partition0_key = "{}/{}/{}.parquet".format(
-            dataset_uuid, table, partition0_label
-        )
+        partition0_key = f"{dataset_uuid}/{table}/{partition0_label}.parquet"
         expected_partitions = {"location=L-0/data": {"files": {"core": partition0_key}}}
         expected_indices = {"location": {"L-0": ["location=L-0/data"]}}
         assert DatasetMetadata.storage_keys(dataset_uuid, store) == [

@@ -105,9 +105,7 @@ def _copy_azure_bbs(keys, src_store, tgt_store):
                 break  # break from while, continue in for-loop
             else:
                 raise RuntimeError(
-                    "Error while copying: status is {}: {}".format(
-                        cprop_current.status, cprop_current.status_description
-                    )
+                    f"Error while copying: status is {cprop_current.status}: {cprop_current.status_description}"
                 )
 
 
@@ -166,9 +164,7 @@ def _copy_azure_cc(keys, src_store, tgt_store):
                 break  # break from while, continue in for-loop
             else:
                 raise RuntimeError(
-                    "Error while copying: status is {}: {}".format(
-                        cprop_current.status, cprop_current.status_description
-                    )
+                    f"Error while copying: status is {cprop_current.status}: {cprop_current.status_description}"
                 )
 
 

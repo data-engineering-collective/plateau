@@ -31,9 +31,7 @@ def dispatch_files_to_gc(dataset_uuid, store_factory, chunk_size, factory):
                 table_files.add(name)
 
         for table in ds_factory.tables:
-            table_path = "{dataset_uuid}/{table}/".format(
-                dataset_uuid=dataset_uuid, table=table
-            )
+            table_path = f"{dataset_uuid}/{table}/"
             table_files.add(table_path + TABLE_METADATA_FILE)
             for key in ds_factory.store.iter_keys(prefix=table_path):
                 remove_table_files.add(key)

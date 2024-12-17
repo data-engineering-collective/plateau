@@ -202,10 +202,10 @@ def mask_sorted_duplicates_keep_last(df, columns):
     """
     columns = list(columns)
     rows = len(df)
-    mask: "npt.NDArray[np.bool_]" = np.zeros(rows, dtype=bool)
+    mask: npt.NDArray[np.bool_] = np.zeros(rows, dtype=bool)
 
     if (rows > 1) and columns:
-        sub: "npt.NDArray[np.bool_]" = np.ones(rows - 1, dtype=bool)
+        sub: npt.NDArray[np.bool_] = np.ones(rows - 1, dtype=bool)
         for col in columns:
             data = df[col].values
             sub &= data[:-1] == data[1:]

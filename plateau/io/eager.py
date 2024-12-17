@@ -535,9 +535,7 @@ def create_empty_dataset_header(
         store.put(*dataset_builder.to_msgpack())
     else:
         raise ValueError(
-            "Unknown metadata storage format encountered: {}".format(
-                metadata_storage_format
-            )
+            f"Unknown metadata storage format encountered: {metadata_storage_format}"
         )
     return dataset_builder.to_dataset()
 
