@@ -121,4 +121,4 @@ jobs:
         with:
           file: ./coverage.xml
           token: ${{ secrets.CODECOV_TOKEN }}
-          name: pytest-numfocus_nightly_${{ matrix.numfocus_nightly }}-os_${{ matrix.os }}-pyarrow_${{ matrix.pyarrow }}-${{ matrix.python }}
+          name: pytest-numfocus_nightly_${{ matrix.numfocus_nightly }}-${{ matrix.environment }}
