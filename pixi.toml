@@ -7,7 +7,7 @@ platforms = ["osx-arm64", "osx-64", "linux-64", "linux-aarch64", "win-64"]
 postinstall = "pip install --no-build-isolation --no-deps --disable-pip-version-check -e ."
 
 [dependencies]
-python = ">=3.11"
+python = ">=3.10"
 dask = ">=2022.5.1"
 decorator = "*"
 msgpack-python = ">=0.5.2"
