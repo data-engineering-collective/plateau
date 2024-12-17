@@ -41,7 +41,7 @@ urls = { Repository = "https://github.com/data-engineering-collective/plateau" }
 
 
 [tool.setuptools.packages.find]
-include = ["plateau"]
+include = ["plateau*"] # include all (sub-)packages starting with "plateau"
 
 [tool.mypy]
 python_version = "3.11"
