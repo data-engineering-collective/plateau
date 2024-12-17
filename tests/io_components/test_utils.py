@@ -216,7 +216,7 @@ def test_align_categories_with_missings():
     pdt.assert_frame_equal(out[1], expected_1)
 
 
-def test_sort_cateogrical():
+def test_sort_categorical():
     values = ["f", "a", "b", "z", "e"]
     categories = ["e", "z", "b", "a", "f"]
     cat_ser = pd.Series(pd.Categorical(values, categories=categories))
@@ -232,7 +232,7 @@ def test_sort_cateogrical():
     assert all(sorted_df["cat"].cat.categories == sorted(categories))
 
 
-def test_sort_cateogrical_multiple_cols():
+def test_sort_categorical_multiple_cols():
     df = pd.DataFrame.from_records(
         [
             {"ColA": "B", "ColB": "Z", "Payload": 1},

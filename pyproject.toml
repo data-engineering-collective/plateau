@@ -87,3 +87,12 @@ convention = "numpy"
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
+
+
+[tool.typos]
+#files.extend-exclude = ["tests/storefact"]
+[tool.typos.default.extend-words]
+ser = "ser"
+leafs = "leafs"       # we would change the public API of asv_bench/benchmarks/write.py:generate_metadata if we renamed "num_leafs" to "num_leaves"
+fo = "fo"
+missings = "missings"

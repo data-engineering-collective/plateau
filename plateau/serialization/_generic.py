@@ -3,7 +3,7 @@
 
 Available constants
 
-**PredicatesType** - A type describing the format of predicates which is a list of ConjuntionType
+**PredicatesType** - A type describing the format of predicates which is a list of ConjunctionType
 **ConjunctionType** - A type describing a single Conjunction which is a list of literals
 **LiteralType**  - A type for a single literal
 
@@ -252,7 +252,7 @@ def columns_in_predicates(predicates: PredicatesType) -> set[str]:
     Parameters
     ----------
     predicates:
-        The predicates to be scaned.
+        The predicates to be scanned.
     """
     if predicates is None:
         return set()

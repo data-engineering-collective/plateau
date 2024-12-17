@@ -1,7 +1,7 @@
 """Improved IO buffering compared to ``io.BufferedReader``.
 
 The main issues w/ ``io.BufferedReader`` is that it is only meant of
-sequencial reads and that it resets the buffer on ``.seek(...)``. This
+sequential reads and that it resets the buffer on ``.seek(...)``. This
 happens quite often in pyarrow and basically renders the buffereing
 inefficient.
 """
@@ -69,7 +69,7 @@ class BlockBuffer(io.BufferedIOBase):
     def _setup_cache(self):
         """Set up cache data structure and inspect underlying IO object.
 
-        If the cache is already inialized, this is a no-op.
+        If the cache is already initialized, this is a no-op.
         """
         if self._cached_blocks is not None:
             # cache initialized, nothing to do

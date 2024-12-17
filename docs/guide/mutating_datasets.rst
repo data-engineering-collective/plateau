@@ -55,7 +55,7 @@ some data there with plateau.
 Appending Data
 --------------
 
-Now, we create ``another_df`` with the same schema as our intial dataframe
+Now, we create ``another_df`` with the same schema as our initial dataframe
 ``df`` and update it using the ``eager`` backend by calling :func:`~plateau.io.eager.update_dataset_from_dataframes`:
 
 .. ipython:: python
@@ -220,7 +220,7 @@ Garbage collection
 ------------------
 
 When plateau is executing an operation, it makes sure to not
-commit changes to the dataset until the operation has been succesfully completed. If a
+commit changes to the dataset until the operation has been successfully completed. If a
 write operation does not succeed for any reason, although there may be new files written
 to storage, those files will not be used by the dataset as they will not be referenced in
 the plateau metadata. Thus, when the user reads the dataset, no new data will

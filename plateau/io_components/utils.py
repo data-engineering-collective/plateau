@@ -369,9 +369,9 @@ def sort_values_categorical(df: pd.DataFrame, columns: list[str] | str) -> pd.Da
         columns = [columns]
     for col in columns:
         if isinstance(df[col].dtype, pd.CategoricalDtype):
-            cat_accesor = df[col].cat
-            df[col] = cat_accesor.reorder_categories(
-                sorted(cat_accesor.categories), ordered=True
+            cat_accessor = df[col].cat
+            df[col] = cat_accessor.reorder_categories(
+                sorted(cat_accessor.categories), ordered=True
             )
     return df.sort_values(by=columns).reset_index(drop=True)
 

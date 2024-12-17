@@ -113,7 +113,7 @@ intersphinx_mapping = {
 
 # In particular type annotations are rendered as its full path to the class but
 # the sphinx docs usually expose the high level API path. This renames the
-# sphinx targets appropriately. The replacments are all applied, therefore mind
+# sphinx targets appropriately. The replacements are all applied, therefore mind
 # overlapping replacements.
 reftarget_replace = {
     "pyarrow.lib.": "pyarrow.",

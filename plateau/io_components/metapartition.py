@@ -135,7 +135,7 @@ def _apply_to_list(method):
         if len(self) == 0:
             raise RuntimeError("Invalid MetaPartition. No sub-partitions to act upon.")
 
-        # Look whether there is a `store` in the arguments and instatiate it
+        # Look whether there is a `store` in the arguments and instantiate it
         # this way we avoid multiple HTTP pools
         method_args, method_kwargs = _initialize_store_for_metapartition(
             method, method_args, method_kwargs
@@ -742,7 +742,7 @@ class MetaPartition(Iterable):
         if schema is None:
             raise ValueError("Cannot reconstruct indices before the schema is loaded.")
 
-        # One of the few places `inplace=True` makes a signifcant difference
+        # One of the few places `inplace=True` makes a significant difference
         df.reset_index(drop=True, inplace=True)
 
         index_names = [primary_key for primary_key, _ in key_indices]
@@ -783,7 +783,7 @@ class MetaPartition(Iterable):
                     value = dtype.type(value)
             else:
                 raise RuntimeError(
-                    f"Unexepected object encountered: ({dtype}, {type(dtype)})"
+                    f"Unexpected object encountered: ({dtype}, {type(dtype)})"
                 )
             if categories and primary_key in categories:
                 if convert_to_date:
@@ -837,7 +837,7 @@ class MetaPartition(Iterable):
         df_serializer: DataFrameSerializer | None = None,
     ) -> "MetaPartition":
         """Stores all dataframes of the MetaPartitions and registers the saved
-        files under the `files` atrribute. The dataframe itself is deleted from
+        files under the `files` attribute. The dataframe itself is deleted from
         memory.
 
         Parameters
@@ -995,7 +995,7 @@ class MetaPartition(Iterable):
     @_apply_to_list
     def build_indices(self, columns: Iterable[str]):
         """This builds the indices for this metapartition for the given
-        columns. The indices for the passed columns are rebuilt, so exisiting
+        columns. The indices for the passed columns are rebuilt, so existing
         index entries in the metapartition are overwritten.
 
         :param columns: A list of columns from which the indices over

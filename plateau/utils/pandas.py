@@ -102,7 +102,7 @@ def is_dataframe_sorted(df, columns):
     ----------
     df: pd.DataFrame
         DataFrame to check.
-    colums: Iterable[str]
+    columns: Iterable[str]
         Column that the DataFrame should be sorted by.
 
     Returns
@@ -163,7 +163,7 @@ def sort_dataframe(df, columns):
     Returns
     -------
     df: pandas.DataFrame
-        Sorted DataFrame w/ reseted index.
+        Sorted DataFrame w/ reset index.
     """
     columns = list(columns)
     if is_dataframe_sorted(df, columns):
@@ -176,7 +176,7 @@ def sort_dataframe(df, columns):
 
 
 def mask_sorted_duplicates_keep_last(df, columns):
-    """Mask duplicates on sorted data, keep last occurance as unique entry.
+    """Mask duplicates on sorted data, keep last occurrence as unique entry.
 
     Roughly equivalent to::
 
@@ -215,7 +215,7 @@ def mask_sorted_duplicates_keep_last(df, columns):
 
 
 def drop_sorted_duplicates_keep_last(df, columns):
-    """Drop duplicates on sorted data, keep last occurance as unique entry.
+    """Drop duplicates on sorted data, keep last occurrence as unique entry.
 
     Roughly equivalent to::
 

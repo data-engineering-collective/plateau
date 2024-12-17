@@ -303,7 +303,7 @@ def test_pushdown_binaries(store, dataframe_not_nested, binary_value, chunk_size
 
 
 @pytest.mark.xfail(reason="Requires parquet-cpp 1.5.0.")
-def test_pushdown_null_itermediate(store):
+def test_pushdown_null_intermediate(store):
     binary = b"\x8f\xb6\xe5@\x90\xdc\x11\xe8\x00\xae\x02B\xac\x12\x01\x06"
     df = pd.DataFrame({"byte_with_null": [binary]})
     serialiser = ParquetSerializer(chunk_size=1)

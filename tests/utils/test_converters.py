@@ -506,7 +506,7 @@ def test_get_str_to_python_converter_unknown_type():
         ),
     ],
 )
-def test_get_str_to_python_converter_failes(s, pa_type):
+def test_get_str_to_python_converter_fails(s, pa_type):
     converter = get_str_to_python_converter(pa_type)
     with pytest.raises(ValueError):
         converter(s)

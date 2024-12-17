@@ -67,7 +67,7 @@ class SchemaWrapper:
             pandas_metadata = schema.pandas_metadata
             index_cols = pandas_metadata["index_columns"]
             if len(index_cols) > 1:
-                raise NotImplementedError("Treatement of MultiIndex not implemented.")
+                raise NotImplementedError("Treatment of MultiIndex not implemented.")
 
             for _, col in enumerate(index_cols):
                 # Range index is now serialized using start/end information. This special treatment

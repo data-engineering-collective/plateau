@@ -161,7 +161,7 @@ def test_compat_old_rw_path(df_all_types, store):
             for c in df_all_types.columns
             if (
                 not c.startswith("array_")  # array types (always null)
-                and c != "unicode"  # unicode type (alway null)
+                and c != "unicode"  # unicode type (always null)
                 and "8" not in c  # 8 bit types are casted to 64 bit
                 and "16" not in c  # 16 bit types are casted to 64 bit
                 and "32" not in c  # 32 bit types are casted to 64 bit
@@ -393,7 +393,7 @@ def test_validate_different_cats_different_type():
 @pytest.mark.parametrize(
     "index", [pd.Index([0], dtype="int64"), pd.RangeIndex(start=0, stop=1)]
 )
-def test_schema_dataframe_rountrip(index, df_all_types):
+def test_schema_dataframe_roundtrip(index, df_all_types):
     df = pd.DataFrame(df_all_types, index=index)
 
     schema = make_meta(df, origin="1")
