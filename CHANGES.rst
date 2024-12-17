@@ -2,6 +2,12 @@
 Changelog
 =========
 
+Plateau 4.4.1 (2024-12-17)
+==========================
+
+* Port project to use the OSS QuantCo copier template (`copier template https://github.com/Quantco/copier-template-python-open-source`_) and (`pixi https://pixi.sh`_) as environment manager.
+
+
 Plateau 4.4.0 (2024-05-23)
 ==========================
 
