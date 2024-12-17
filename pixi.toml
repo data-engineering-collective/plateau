@@ -29,6 +29,7 @@ pyyaml = "*"
 pip = "*"
 setuptools = ">=61"
 setuptools-scm = "*"
+wheel = "*"
 
 [feature.test.dependencies]
 pytest = ">=6"
