@@ -7,7 +7,6 @@ import numpy as np
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
-from packaging import version
 from toolz.itertoolz import partition_all
 
 import plateau.core._time
@@ -38,8 +37,6 @@ __all__ = (
     "ExplicitSecondaryIndex",
     "PartitionIndex",
 )
-
-PYARROW_LT_13 = version.parse(pa.__version__) < version.parse("13")
 
 
 class IndexBase(CopyMixin):
@@ -143,11 +140,7 @@ class IndexBase(CopyMixin):
         keys = np.array(list(self.index_dct.keys()))
         labeled_array = pa.array(keys, type=self.dtype)
 
-        # Prior to pyarrow 13.0.0 coerce_temporal_nanoseconds didn't exist
-        # as it was introduced for backwards compatibility with pandas 1.x
-        _coerce = {}
-        if not PYARROW_LT_13:
-            _coerce["coerce_temporal_nanoseconds"] = coerce_temporal_nanoseconds
+        _coerce = {"coerce_temporal_nanoseconds": coerce_temporal_nanoseconds}
         return np.array(
             labeled_array.to_pandas(date_as_object=date_as_object, **_coerce)
         )
@@ -480,9 +473,7 @@ class IndexBase(CopyMixin):
         table = _index_dct_to_table(
             self.index_dct, column=self.column, dtype=self.dtype
         )
-        # Prior to pyarrow 13.0.0 coerce_temporal_nanoseconds didn't exist
-        # as it was introduced for backwards compatibility with pandas 1.x
-        _coerce = {} if PYARROW_LT_13 else {"coerce_temporal_nanoseconds": True}
+        _coerce = {"coerce_temporal_nanoseconds": True}
         df = table.to_pandas(date_as_object=date_as_object, **_coerce)
 
         if predicates is not None:
@@ -864,9 +855,7 @@ def _parquet_bytes_to_dict(column: str, index_buffer: bytes):
     if column_type == pa.timestamp("us"):
         column_type = pa.timestamp("ns")
 
-    # Prior to pyarrow 13.0.0 coerce_temporal_nanoseconds didn't exist
-    # as it was introduced for backwards compatibility with pandas 1.x
-    _coerce = {} if PYARROW_LT_13 else {"coerce_temporal_nanoseconds": True}
+    _coerce = {"coerce_temporal_nanoseconds": True}
     df = table.to_pandas(**_coerce)
 
     index_dct = dict(
