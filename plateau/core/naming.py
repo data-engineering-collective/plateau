@@ -38,9 +38,7 @@ def get_partition_file_prefix(
     dataset_uuid, partition_label, table, metadata_version=DEFAULT_METADATA_VERSION
 ):
     if metadata_version == 4:
-        file_prefix = "{dataset_uuid}/{table}/{partition_label}".format(
-            dataset_uuid=dataset_uuid, table=table, partition_label=partition_label
-        )
+        file_prefix = f"{dataset_uuid}/{table}/{partition_label}"
     else:
         raise NotImplementedError(f"Metadata version {metadata_version} not supported")
     return file_prefix

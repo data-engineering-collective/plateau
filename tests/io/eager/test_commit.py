@@ -57,7 +57,7 @@ def test_commit_dataset_from_metapartition(dataset_function, store):
     assert loaded_dataset == updated_dataset
 
     # Read the data and check whether the rows above are included.
-    # This checks whether all necessary informations were updated in the header
+    # This checks whether all necessary information were updated in the header
     # (e.g. files attributes of the partitions)
     actual = read_table(store=store, dataset_uuid=dataset_function.uuid)
     df_expected = pd.DataFrame(

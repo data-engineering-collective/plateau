@@ -643,7 +643,7 @@ def test_binary_column_metadata(store_factory, bound_load_dataframes):
     assert set(df.columns.map(type)) == {str}
 
 
-def test_extensiondtype_rountrip(store_factory, bound_load_dataframes):
+def test_extensiondtype_roundtrip(store_factory, bound_load_dataframes):
     df = pd.DataFrame({"str": pd.Series(["a", "b"], dtype="string")})
 
     store_dataframes_as_dataset(

@@ -142,9 +142,7 @@ def validate_partition_keys(
             if partition_on != ds_factory.partition_keys:
                 raise ValueError(
                     "Incompatible set of partition keys encountered. "
-                    "Input partitioning was `{}` while actual dataset was `{}`".format(
-                        partition_on, ds_factory.partition_keys
-                    )
+                    f"Input partitioning was `{partition_on}` while actual dataset was `{ds_factory.partition_keys}`"
                 )
         else:
             partition_on = ds_factory.partition_keys
@@ -229,11 +227,11 @@ def normalize_arg(arg_name, old_value):
     """
 
     def _make_list(_args):
-        if isinstance(_args, (str, bytes, int, float)):
+        if isinstance(_args, str | bytes | int | float):
             return [_args]
         if _args is None:
             return []
-        if isinstance(_args, (set, frozenset, dict)):
+        if isinstance(_args, set | frozenset | dict):
             raise ValueError(f"{type(_args)} is incompatible for normalisation.")
         return list(_args)
 
@@ -326,8 +324,8 @@ def align_categories(dfs, categoricals):
                 cats = ser.dropna().unique()
                 LOGGER.info(
                     "Encountered non-categorical type where categorical was expected\n"
-                    "Found at index position {ix} for column {col}\n"
-                    "Dtypes: {dtypes}".format(ix=ix, col=column, dtypes=df.dtypes)
+                    f"Found at index position {ix} for column {column}\n"
+                    f"Dtypes: {df.dtypes}"
                 )
             else:
                 cats = ser.cat.categories
@@ -371,9 +369,9 @@ def sort_values_categorical(df: pd.DataFrame, columns: list[str] | str) -> pd.Da
         columns = [columns]
     for col in columns:
         if isinstance(df[col].dtype, pd.CategoricalDtype):
-            cat_accesor = df[col].cat
-            df[col] = cat_accesor.reorder_categories(
-                sorted(cat_accesor.categories), ordered=True
+            cat_accessor = df[col].cat
+            df[col] = cat_accessor.reorder_categories(
+                sorted(cat_accessor.categories), ordered=True
             )
     return df.sort_values(by=columns).reset_index(drop=True)
 

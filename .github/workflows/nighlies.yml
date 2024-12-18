@@ -1,0 +1,51 @@
+name: Nightlies
+on:
+  schedule:
+    - cron: "0 5 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  id-token: write
+  contents: read
+  issues: write
+
+jobs:
+  nightlies:
+    name: Nightlies
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        environment: [
+            # nightlies (e.g. pyarrow) will be installed in the following steps
+            "py310-pyarrow18-1",
+            "py311-pyarrow18-1",
+            "py312-pyarrow18-1",
+          ]
+
+    steps:
+      - uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
+      - name: Set up pixi
+        uses: prefix-dev/setup-pixi@ba3bb36eb2066252b2363392b7739741bb777659 # v0.8.1
+        with:
+          environments: ${{ matrix.environment }}
+
+      - name: Install Pyarrow nightly
+        # The nightlies channel for conda is currently empty: https://github.com/apache/arrow/issues/41856
+        # We therefore rely on the pip nightlies: https://github.com/data-engineering-collective/plateau/pull/184#discussion_r1888429974
+        run: pixi run pip install --extra-index-url https://pypi.fury.io/arrow-nightlies/ --prefer-binary --pre pyarrow
+      - name: Pip Install NumFOCUS nightly
+        # NumFOCUS nightly wheels, contains numpy and pandas
+        # TODO(gh-45): Re-add numpy
+        run: pixi run python -m pip install --pre --upgrade --timeout=60 --extra-index-url https://pypi.anaconda.org/scientific-python-nightly-wheels/simple/ pandas
+
+      - name: Install repository
+        run: pixi run postinstall
+
+      - name: Pytest
+        run: pixi run test-coverage -n auto

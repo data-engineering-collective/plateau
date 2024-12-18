@@ -112,7 +112,7 @@ def read_dataset_as_ddf(
     """
     if dask_index_on is not None and not isinstance(dask_index_on, str):
         raise TypeError(
-            f"The paramter `dask_index_on` must be a string but got {type(dask_index_on)}"
+            f"The parameter `dask_index_on` must be a string but got {type(dask_index_on)}"
         )
 
     if dask_index_on is not None and dispatch_by is not None and len(dispatch_by) > 0:
@@ -633,7 +633,7 @@ def hash_dataset(
 
     .. note::
 
-        We do not guarantee the hash values to remain constant accross versions.
+        We do not guarantee the hash values to remain constant across versions.
 
 
     Example output::

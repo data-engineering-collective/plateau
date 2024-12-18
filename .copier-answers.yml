@@ -1,0 +1,13 @@
+# This file is managed by Copier; DO NOT EDIT OR REMOVE.
+_commit: v0.2.1
+_src_path: https://github.com/quantco/copier-template-python-open-source
+add_autobump_workflow: true
+author_email: plateau@uwekorn.com
+author_name: Data Engineering Collective
+github_url: https://github.com/data-engineering-collective/plateau
+github_user: xhochy
+minimal_python_version: py311
+project_short_description: A Python library to manage (create, read, update, delete)
+    large amounts of tabular data in a blob store.
+project_slug: plateau
+use_devcontainer: false

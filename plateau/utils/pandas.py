@@ -102,7 +102,7 @@ def is_dataframe_sorted(df, columns):
     ----------
     df: pd.DataFrame
         DataFrame to check.
-    colums: Iterable[str]
+    columns: Iterable[str]
         Column that the DataFrame should be sorted by.
 
     Returns
@@ -163,7 +163,7 @@ def sort_dataframe(df, columns):
     Returns
     -------
     df: pandas.DataFrame
-        Sorted DataFrame w/ reseted index.
+        Sorted DataFrame w/ reset index.
     """
     columns = list(columns)
     if is_dataframe_sorted(df, columns):
@@ -176,7 +176,7 @@ def sort_dataframe(df, columns):
 
 
 def mask_sorted_duplicates_keep_last(df, columns):
-    """Mask duplicates on sorted data, keep last occurance as unique entry.
+    """Mask duplicates on sorted data, keep last occurrence as unique entry.
 
     Roughly equivalent to::
 
@@ -202,10 +202,10 @@ def mask_sorted_duplicates_keep_last(df, columns):
     """
     columns = list(columns)
     rows = len(df)
-    mask: "npt.NDArray[np.bool_]" = np.zeros(rows, dtype=bool)
+    mask: npt.NDArray[np.bool_] = np.zeros(rows, dtype=bool)
 
     if (rows > 1) and columns:
-        sub: "npt.NDArray[np.bool_]" = np.ones(rows - 1, dtype=bool)
+        sub: npt.NDArray[np.bool_] = np.ones(rows - 1, dtype=bool)
         for col in columns:
             data = df[col].values
             sub &= data[:-1] == data[1:]
@@ -215,7 +215,7 @@ def mask_sorted_duplicates_keep_last(df, columns):
 
 
 def drop_sorted_duplicates_keep_last(df, columns):
-    """Drop duplicates on sorted data, keep last occurance as unique entry.
+    """Drop duplicates on sorted data, keep last occurrence as unique entry.
 
     Roughly equivalent to::
 

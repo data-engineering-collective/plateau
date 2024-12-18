@@ -7,7 +7,6 @@ import numpy as np
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
-from packaging import version
 from toolz.itertoolz import partition_all
 
 import plateau.core._time
@@ -39,8 +38,6 @@ __all__ = (
     "PartitionIndex",
 )
 
-PYARROW_LT_13 = version.parse(pa.__version__) < version.parse("13")
-
 
 class IndexBase(CopyMixin):
     """Initialize an IndexBase.
@@ -69,10 +66,8 @@ class IndexBase(CopyMixin):
     ):
         if column == _PARTITION_COLUMN_NAME:
             raise ValueError(
-                "Cannot create an index for column {} due to an internal implementation conflict. "
-                "Please contact a plateau maintainer if you receive this error message".format(
-                    column
-                )
+                f"Cannot create an index for column {column} due to an internal implementation conflict. "
+                "Please contact a plateau maintainer if you receive this error message"
             )
         if (dtype is None) and index_dct:
             # do dtype given but index_dct is present => auto-derive dtype
@@ -114,10 +109,8 @@ class IndexBase(CopyMixin):
 
                 if n_collisions:
                     _logger.warning(
-                        (
-                            "Value normalization for index column {} resulted in {} collision(s). plateau merged "
-                            "the affected partition lists, but you may want to check if this was desired."
-                        ).format(column, n_collisions)
+                        f"Value normalization for index column {column} resulted in {n_collisions} collision(s). plateau merged "
+                        "the affected partition lists, but you may want to check if this was desired."
                     )
             else:
                 # data comes from a trusted source (e.g. an index that we've already preserved and are now reading), so
@@ -147,11 +140,7 @@ class IndexBase(CopyMixin):
         keys = np.array(list(self.index_dct.keys()))
         labeled_array = pa.array(keys, type=self.dtype)
 
-        # Prior to pyarrow 13.0.0 coerce_temporal_nanoseconds didn't exist
-        # as it was introduced for backwards compatibility with pandas 1.x
-        _coerce = {}
-        if not PYARROW_LT_13:
-            _coerce["coerce_temporal_nanoseconds"] = coerce_temporal_nanoseconds
+        _coerce = {"coerce_temporal_nanoseconds": coerce_temporal_nanoseconds}
         return np.array(
             labeled_array.to_pandas(date_as_object=date_as_object, **_coerce)
         )
@@ -300,25 +289,19 @@ class IndexBase(CopyMixin):
         """
         if not isinstance(index, IndexBase):
             raise TypeError(
-                "Need to input an plateau.core.index.IndexBase object, instead got `{}`".format(
-                    type(index)
-                )
+                f"Need to input an plateau.core.index.IndexBase object, instead got `{type(index)}`"
             )
         # Assume that if one of the indices dtypes is None, they are compatible. In future versions we should make
         # dtype a non-optional parameter
         if self.dtype is not None and index.dtype is not None:
             if self.dtype != index.dtype:
                 raise TypeError(
-                    "Trying to update an index with different types. Expected `{}` but got `{}`".format(
-                        self.dtype, index.dtype
-                    )
+                    f"Trying to update an index with different types. Expected `{self.dtype}` but got `{index.dtype}`"
                 )
 
         if self.column != index.column:
             raise ValueError(
-                "Trying to update an index with the wrong column. Got `{}` but expected `{}`".format(
-                    index.column, self.column
-                )
+                f"Trying to update an index with the wrong column. Got `{index.column}` but expected `{self.column}`"
             )
 
         if index.index_dct is None or len(index.index_dct) == 0:
@@ -490,9 +473,7 @@ class IndexBase(CopyMixin):
         table = _index_dct_to_table(
             self.index_dct, column=self.column, dtype=self.dtype
         )
-        # Prior to pyarrow 13.0.0 coerce_temporal_nanoseconds didn't exist
-        # as it was introduced for backwards compatibility with pandas 1.x
-        _coerce = {} if PYARROW_LT_13 else {"coerce_temporal_nanoseconds": True}
+        _coerce = {"coerce_temporal_nanoseconds": True}
         df = table.to_pandas(date_as_object=date_as_object, **_coerce)
 
         if predicates is not None:
@@ -687,12 +668,7 @@ class ExplicitSecondaryIndex(IndexBase):
         ):
             storage_key = self.index_storage_key
         if storage_key is None:
-            storage_key = "{dataset_uuid}/indices/{column}/{timestamp}{suffix}".format(
-                dataset_uuid=dataset_uuid,
-                suffix=naming.EXTERNAL_INDEX_SUFFIX,
-                column=quote(self.column),
-                timestamp=quote(self.creation_time.isoformat()),
-            )
+            storage_key = f"{dataset_uuid}/indices/{quote(self.column)}/{quote(self.creation_time.isoformat())}{naming.EXTERNAL_INDEX_SUFFIX}"
 
         # The arrow representation of index_dct requires a large amount of memory because strings are duplicated and
         # flattened into the buffer. To avoid a high peak memory usage, split the index_dct into chunks and only convert
@@ -879,9 +855,7 @@ def _parquet_bytes_to_dict(column: str, index_buffer: bytes):
     if column_type == pa.timestamp("us"):
         column_type = pa.timestamp("ns")
 
-    # Prior to pyarrow 13.0.0 coerce_temporal_nanoseconds didn't exist
-    # as it was introduced for backwards compatibility with pandas 1.x
-    _coerce = {} if PYARROW_LT_13 else {"coerce_temporal_nanoseconds": True}
+    _coerce = {"coerce_temporal_nanoseconds": True}
     df = table.to_pandas(**_coerce)
 
     index_dct = dict(
@@ -915,7 +889,7 @@ def _index_dct_to_table(index_dct: IndexDictType, column: str, dtype: pa.DataTyp
             dtype = pa.timestamp(
                 "ns"
             )  # workaround pyarrow type inference bug (ARROW-2554)
-        elif isinstance(probe, (np.bool_, bool)):
+        elif isinstance(probe, np.bool_ | bool):
             dtype = pa.bool_()
 
     # fix pyarrow input

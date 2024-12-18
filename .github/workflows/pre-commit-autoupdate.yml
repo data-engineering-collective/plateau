@@ -1,13 +1,12 @@
 name: pre-commit autoupdate
 on:
- workflow_dispatch:
- schedule:
-   - cron: "0 6 4 * *"
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 4 * *"
 
 defaults:
   run:
-    shell:
-      bash -el {0}
+    shell: bash -el {0}
 
 jobs:
   check_update:
@@ -19,22 +18,15 @@ jobs:
         # We need to checkout with SSH here to have actions run on the PR.
         with:
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
-      - name: Set up Conda env
-        uses: mamba-org/setup-micromamba@068f1ab4b37ed9b3d9f73da7db90a0cda0a48d29
+      - name: Set up pixi
+        uses: prefix-dev/setup-pixi@ba3bb36eb2066252b2363392b7739741bb777659 # v0.8.1
         with:
-          environment-name: pre-commit
-          create-args: >-
-            -c
-            conda-forge
-            pre-commit
-            mamba
+          environments: default lint
       - name: Update pre-commit hooks and run
         id: versions
-        env:
-          PRE_COMMIT_USE_MAMBA: 1
         run: |
-          pre-commit autoupdate
-          pre-commit run -a || true
+          pixi run pre-commit-update
+          pixi run pre-commit-run --color=always --show-diff-on-failure || true
       - uses: peter-evans/create-pull-request@5e914681df9dc83aa4e4905692ca88beb2f9e91f
         with:
           commit-message: "Auto-update pre-commit hooks"
@@ -44,4 +36,3 @@ jobs:
             This PR updates them to the latest and already ran `pre-commit run -a` for you to fix any changes in formatting.
           branch: pre-commit-autoupdate
           delete-branch: true
-          sign-commits: true

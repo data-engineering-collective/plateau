@@ -67,9 +67,7 @@ class DatasetFactory(DatasetMetadataBase):
         self.load_all_indices_flag = load_all_indices
 
     def __repr__(self):
-        return "<DatasetFactory: uuid={} is_loaded={}>".format(
-            self.dataset_uuid, self.is_loaded
-        )
+        return f"<DatasetFactory: uuid={self.dataset_uuid} is_loaded={self.is_loaded}>"
 
     @property
     def store(self) -> "KeyValueStore":

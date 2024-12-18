@@ -3,7 +3,7 @@
 
 Available constants
 
-**PredicatesType** - A type describing the format of predicates which is a list of ConjuntionType
+**PredicatesType** - A type describing the format of predicates which is a list of ConjunctionType
 **ConjunctionType** - A type describing a single Conjunction which is a list of literals
 **LiteralType**  - A type for a single literal
 
@@ -15,7 +15,7 @@ Available constants
 
 import warnings
 from collections.abc import Iterable
-from typing import TYPE_CHECKING, Optional, TypeVar
+from typing import TYPE_CHECKING, TypeVar
 
 import numpy as np
 import pandas as pd
@@ -34,7 +34,7 @@ LiteralType = tuple[str, str, LiteralValue]
 ConjunctionType = list[LiteralType]
 # Optional is part of the actual type since predicate=None
 # is a sential for: All values
-PredicatesType = Optional[list[ConjunctionType]]
+PredicatesType = list[ConjunctionType] | None
 
 
 class DataFrameSerializer:
@@ -252,7 +252,7 @@ def columns_in_predicates(predicates: PredicatesType) -> set[str]:
     Parameters
     ----------
     predicates:
-        The predicates to be scaned.
+        The predicates to be scanned.
     """
     if predicates is None:
         return set()
@@ -290,9 +290,9 @@ def filter_df_from_predicates(
     """
     if predicates is None:
         return df
-    indexer: "npt.NDArray[np.bool_]" = np.zeros(len(df), dtype=bool)
+    indexer: npt.NDArray[np.bool_] = np.zeros(len(df), dtype=bool)
     for conjunction in predicates:
-        inner_indexer: "npt.NDArray[np.bool_]" = np.ones(len(df), dtype=bool)
+        inner_indexer: npt.NDArray[np.bool_] = np.ones(len(df), dtype=bool)
         for column, op, value in conjunction:
             column_name = ensure_unicode_string_type(column)
             filter_array_like(
@@ -458,7 +458,7 @@ def filter_array_like(
 
     # In the case of an empty list, don't bother with evaluating types, etc.
     if is_list_like(value) and len(value) == 0:
-        false_arr: "npt.NDArray[np.bool_]" = np.zeros(len(array_like), dtype=bool)
+        false_arr: npt.NDArray[np.bool_] = np.zeros(len(array_like), dtype=bool)
         np.logical_and(false_arr, mask, out=out)
         return out
 

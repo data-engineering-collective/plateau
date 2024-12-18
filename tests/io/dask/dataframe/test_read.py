@@ -302,7 +302,7 @@ def test_dask_index_on_non_string_raises(store_factory):
     )
     with pytest.raises(
         TypeError,
-        match=f"The paramter `dask_index_on` must be a string but got {type(colA)}",
+        match=f"The parameter `dask_index_on` must be a string but got {type(colA)}",
     ):
         read_dataset_as_ddf(
             dataset_uuid=dataset_uuid,

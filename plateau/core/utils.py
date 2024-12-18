@@ -14,9 +14,7 @@ def _verify_metadata_version(metadata_version: int) -> None:
     """This is factored out to be an easier target for mocking."""
     if metadata_version < MIN_METADATA_VERSION:
         raise NotImplementedError(
-            "Minimal supported metadata version is 4. You requested {metadata_version} instead.".format(
-                metadata_version=metadata_version
-            )
+            f"Minimal supported metadata version is 4. You requested {metadata_version} instead."
         )
     elif metadata_version > MAX_METADATA_VERSION:
         raise NotImplementedError(

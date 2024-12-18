@@ -128,7 +128,7 @@ Supported data types for indices include
 
 See also
 --------
-* :doc:`efficient_querying` for some general hints for faster quering
+* :doc:`efficient_querying` for some general hints for faster querying
 * :doc:`storage_layout`
 * :doc:`../guide/partitioning` for some guidance on how to partition a dataset
 * :doc:`../guide/dask_indexing`

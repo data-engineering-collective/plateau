@@ -225,9 +225,7 @@ def mock_default_metadata_version(mocker, backend_identifier):
             raise AssertionError(f"Traversed through mock. Original error: {e}") from e
 
     mocker.patch(
-        "plateau.io.{backend_identifier}.parse_input_to_metapartition".format(
-            backend_identifier=backend_identifier
-        ),
+        f"plateau.io.{backend_identifier}.parse_input_to_metapartition",
         patched__parse_input_to_metapartition,
     )
 

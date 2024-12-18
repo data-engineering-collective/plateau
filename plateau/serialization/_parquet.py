@@ -11,7 +11,6 @@ import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 from minimalkv import KeyValueStore
-from packaging import version
 from pyarrow.parquet import ParquetFile
 
 from ._generic import (
@@ -39,16 +38,7 @@ _logger = logging.getLogger(__name__)
 EPOCH_ORDINAL = datetime.date(1970, 1, 1).toordinal()
 MAX_NB_RETRIES = 6  # longest retry backoff = BACKOFF_TIME * 2**(MAX_NB_RETRIES - 2)
 BACKOFF_TIME = 0.01  # 10 ms
-PYARROW_LT_6 = version.parse(pa.__version__) < version.parse("6")
-PYARROW_LT_8 = version.parse(pa.__version__) < version.parse("8")
-PYARROW_LT_13 = version.parse(pa.__version__) < version.parse("13")
-
-# Since pyarrow 6, the Parquet version/features can be selected more granular.
-# Version 2.0 is equal to 2.4 but 2.4 doesn't trigger deprecation warnings.
-if PYARROW_LT_6:
-    PARQUET_VERSION = "2.0"
-else:
-    PARQUET_VERSION = "2.4"
+PARQUET_VERSION = "2.4"
 
 
 def _empty_table_from_schema(parquet_file):
@@ -188,9 +178,7 @@ class ParquetSerializer(DataFrameSerializer):
         )
 
     def __repr__(self):
-        return "ParquetSerializer(compression={compression!r}, chunk_size={chunk_size!r})".format(
-            compression=self.compression, chunk_size=self.chunk_size
-        )
+        return f"ParquetSerializer(compression={self.compression!r}, chunk_size={self.chunk_size!r})"
 
     @staticmethod
     def _restore_dataframe(
@@ -256,11 +244,7 @@ class ParquetSerializer(DataFrameSerializer):
                 else:
                     # ARROW-5139 Column projection with empty columns returns a table w/out index
                     if columns == []:
-                        # Prior to pyarrow 13.0.0 coerce_temporal_nanoseconds didn't exist
-                        # as it was introduced for backwards compatibility with pandas 1.x
-                        _coerce = {}
-                        if not PYARROW_LT_13:
-                            _coerce["coerce_temporal_nanoseconds"] = True
+                        _coerce = {"coerce_temporal_nanoseconds": True}
                         # Create an arrow table with expected index length.
                         df = (
                             parquet_file.schema.to_arrow_schema()
@@ -293,9 +277,7 @@ class ParquetSerializer(DataFrameSerializer):
         # HACK: Cast bytes to object in metadata until Pandas bug is fixed: https://github.com/pandas-dev/pandas/issues/50127
         table = table.cast(schema_metadata_bytes_to_object(table.schema))
 
-        # Prior to pyarrow 13.0.0 coerce_temporal_nanoseconds didn't exist
-        # as it was introduced for backwards compatibility with pandas 1.x
-        _coerce = {} if PYARROW_LT_13 else {"coerce_temporal_nanoseconds": True}
+        _coerce = {"coerce_temporal_nanoseconds": True}
         df = table.to_pandas(date_as_object=date_as_object, **_coerce)
 
         # XXX: Patch until Pyarrow bug is resolved: https://issues.apache.org/jira/browse/ARROW-18099?filter=-2
@@ -452,39 +434,20 @@ def _normalize_predicates(
                 break
 
             if op == "in":
-                values = [
+                normalized_value = [
                     _normalize_value(lit, pa_type, column_name=column_name)
                     for lit in literal[2]
                 ]
-                if for_pushdown and values:
-                    normalized_value = [
-                        _timelike_to_arrow_encoding(value, pa_type) for value in values
-                    ]
-                else:
-                    normalized_value = values
             else:
                 normalized_value = _normalize_value(
                     literal[2], pa_type, column_name=column_name
                 )
-                if for_pushdown:
-                    normalized_value = _timelike_to_arrow_encoding(
-                        normalized_value, pa_type
-                    )
             new_literal = (literal[0], literal[1], normalized_value)
             new_conjunction.append(new_literal)
 
         if not evaluates_to_false:
             normalized_predicates.append(new_conjunction)
     return normalized_predicates
-
-
-def _timelike_to_arrow_encoding(value, pa_type):
-    # Date32 columns are encoded as days since 1970 prior to pyarrow 8
-    if PYARROW_LT_8 and pa.types.is_date32(pa_type):
-        if isinstance(value, datetime.date):
-            return value.toordinal() - EPOCH_ORDINAL
-    else:
-        return value
 
 
 def _normalize_value(value, pa_type, column_name=None):
@@ -511,7 +474,7 @@ def _normalize_value(value, pa_type, column_name=None):
         or pa.types.is_boolean(pa_type)
         and pd.api.types.is_bool(value)
         or pa.types.is_timestamp(pa_type)
-        and not isinstance(value, (bytes, str))
+        and not isinstance(value, bytes | str)
         and (
             pd.api.types.is_datetime64_dtype(value)
             or isinstance(value, datetime.datetime)

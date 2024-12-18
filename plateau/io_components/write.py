@@ -77,10 +77,8 @@ def persist_indices(
     for column, index in indices.items():
         # backwards compat
         if isinstance(index, dict):
-            legacy_storage_key = "{dataset_uuid}.{column}{suffix}".format(
-                dataset_uuid=dataset_uuid,
-                column=column,
-                suffix=naming.EXTERNAL_INDEX_SUFFIX,
+            legacy_storage_key = (
+                f"{dataset_uuid}.{column}{naming.EXTERNAL_INDEX_SUFFIX}"
             )
             index = ExplicitSecondaryIndex(
                 column=column, index_dct=index, index_storage_key=legacy_storage_key
@@ -117,9 +115,7 @@ def persist_common_metadata(
         result = validate_compatible(schemas_sorted)
     except ValueError as e:
         raise ValueError(
-            "Schemas for dataset '{dataset_uuid}' are not compatible!\n\n{e}".format(
-                dataset_uuid=dataset_uuid, e=e
-            )
+            f"Schemas for dataset '{dataset_uuid}' are not compatible!\n\n{e}"
         ) from e
     if result:
         store_schema_metadata(
@@ -221,9 +217,7 @@ def store_dataset_from_partitions(
         store.put(*dataset_builder.to_msgpack())
     else:
         raise ValueError(
-            "Unknown metadata storage format encountered: {}".format(
-                metadata_storage_format
-            )
+            f"Unknown metadata storage format encountered: {metadata_storage_format}"
         )
     dataset = dataset_builder.to_dataset()
     return dataset

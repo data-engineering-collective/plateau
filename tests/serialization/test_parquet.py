@@ -303,7 +303,7 @@ def test_pushdown_binaries(store, dataframe_not_nested, binary_value, chunk_size
 
 
 @pytest.mark.xfail(reason="Requires parquet-cpp 1.5.0.")
-def test_pushdown_null_itermediate(store):
+def test_pushdown_null_intermediate(store):
     binary = b"\x8f\xb6\xe5@\x90\xdc\x11\xe8\x00\xae\x02B\xac\x12\x01\x06"
     df = pd.DataFrame({"byte_with_null": [binary]})
     serialiser = ParquetSerializer(chunk_size=1)
@@ -473,7 +473,7 @@ def test_reset_dict_cols(store):
     assert pa.types.is_dictionary(only_a_reset.field("colB").type)
 
 
-def test_retry_on_IOError(monkeypatch, caplog, store):
+def test_retry_on_IOError(monkeypatch, caplog, store):  # noqa: N802
     """See https://github.com/JDASoftwareGroup/plateau/issues/407 :
 
     We are testing a retry-workaround for the above issue here. Once the
@@ -504,7 +504,7 @@ def test_retry_on_IOError(monkeypatch, caplog, store):
     pdt.assert_frame_equal(df, df_result)
 
 
-def test_retries_on_IOError_logs(monkeypatch, caplog, store):
+def test_retries_on_IOError_logs(monkeypatch, caplog, store):  # noqa: N802
     """See https://github.com/JDASoftwareGroup/plateau/issues/407 :
 
     We are testing a retry-workaround for the above issue here. Once the

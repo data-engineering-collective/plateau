@@ -69,7 +69,7 @@ def dispatch_metapartitions_from_factory(
         if len(dispatch_by) == 0:
             merged_partitions = [((""), base_df)]
         else:
-            # Group the resulting MetaParitions by partition keys or a subset of those keys
+            # Group the resulting MetaPartitions by partition keys or a subset of those keys
             merged_partitions = base_df.groupby(
                 by=list(dispatch_by), sort=True, as_index=False, observed=True
             )

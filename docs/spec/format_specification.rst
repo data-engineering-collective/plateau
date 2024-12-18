@@ -26,7 +26,7 @@ Goals
  * Inverted indices for fast query planing
  * Read access without any locking mechanism
  * Portable across frameworks and languages
- * Seemless integration to OSS community software
+ * Seamless integration to OSS community software
    (Apache Arrow, Apache Parquet, pandas, etc.)
  * Lifecycle management (garbage collection, retention, etc.)
  * No external service required for state tracking

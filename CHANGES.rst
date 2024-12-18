@@ -2,6 +2,12 @@
 Changelog
 =========
 
+Plateau 4.4.1 (2024-12-17)
+==========================
+
+* Port project to use the OSS QuantCo copier template (`copier template https://github.com/Quantco/copier-template-python-open-source`_) and (`pixi https://pixi.sh`_) as environment manager.
+
+
 Plateau 4.4.0 (2024-05-23)
 ==========================
 
@@ -162,7 +168,7 @@ Version 3.19.1 (2021-02-24)
 Version 3.19.0 (2021-02-12)
 ===========================
 
-* Fix an issue where updates on cubes or updates on datatsets using
+* Fix an issue where updates on cubes or updates on datasets using
   dask.dataframe might not update all secondary indices, resulting in a corrupt
   state after the update
 * Expose compression type and row group chunk size in Cube interface via optional
@@ -528,7 +534,7 @@ Version 3.3.0 (2019-08-15)
 
 Version 3.2.0 (2019-07-25)
 ==========================
-- Fix gh:66 where predicate pushdown may evalute false results if evaluated
+- Fix gh:66 where predicate pushdown may evaluate false results if evaluated
   using improper types. The behavior now is to raise in these situations.
 - Predicate pushdown and ``kartothek.serialization.filter_array_like`` will now properly handle pandas Categoricals.
 - Add ``kartothek.io.dask.bag.read_dataset_as_dataframe_bag``

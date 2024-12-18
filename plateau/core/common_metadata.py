@@ -11,7 +11,6 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import simplejson
 from minimalkv import KeyValueStore
-from packaging import version
 
 from plateau.core import naming
 from plateau.core._compat import load_json
@@ -30,8 +29,6 @@ __all__ = (
     "normalize_type",
     "normalize_column_order",
 )
-
-PYARROW_LT_13 = version.parse(pa.__version__) < version.parse("13")
 
 
 class SchemaWrapper:
@@ -67,7 +64,7 @@ class SchemaWrapper:
             pandas_metadata = schema.pandas_metadata
             index_cols = pandas_metadata["index_columns"]
             if len(index_cols) > 1:
-                raise NotImplementedError("Treatement of MultiIndex not implemented.")
+                raise NotImplementedError("Treatment of MultiIndex not implemented.")
 
             for _, col in enumerate(index_cols):
                 # Range index is now serialized using start/end information. This special treatment
@@ -531,8 +528,8 @@ def _strip_columns_from_schema(schema, field_names):
             # This is most likely an indicator for incompatible schemas and we refuse to strip the schema
             # to not obfurscate the validation result
             _logger.warning(
-                "Unexpected field `%s` encountered while trying to strip `null` columns.\n"
-                "Schema was:\n\n`%s`" % (name, schema)
+                f"Unexpected field `{name}` encountered while trying to strip `null` columns.\n"
+                f"Schema was:\n\n`{schema}`"
             )
             return schema
     return stripped_schema
@@ -635,21 +632,16 @@ def validate_compatible(schemas, ignore_pandas=False):
 
         if reference_to_compare != current_to_compare:
             schema_diff = _diff_schemas(reference, current)
-            exception_message = """Schema violation
+            exception_message = f"""Schema violation
 
-Origin schema: {origin_schema}
-Origin reference: {origin_reference}
+Origin schema: {_fmt_origin(current.origin)}
+Origin reference: {_fmt_origin(reference.origin)}
 
 Diff:
 {schema_diff}
 
 Reference schema:
-{reference}""".format(
-                schema_diff=schema_diff,
-                reference=str(reference),
-                origin_schema=_fmt_origin(current.origin),
-                origin_reference=_fmt_origin(reference.origin),
-            )
+{str(reference)}"""
             raise ValueError(exception_message)
 
     # add all origins to result AFTER error checking, otherwise the error message would be pretty misleading due to the
@@ -729,9 +721,7 @@ def validate_shared_columns(schemas, ignore_pandas=False):
                     continue
                 if ref != obj:
                     raise ValueError(
-                        'Found incompatible entries for column "{}"\n{}\n{}'.format(
-                            col, ref, obj
-                        )
+                        f'Found incompatible entries for column "{col}"\n{ref}\n{obj}'
                     )
             else:
                 seen[col] = obj
@@ -767,11 +757,7 @@ def empty_dataframe_from_schema(
     # HACK: Cast bytes to object in metadata until Pandas bug is fixed: https://github.com/pandas-dev/pandas/issues/50127
     schema = schema_metadata_bytes_to_object(schema.internal())
 
-    # Prior to pyarrow 13.0.0 coerce_temporal_nanoseconds didn't exist
-    # as it was introduced for backwards compatibility with pandas 1.x
-    _coerce = {}
-    if not PYARROW_LT_13:
-        _coerce["coerce_temporal_nanoseconds"] = coerce_temporal_nanoseconds
+    _coerce = {"coerce_temporal_nanoseconds": coerce_temporal_nanoseconds}
     df = schema.empty_table().to_pandas(date_as_object=date_as_object, **_coerce)
 
     df.columns = df.columns.map(ensure_string_type)

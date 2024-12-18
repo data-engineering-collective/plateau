@@ -68,7 +68,7 @@ column all get written to the same partition. To do this, we use the
         store_url, "partitioned_dataset", [df], partition_on="B"
     )
 
-Partitioning based on a date column ussually makes sense for timeseries data.
+Partitioning based on a date column usually makes sense for timeseries data.
 
 Of interest here is ``dm.partitions``:
 
@@ -195,7 +195,7 @@ If you need more control over the size of files and the distribution within the 
 
 Bucketing uses the values of the requested columns and assigns every unique
 tuple to one of `num_buckets` files. This not only helps to control output file
-sizes but also allows for very efficient querying in combination with seconday
+sizes but also allows for very efficient querying in combination with secondary
 indices, see also :ref:`efficient_querying`.
 
 In the below example you can see the same data being used as above but this time we will bucket by column `B` which will no longer create a single file per value in `B` but rather `num_buckets` files.
