@@ -22,34 +22,34 @@ def generate_mp():
     )
 
 
-def _partition_metadata(depth, num_leafs):
+def _partition_metadata(depth, num_leaves):
     if depth == 0:
         return "the_end"
-    part_meta = _partition_metadata(depth - 1, num_leafs)
-    return {str(k): part_meta for k in range(num_leafs)}
+    part_meta = _partition_metadata(depth - 1, num_leaves)
+    return {str(k): part_meta for k in range(num_leaves)}
 
 
-def generate_metadata(max_depth=7, num_leafs=5):
+def generate_metadata(max_depth=7, num_leaves=5):
     """Generate a metadata dictionary which holds many `partition_metadata`
     keys."""
     return {
         "creation_time": "2018-05-05 12:00:00",
-        "partition_metadata": _partition_metadata(max_depth, num_leafs),
+        "partition_metadata": _partition_metadata(max_depth, num_leaves),
     }
 
 
 class TimeStoreDataset(AsvBenchmarkConfig):
     timeout = 120
     params = ([10, 10**2, 10**3], [4], [2, 4])
-    param_names = ["num_partitions", "max_depth", "num_leafs"]
+    param_names = ["num_partitions", "max_depth", "num_leaves"]
 
-    def setup(self, num_partitions, max_depth, num_leafs):
+    def setup(self, num_partitions, max_depth, num_leaves):
         self.store = get_store_from_url(f"hfs://{tempfile.mkdtemp()}")
         self.partitions = [generate_mp() for _ in range(num_partitions)]
         self.dataset_uuid = "dataset_uuid"
         self.user_dataset_metadata = {}
 
-    def time_store_dataset_from_partitions(self, num_partitions, max_depth, num_leafs):
+    def time_store_dataset_from_partitions(self, num_partitions, max_depth, num_leaves):
         store_dataset_from_partitions(
             partition_list=self.partitions,
             store=self.store,
