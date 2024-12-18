@@ -16,6 +16,7 @@ license = { file = "LICENSE.txt" }
 classifiers = [
   "License :: OSI Approved :: MIT License",
   "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
 ]
@@ -23,7 +24,7 @@ dependencies = [
   "dask[dataframe]!=2021.5.1,!=2021.6.0", # gh475 - 2021.5.1 and 2021.6.0 broke ci, omit those versions
   "decorator",
   "msgpack>=0.5.2",
-  "numpy>1.23",
+  "numpy>1.23,<2",
   "pandas>=2",
   "pyarrow>=14",
   "simplejson",
