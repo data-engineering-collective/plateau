@@ -357,7 +357,7 @@ def commit_dataset(
 
         Note::
 
-            If you do not want the new metadata to be merged with the existing one, povide a custom ``metadata_merger``
+            If you do not want the new metadata to be merged with the existing one, provide a custom ``metadata_merger``
 
     Parameters
     ----------
