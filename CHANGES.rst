@@ -8,6 +8,7 @@ Plateau 4.5.0 (XXXX-XX-XX)
 * Include pyarrow 17.0.0 in CI
 * Support numpy 2.x
 * Compatibility with dask 2025.1.1
+* Fixes for Python 3.13 support
 
 Plateau 4.4.1 (2024-12-17)
 ==========================

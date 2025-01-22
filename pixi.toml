@@ -88,6 +88,8 @@ python = "3.10.*"
 python = "3.11.*"
 [feature.py312.dependencies]
 python = "3.12.*"
+[feature.py313.dependencies]
+python = "3.13.*"
 
 # We only support the four most recent versions of pyarrow
 [feature.pyarrow15_0_2.dependencies]
@@ -116,6 +118,8 @@ py312-pyarrow15-0-2 = ["py312", "pyarrow15_0_2", "test"]
 py312-pyarrow16-1 = ["py312", "pyarrow16_1", "test"]
 py312-pyarrow17-0 = ["py312", "pyarrow17_0", "test"]
 py312-pyarrow18-1 = ["py312", "pyarrow18_1", "test"]
+
+py313-pyarrow18-1 = ["py313", "pyarrow18_1", "test"]
 
 build = ["build"]
 benchmark = ["benchmark", "test"]
