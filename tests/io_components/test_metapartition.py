@@ -1003,9 +1003,7 @@ def test_reconstruct_date_index(store, metadata_version, dates_as_object):
     if dates_as_object:
         dt_constructor = date
     else:
-
-        def dt_constructor(*args):
-            return pd.Timestamp(datetime(*args), unit="ns")
+        dt_constructor = datetime
 
     df_expected = pd.DataFrame(
         OrderedDict(
@@ -1015,6 +1013,11 @@ def test_reconstruct_date_index(store, metadata_version, dates_as_object):
             ]
         )
     )
+    if not dates_as_object:
+        # pandas 3+ supports non-ns datetimes
+        df_expected = df_expected.assign(
+            index_col=lambda x: x.index_col.astype("datetime64[ns]")
+        )
     pdt.assert_frame_equal(df_actual, df_expected)
 
 
