@@ -1,4 +1,5 @@
 import inspect
+import textwrap
 from collections import defaultdict
 
 import pytest
@@ -81,6 +82,11 @@ def test_docs(function):
     valid_docs = defaultdict(set)
     for arg in arguments:
         valid = _PARAMETER_MAPPING.get(arg, "Parameters") in docstrings
+        if not valid:
+            indented = textwrap.indent(
+                _PARAMETER_MAPPING.get(arg, "Parameters"), " " * 4, lambda line: True
+            )
+            valid = indented.lstrip() in docstrings
         valid_docs[valid].add(arg)
 
     assert valid_docs[True]
