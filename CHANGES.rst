@@ -2,10 +2,11 @@
 Changelog
 =========
 
-Plateau 4.4.1 (XXXX-XX-XX)
+Plateau 4.5.0 (XXXX-XX-XX)
 ==========================
 
 * Include pyarrow 17.0.0 in CI
+* Support numpy 2.x
 
 Plateau 4.4.1 (2024-12-17)
 ==========================
