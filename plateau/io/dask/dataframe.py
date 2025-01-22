@@ -146,9 +146,9 @@ def read_dataset_as_ddf(
     if dask_index_on:
         ds_factory.load_index(dask_index_on)
         divisions = ds_factory.indices[dask_index_on].observed_values()
-        divisions.sort()
         divisions_lst = list(divisions)
-        divisions_lst.append(divisions[-1])
+        divisions_lst = sorted(divisions_lst)
+        divisions_lst.append(divisions_lst[-1])
 
     with dask.config.set({"dataframe.convert-string": False}):
         ddf = from_map(
