@@ -8,7 +8,7 @@ postinstall = "pip install --no-build-isolation --no-deps --disable-pip-version-
 
 [dependencies]
 python = ">=3.10"
-dask = ">=2022.5.1"
+dask = ">=2022.5.1,<2025"
 decorator = "*"
 msgpack-python = ">=0.5.2"
 numpy = ">1.23,<2"
@@ -38,7 +38,7 @@ pytest-mock = "*"
 pytest-xdist = ">=3.6.1,<4"
 freezegun = "*"
 mypy = "*"
-distributed = ">=2022.5.1"
+distributed = ">=2022.5.1,<2025"
 pytz = "*"
 cloudpickle = "*"
 hypothesis = "*"

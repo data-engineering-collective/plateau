@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Plateau 4.4.1 (XXXX-XX-XX)
+==========================
+
+* Include pyarrow 17.0.0 in CI
+
 Plateau 4.4.1 (2024-12-17)
 ==========================
 
