@@ -26,6 +26,7 @@ jobs:
             "py310-pyarrow18-1",
             "py311-pyarrow18-1",
             "py312-pyarrow18-1",
+            "py313-pyarrow18-1",
           ]
 
     steps:
