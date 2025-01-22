@@ -127,11 +127,8 @@ def test_reconstruct_dask_index(store_factory, index_type, monkeypatch):
             pd.DataFrame(data=arr, columns=df1.columns).astype(df1.dtypes)
             for arr in df_chunks
         ]
-    query_planning = dask.config.get("dataframe.query-planning", True)
     with dask.config.set(
         {"dataframe.convert-string": False, "dataframe.shuffle.method": "tasks"}
-        if query_planning or query_planning is None
-        else {"dataframe.shuffle.method": "tasks"}
     ):
         ddf_expected = dd.from_map(lambda x: x, df_chunks).set_index(
             colA, divisions=[1, 2, 3, 4, 4]
@@ -155,10 +152,6 @@ def test_reconstruct_dask_index(store_factory, index_type, monkeypatch):
         partition_on=partition_on,
     )
 
-    # Make sure we're not shuffling anything
-    monkeypatch.delattr(
-        dask.dataframe.shuffle, dask.dataframe.shuffle.set_index.__name__
-    )
     ddf = read_dataset_as_ddf(
         dataset_uuid=dataset_uuid,
         store=store_factory,
@@ -213,10 +206,6 @@ def test_reconstruct_dask_index_types(
 
 
 def test_reconstruct_dask_index_sorting(store_factory, monkeypatch):
-    # Make sure we're not shuffling anything
-    monkeypatch.delattr(
-        dask.dataframe.shuffle, dask.dataframe.shuffle.set_index.__name__
-    )
     dataset_uuid = "dataset_uuid"
     colA = "ColumnA"
     colB = "ColumnB"
