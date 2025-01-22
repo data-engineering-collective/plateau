@@ -1003,7 +1003,10 @@ def test_reconstruct_date_index(store, metadata_version, dates_as_object):
     if dates_as_object:
         dt_constructor = date
     else:
-        dt_constructor = datetime
+
+        def dt_constructor(*args):
+            return pd.Timestamp(datetime(*args), unit="ns")
+
     df_expected = pd.DataFrame(
         OrderedDict(
             [
