@@ -95,7 +95,7 @@ def deprecate_kwarg(old_arg_name, new_arg_name, mapping=None, stacklevel=2):
 
     if mapping is not None and not hasattr(mapping, "get") and not callable(mapping):
         raise TypeError(
-            "mapping from old to new argument values " "must be dict or callable!"
+            "mapping from old to new argument values must be dict or callable!"
         )
 
     def _deprecate_kwarg(func):

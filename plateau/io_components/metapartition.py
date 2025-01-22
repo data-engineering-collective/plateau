@@ -873,7 +873,7 @@ class MetaPartition(Iterable):
                         buf = io.StringIO()
                         df.info(buf=buf)
                         LOGGER.error(
-                            "Writing dataframe failed.\n" "%s\n" "%s\n" "%s",
+                            "Writing dataframe failed.\n%s\n%s\n%s",
                             exc,
                             buf.getvalue(),
                             df.head(),
