@@ -60,10 +60,10 @@ jobs:
         with:
           environments: ${{ matrix.environment }} # References the environments defined in pixi.toml
       - name: Install repository
-        run: pixi run postinstall
+        run: pixi run -e ${{ matrix.environment }} postinstall
 
       - name: Pytest
-        run: pixi run test-coverage -n auto
+        run: pixi run -e ${{ matrix.environment }}  test-coverage -n auto
 
       - name: Codecov
         uses: codecov/codecov-action@v5.1.2
