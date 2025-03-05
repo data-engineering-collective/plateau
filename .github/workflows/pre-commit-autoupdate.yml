@@ -27,7 +27,7 @@ jobs:
         run: |
           pixi run pre-commit-update
           pixi run pre-commit-run --color=always --show-diff-on-failure || true
-      - uses: peter-evans/create-pull-request@dd2324fc52d5d43c699a5636bcf19fceaa70c284
+      - uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e
         with:
           commit-message: "Auto-update pre-commit hooks"
           title: "Auto-update pre-commit hooks"
