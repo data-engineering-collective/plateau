@@ -1,3 +1,4 @@
+from typing import Any
 import duckdb
 from duckdb import DuckDBPyConnection, DuckDBPyRelation
 from minimalkv import KeyValueStore
@@ -9,9 +10,13 @@ from plateau.io.eager import (
 
 
 def read_table_as_ddb(
-    uuid: str, store: KeyValueStore, table: str
+    uuid: str,
+    store: KeyValueStore,
+    table: str,
+    predicates: list[list[tuple[str, str, Any]]] | None = None,
+    **kwargs,  # support for everything else
 ) -> duckdb.DuckDBPyConnection:
-    df = read_table(uuid, store=store)
+    df = read_table(uuid, store=store, predicates=predicates, **kwargs)
     con = duckdb.connect()
     con.register(table, df)
     return con
@@ -21,6 +26,8 @@ def store_dataset_from_ddb(
     store: KeyValueStore,
     dataset_uuid: str,
     duckdb: list[DuckDBPyConnection | DuckDBPyRelation],
+    partition_on: list[str] | None = None,
+    **kwargs,  # support for everything else
 ):
     store_dataframes_as_dataset(
         store=store,
@@ -29,6 +36,8 @@ def store_dataset_from_ddb(
             item.fetch_df() if isinstance(item, DuckDBPyConnection) else item.fetchdf()
             for item in duckdb  # TODO: use arrow
         ],
+        partition_on=partition_on,
+        **kwargs,
     )
 
 
