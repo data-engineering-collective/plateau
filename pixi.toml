@@ -23,6 +23,7 @@ attrs = "*"
 click = "*"
 prompt-toolkit = "*"
 pyyaml = "*"
+polars = ">=1.24.0,<2"
 
 
 [host-dependencies]

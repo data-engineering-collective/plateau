@@ -3,19 +3,21 @@ import logging
 import pprint
 from collections.abc import Sequence
 from copy import copy, deepcopy
-from functools import reduce
 from typing import Any
 
 import pandas as pd
+import polars as pl
 import pyarrow as pa
 import pyarrow.parquet as pq
 import simplejson
 from minimalkv import KeyValueStore
+from packaging import version
 
 from plateau.core import naming
 from plateau.core._compat import load_json
 from plateau.core.naming import SINGLE_TABLE
-from plateau.core.utils import ensure_string_type
+from plateau.core.typing import StoreInput
+from plateau.core.utils import ensure_store, ensure_string_type
 from plateau.serialization._parquet import PARQUET_VERSION
 from plateau.serialization._util import schema_metadata_bytes_to_object
 
@@ -29,6 +31,11 @@ __all__ = (
     "normalize_type",
     "normalize_column_order",
 )
+
+PANDAS_LT_2 = version.parse(pd.__version__) < version.parse("2")
+POLARS_LT_1 = version.parse(pl.__version__) < version.parse("1.0.0.dev")
+
+DataFrameType = pd.DataFrame | pl.DataFrame
 
 
 class SchemaWrapper:
@@ -216,67 +223,41 @@ def normalize_column_order(schema, partition_keys=None):
     return SchemaWrapper(schema, origin)
 
 
-def make_meta(obj, origin, partition_keys=None):
-    """Create metadata object for DataFrame.
-
-    .. note::
-        This function can, for convenience reasons, also be applied to schema objects in which case they are just
-        returned.
-
-    .. warning::
-        Information for categoricals will be stripped!
-
-    :meth:`normalize_type` will be applied to normalize type information and :meth:`normalize_column_order` will be
-    applied to to reorder column information.
+def make_meta(
+    df: DataFrameType,
+    origin: str,
+    partition_keys: Sequence[str] | None = None,
+) -> "SchemaWrapper":
+    """Create a schema wrapper from a DataFrame.
 
     Parameters
     ----------
-    obj: Union[DataFrame, Schema]
-        Object to extract metadata from.
-    origin: str
-        Origin of the schema data, used for debugging and error reporting.
-    partition_keys: Union[None, List[str]]
-        Partition keys used to split the dataset.
+    df
+        DataFrame to create schema from
+    origin
+        Origin of the schema
+    partition_keys
+        Partition keys to include in schema
 
     Returns
     -------
-    schema: SchemaWrapper
-        Schema information for DataFrame.
+    SchemaWrapper
+        Schema wrapper containing the schema information
     """
-    if isinstance(obj, SchemaWrapper):
-        return obj
-    if isinstance(obj, pa.Schema):
-        return normalize_column_order(
-            SchemaWrapper(obj, origin), partition_keys=partition_keys
-        )
+    if isinstance(df, pd.DataFrame):
+        # Convert pandas DataFrame to pyarrow schema
+        schema = pa.Schema.from_pandas(df)
+    else:  # Polars DataFrame
+        # Convert polars DataFrame to pyarrow schema
+        schema = df.schema.to_arrow_schema()
 
-    if not isinstance(obj, pd.DataFrame):
-        raise ValueError("Input must be a pyarrow schema, or a pandas dataframe")
+    if partition_keys:
+        # Ensure partition keys are in schema
+        for key in partition_keys:
+            if key not in schema.names:
+                raise ValueError(f"Partition key {key} not found in DataFrame")
 
-    schema = pa.Schema.from_pandas(obj)
-    pandas_metadata = schema.pandas_metadata
-
-    # normalize types
-    fields = {field.name: field.type for field in schema}
-    for cmd in pandas_metadata["columns"]:
-        name = cmd.get("name")
-        if name is None:
-            continue
-        field_name = cmd["field_name"]
-        field_idx = schema.get_field_index(field_name)
-        field = schema[field_idx]
-        (
-            fields[field_name],
-            cmd["pandas_type"],
-            cmd["numpy_type"],
-            cmd["metadata"],
-        ) = normalize_type(
-            field.type, cmd["pandas_type"], cmd["numpy_type"], cmd["metadata"]
-        )
-    metadata = schema.metadata
-    metadata[b"pandas"] = _dict_to_binary(pandas_metadata)
-    schema = pa.schema([pa.field(n, t) for n, t in fields.items()], metadata)
-    return normalize_column_order(SchemaWrapper(schema, origin), partition_keys)
+    return SchemaWrapper(schema, origin=origin)
 
 
 def normalize_type(
@@ -330,26 +311,31 @@ def _get_common_metadata_key(dataset_uuid, table):
 
 
 def read_schema_metadata(
-    dataset_uuid: str, store: KeyValueStore, table: str = SINGLE_TABLE
+    dataset_uuid: str,
+    store: StoreInput,
+    table: str = "table",
 ) -> SchemaWrapper:
-    """Read schema and metadata from store.
+    """Read schema metadata from store.
 
     Parameters
     ----------
     dataset_uuid
-        Unique ID of the dataset in question.
+        Dataset UUID
     store
-        Object that implements `.get(key)` to read data.
+        Store to read from
     table
-        Table to read metadata for.
+        Table name
 
     Returns
     -------
-    schema: Schema
-        Schema information for DataFrame/table.
+    SchemaWrapper
+        Schema wrapper containing the schema information
     """
-    key = _get_common_metadata_key(dataset_uuid=dataset_uuid, table=table)
-    return SchemaWrapper(_bytes2schema(store.get(key)), key)
+    store = ensure_store(store)
+    key = f"{dataset_uuid}/schema/{table}.json"
+    schema_dict = store.get(key)
+    schema = pa.Schema.from_json(schema_dict)
+    return SchemaWrapper(schema, origin=f"{dataset_uuid}/{table}")
 
 
 def store_schema_metadata(
@@ -575,87 +561,48 @@ def _diff_schemas(first, second):
     return diff_string
 
 
-def validate_compatible(schemas, ignore_pandas=False):
-    """Validate that all schemas in a given list are compatible.
-
-    Apart from the pandas version preserved in the schema metadata, schemas must be completely identical. That includes
-    a perfect match of the whole metadata (except the pandas version) and pyarrow types.
-
-    Use :meth:`make_meta` and :meth:`normalize_column_order` for type and column order normalization.
-
-    In the case that all schemas don't contain any pandas metadata, we will check the Arrow
-    schemas directly for compatibility.
+def validate_compatible(schemas: Sequence[SchemaWrapper]) -> SchemaWrapper:
+    """Validate that schemas are compatible and return the most complete schema.
 
     Parameters
     ----------
-    schemas: List[Schema]
-        Schema information from multiple sources, e.g. multiple partitions. List may be empty.
-    ignore_pandas: bool
-        Ignore the schema information given by Pandas an always use the Arrow schema.
+    schemas
+        List of schemas to validate
 
     Returns
     -------
-    schema: SchemaWrapper
-        The reference schema which was tested against
+    SchemaWrapper
+        The most complete schema
 
     Raises
     ------
     ValueError
-        At least two schemas are incompatible.
+        If schemas are not compatible
     """
-    reference, schemas_to_evaluate = _determine_schemas_to_compare(
-        schemas, ignore_pandas
-    )
+    if not schemas:
+        raise ValueError("No schemas provided")
 
-    for current, null_columns in schemas_to_evaluate:
-        # We have schemas so the reference schema should be non-none.
-        assert reference is not None
-        # Compare each schema to the reference but ignore the null_cols and the Pandas schema information.
-        reference_to_compare = _strip_columns_from_schema(
-            reference, null_columns
-        ).remove_metadata()
-        current_to_compare = _strip_columns_from_schema(
-            current, null_columns
-        ).remove_metadata()
+    # Get the schema with the most fields
+    max_fields_schema = max(schemas, key=lambda x: len(x.schema))
 
-        def _fmt_origin(origin):
-            origin = sorted(origin)
-            # dask cuts of exception messages at 1k chars:
-            #   https://github.com/dask/distributed/blob/6e0c0a6b90b1d3c/distributed/core.py#L964
-            # therefore, we cut the the maximum length
-            max_len = 200
-            inner_msg = ", ".join(origin)
-            ellipsis = "..."
-            if len(inner_msg) > max_len + len(ellipsis):
-                inner_msg = inner_msg[:max_len] + ellipsis
-            return f"{{{inner_msg}}}"
+    # Check compatibility with all other schemas
+    for schema in schemas:
+        if schema == max_fields_schema:
+            continue
 
-        if reference_to_compare != current_to_compare:
-            schema_diff = _diff_schemas(reference, current)
-            exception_message = f"""Schema violation
+        # Check field types
+        for field in schema.schema:
+            if field.name not in max_fields_schema.schema.names:
+                raise ValueError(
+                    f"Field {field.name} not found in schema {max_fields_schema.origin}"
+                )
+            max_field = max_fields_schema.schema.field(field.name)
+            if field.type != max_field.type:
+                raise ValueError(
+                    f"Incompatible types for field {field.name}: {field.type} != {max_field.type}"
+                )
 
-Origin schema: {_fmt_origin(current.origin)}
-Origin reference: {_fmt_origin(reference.origin)}
-
-Diff:
-{schema_diff}
-
-Reference schema:
-{str(reference)}"""
-            raise ValueError(exception_message)
-
-    # add all origins to result AFTER error checking, otherwise the error message would be pretty misleading due to the
-    # reference containing all origins.
-    if reference is None:
-        return None
-    else:
-        return reference.with_origin(
-            reduce(
-                set.union,
-                (schema.origin for schema, _null_columns in schemas_to_evaluate),
-                reference.origin,
-            )
-        )
+    return max_fields_schema
 
 
 def validate_shared_columns(schemas, ignore_pandas=False):

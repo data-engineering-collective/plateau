@@ -1,3 +1,4 @@
+import datetime
 import logging
 from collections.abc import Iterable
 from copy import copy
@@ -5,6 +6,7 @@ from typing import Any, TypeVar, cast
 
 import numpy as np
 import pandas as pd
+import polars as pl
 import pyarrow as pa
 import pyarrow.parquet as pq
 from toolz.itertoolz import partition_all
@@ -12,7 +14,6 @@ from toolz.itertoolz import partition_all
 import plateau.core._time
 from plateau.core import naming
 from plateau.core._mixins import CopyMixin
-from plateau.core.common_metadata import normalize_type
 from plateau.core.docs import default_docs
 from plateau.core.typing import StoreInput
 from plateau.core.urlencode import quote
@@ -40,83 +41,31 @@ __all__ = (
 
 
 class IndexBase(CopyMixin):
-    """Initialize an IndexBase.
+    """Base class for all index types."""
 
-    Parameters
-    ----------
-    column
-        Name of the column this index is for.
-    index_dct
-        Mapping from index values to partition labels
-    dtype
-        Type of index. If left out and ``index_dct`` is present, this will be inferred.
-    normalize_dtype
-        Normalize type information and values within ``index_dct``. The user may
-        disable this when it the index was already normalized, e.g. when the
-        index python objects gets copied, or when the index data is restored
-        from a parquet file that was written by a trusted write path.
-    """
+    def __init__(self, column: str, dtype: pa.DataType | None = None):
+        """Initialize the index.
 
-    def __init__(
-        self,
-        column: str,
-        index_dct: IndexDictType | None = None,
-        dtype: pa.DataType | None = None,
-        normalize_dtype: bool = True,
-    ):
-        if column == _PARTITION_COLUMN_NAME:
-            raise ValueError(
-                f"Cannot create an index for column {column} due to an internal implementation conflict. "
-                "Please contact a plateau maintainer if you receive this error message"
-            )
-        if (dtype is None) and index_dct:
-            # do dtype given but index_dct is present => auto-derive dtype
-            table = _index_dct_to_table(index_dct, column, None)
-            schema = table.schema
-            dtype = schema[0].type
-
-        if dtype is not None:
-            if pa.types.is_nested(dtype):
-                raise NotImplementedError("Indices w/ nested types are not supported")
-            if pa.types.is_null(dtype):
-                raise NotImplementedError("Indices w/ null/NA type are not supported")
-            if normalize_dtype:
-                dtype, _t_pd, _t_np, _metadata = normalize_type(dtype, None, None, None)
-
+        Parameters
+        ----------
+        column
+            Column name to index
+        dtype
+            Arrow data type of the column
+        """
         self.column = column
         self.dtype = dtype
+        self.loaded = False
         self.creation_time = plateau.core._time.datetime_utcnow()
         self.index_dct: IndexDictType
 
         self.index_dct = {}
         self._index_dct_available = False
-        if index_dct is not None:
-            self._index_dct_available = True
-            if normalize_dtype:
-                # index_dct may be from an untrusted or weakly typed source, so we need to normalize and fuse values
-                self.index_dct = {}
-                n_collisions = 0
-                for value, partitions in index_dct.items():
-                    value = IndexBase.normalize_value(self.dtype, value)
-                    if value not in self.index_dct:
-                        self.index_dct[value] = copy(partitions)
-                    else:
-                        existing = self.index_dct[value]
-                        self.index_dct[value] += [
-                            part for part in partitions if part not in existing
-                        ]
-                        n_collisions += 1
-
-                if n_collisions:
-                    _logger.warning(
-                        f"Value normalization for index column {column} resulted in {n_collisions} collision(s). plateau merged "
-                        "the affected partition lists, but you may want to check if this was desired."
-                    )
-            else:
-                # data comes from a trusted source (e.g. an index that we've already preserved and are now reading), so
-                # use the fast path and don't re-normalize the values
-                self.index_dct = index_dct
-
+        if dtype is not None:
+            if pa.types.is_nested(dtype):
+                raise NotImplementedError("Indices w/ nested types are not supported")
+            if pa.types.is_null(dtype):
+                raise NotImplementedError("Indices w/ null/NA type are not supported")
         super().__init__()
 
     def copy(self, **kwargs) -> "IndexBase":
@@ -147,62 +96,75 @@ class IndexBase(CopyMixin):
 
     @staticmethod
     def normalize_value(dtype: pa.DataType, value: Any) -> Any:
-        """Normalize value according to index dtype.
-
-        This may apply casts (e.g. integers to floats) or parsing (e.g. timestamps from strings) to the value.
+        """Normalize a value to match the index dtype.
 
         Parameters
         ----------
         dtype
-            Arrow type of the index.
+            Arrow data type to normalize to
         value
-            any value
+            Value to normalize
 
         Returns
         -------
-        value: Any
-            normalized value, with a type that matches the index dtype
-
-        Raises
-        ------
-        ValueError
-            If dtype of the index was not set or derived.
-        NotImplementedError
-            If the dtype cannot be handled.
+        Any
+            Normalized value
         """
-        if dtype is None:
-            raise ValueError(
-                "Cannot normalize index values as long as dtype is not set"
-            )
-        elif pa.types.is_string(dtype):
-            if isinstance(value, bytes):
-                return value.decode("utf-8")
-            else:
-                return str(value)
-        elif pa.types.is_binary(dtype):
-            if isinstance(value, bytes):
-                return value
-            else:
-                return str(value).encode("utf-8")
-        elif pa.types.is_date(dtype):
-            return pd.Timestamp(value).date()
-        elif pa.types.is_temporal(dtype):
-            return pd.Timestamp(value).to_datetime64().astype("datetime64[ns]")
+        if pa.types.is_date(dtype):
+            if isinstance(value, str):
+                return pd.to_datetime(value).date()
+            elif isinstance(value, pd.Timestamp):
+                return value.date()
+            elif isinstance(value, np.datetime64 | datetime.date):
+                return pd.Timestamp(value).date()
+        elif pa.types.is_timestamp(dtype):
+            if isinstance(value, str):
+                return pd.to_datetime(value)
+            elif isinstance(value, np.datetime64 | datetime.date):
+                return pd.Timestamp(value)
         elif pa.types.is_integer(dtype):
             return int(value)
         elif pa.types.is_floating(dtype):
             return float(value)
-        elif pa.types.is_boolean(dtype):
-            if isinstance(value, str):
-                if value.lower() == "false":
-                    return False
-                elif value.lower() == "true":
-                    return True
-                else:
-                    return ValueError(f'Cannot parse boolean value "{value}"')
-            return bool(value)
-        else:
-            raise NotImplementedError(f"Cannot normalize index value for type {dtype}")
+        elif pa.types.is_string(dtype):
+            return str(value)
+        return value
+
+    def get_values(self, df: pd.DataFrame | pl.DataFrame) -> set[Any]:
+        """Get unique values from DataFrame column.
+
+        Parameters
+        ----------
+        df
+            DataFrame to get values from
+
+        Returns
+        -------
+        Set[Any]
+            Set of unique values
+        """
+        if isinstance(df, pd.DataFrame):
+            return set(df[self.column].dropna().unique())
+        else:  # Polars DataFrame
+            return set(df.get_column(self.column).unique().to_list())
+
+    def get_value_counts(self, df: pd.DataFrame | pl.DataFrame) -> dict[Any, int]:
+        """Get value counts from DataFrame column.
+
+        Parameters
+        ----------
+        df
+            DataFrame to get value counts from
+
+        Returns
+        -------
+        Dict[Any, int]
+            Dictionary mapping values to their counts
+        """
+        if isinstance(df, pd.DataFrame):
+            return df[self.column].value_counts().to_dict()
+        else:  # Polars DataFrame
+            return df.get_column(self.column).value_counts().to_dict()
 
     @property
     def loaded(self) -> bool:
@@ -552,9 +514,7 @@ class PartitionIndex(IndexBase):
             )
         super().__init__(
             column=column,
-            index_dct=index_dct,
             dtype=dtype,
-            normalize_dtype=normalize_dtype,
         )
 
     def __eq__(self, other):
@@ -588,9 +548,7 @@ class ExplicitSecondaryIndex(IndexBase):
         self.index_storage_key = index_storage_key
         super().__init__(
             column=column,
-            index_dct=index_dct,
             dtype=dtype,
-            normalize_dtype=normalize_dtype,
         )
 
     def copy(self, **kwargs) -> "ExplicitSecondaryIndex":
