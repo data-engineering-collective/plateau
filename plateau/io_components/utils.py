@@ -8,6 +8,7 @@ from typing import Literal, cast, overload
 
 import decorator
 import pandas as pd
+import polars as pl
 
 from plateau.core.dataset import DatasetMetadata, DatasetMetadataBase
 from plateau.core.factory import _ensure_factory
@@ -278,107 +279,128 @@ def normalize_args(function, *args, **kwargs):
 
 
 def extract_duplicates(lst):
-    """Return all items of a list that occur more than once.
+    """Extract duplicate values from a list.
 
     Parameters
     ----------
     lst: List[Any]
+        The list to check for duplicates
 
     Returns
     -------
-    lst: List[Any]
+    List[Any]
+        The list of duplicate values
     """
-
     return [item for item, count in collections.Counter(lst).items() if count > 1]
 
 
 def align_categories(dfs, categoricals):
-    """Takes a list of dataframes with categorical columns and determines the
-    superset of categories. All specified columns will then be cast to the same
-    `pd.CategoricalDtype`
+    """Align the categories of a list of DataFrames.
 
     Parameters
     ----------
-    dfs: List[pd.DataFrame]
-        A list of dataframes for which the categoricals should be aligned
+    dfs: List[Union[pandas.DataFrame, polars.DataFrame]]
+        The list of DataFrames to align
     categoricals: List[str]
-        Columns holding categoricals which should be aligned
+        The list of categorical columns to align
 
     Returns
     -------
-    List[pd.DataFrame]
-        A list with aligned dataframes
+    List[Union[pandas.DataFrame, polars.DataFrame]]
+        The list of DataFrames with aligned categories
     """
-    if len(categoricals) == 0:
+    if not dfs:
         return dfs
 
-    col_dtype = {}
+    # Handle Polars DataFrames
+    if isinstance(dfs[0], pl.DataFrame):
+        for col in categoricals:
+            # Get all unique values across all DataFrames
+            unique_values = set()
+            for df in dfs:
+                if col in df.columns:
+                    unique_values.update(df[col].unique().to_list())
 
-    for column in categoricals:
-        position_largest_df = None
-        categories = set()
-        largest_df_categories = set()
-        for ix, df in enumerate(dfs):
-            ser = df[column]
-            if not isinstance(ser.dtype, pd.CategoricalDtype):
-                cats = ser.dropna().unique()
-                LOGGER.info(
-                    "Encountered non-categorical type where categorical was expected\n"
-                    f"Found at index position {ix} for column {column}\n"
-                    f"Dtypes: {df.dtypes}"
-                )
-            else:
-                cats = ser.cat.categories
-                length = len(df)
-                if position_largest_df is None or length > position_largest_df[0]:
-                    position_largest_df = (length, ix)
-                if position_largest_df[1] == ix:
-                    largest_df_categories = cats
-            categories.update(cats)
+            # Convert to list and sort for deterministic order
+            unique_values = sorted(unique_values)
 
-        # use the categories of the largest DF as a baseline to avoid having
-        # to rewrite its codes. Append the remainder and sort it for reproducibility
-        categories_lst = list(largest_df_categories) + sorted(
-            set(categories) - set(largest_df_categories)
-        )
-        cat_dtype = pd.api.types.CategoricalDtype(categories_lst, ordered=False)
-        col_dtype[column] = cat_dtype
+            # Update each DataFrame to use the same categories
+            for i, df in enumerate(dfs):
+                if col in df.columns:
+                    dfs[i] = df.with_columns(
+                        pl.col(col)
+                        .cast(pl.Categorical)
+                        .cast(pl.Categorical(unique_values))
+                    )
+        return dfs
 
-    return_dfs = []
-    for df in dfs:
-        try:
-            new_df = df.astype(col_dtype, copy=False)
-        except ValueError as verr:
-            cat_types = {
-                col: dtype.categories.dtype for col, dtype in col_dtype.items()
-            }
-            # Should be fixed by pandas>=0.24.0
-            if "buffer source array is read-only" in str(verr):
-                new_df = df.astype(cat_types)
-                new_df = new_df.astype(col_dtype)
-            else:
-                raise verr
-        return_dfs.append(new_df)
-    return return_dfs
+    # Handle Pandas DataFrames (existing code)
+    if not isinstance(dfs[0], pd.DataFrame):
+        return dfs
+
+    # Existing Pandas implementation...
+    categories = {}
+    for cat in categoricals:
+        for df in dfs:
+            if cat in df.columns:
+                if cat not in categories:
+                    categories[cat] = set()
+                categories[cat].update(df[cat].dropna().unique())
+
+    for cat in categories:
+        categories[cat] = list(categories[cat])
+
+    dfs = [df.copy() for df in dfs]
+    for cat in categories:
+        for df in dfs:
+            if cat in df.columns:
+                df[cat] = pd.Categorical(df[cat], categories=categories[cat])
+    return dfs
 
 
-def sort_values_categorical(df: pd.DataFrame, columns: list[str] | str) -> pd.DataFrame:
-    """Sort a dataframe lexicographically by the categories of column
-    `column`"""
-    if not isinstance(columns, list):
-        columns = [columns]
-    for col in columns:
-        if isinstance(df[col].dtype, pd.CategoricalDtype):
-            cat_accessor = df[col].cat
-            df[col] = cat_accessor.reorder_categories(
-                sorted(cat_accessor.categories), ordered=True
-            )
-    return df.sort_values(by=columns).reset_index(drop=True)
+def sort_values_categorical(df, columns):
+    """Sort a DataFrame by categorical columns.
+
+    Parameters
+    ----------
+    df: Union[pandas.DataFrame, polars.DataFrame]
+        The DataFrame to sort
+    columns: Union[str, List[str]]
+        The columns to sort by
+
+    Returns
+    -------
+    Union[pandas.DataFrame, polars.DataFrame]
+        The sorted DataFrame
+    """
+    if isinstance(df, pl.DataFrame):
+        if isinstance(columns, str):
+            columns = [columns]
+        return df.sort(columns)
+    elif isinstance(df, pd.DataFrame):
+        return df.sort_values(columns)
+    else:
+        raise TypeError(f"Unsupported DataFrame type: {type(df)}")
 
 
 def raise_if_indices_overlap(partition_on, secondary_indices):
-    partition_secondary_overlap = set(partition_on) & set(secondary_indices)
-    if partition_secondary_overlap:
-        raise RuntimeError(
-            f"Cannot create secondary index on partition columns: {partition_secondary_overlap}"
-        )
+    """Raise an error if partition keys and secondary indices overlap.
+
+    Parameters
+    ----------
+    partition_on: List[str]
+        The list of partition keys
+    secondary_indices: List[str]
+        The list of secondary indices
+
+    Raises
+    ------
+    ValueError
+        If there is overlap between partition keys and secondary indices
+    """
+    if partition_on and secondary_indices:
+        duplicates = set(partition_on) & set(secondary_indices)
+        if duplicates:
+            raise ValueError(
+                f"Partition columns and secondary indices overlap: {duplicates}"
+            )

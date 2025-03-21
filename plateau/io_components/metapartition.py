@@ -16,6 +16,7 @@ from typing import (
 
 import numpy as np
 import pandas as pd
+import polars as pl
 import pyarrow as pa
 from minimalkv import KeyValueStore
 from packaging import version
@@ -55,6 +56,7 @@ if TYPE_CHECKING:
 LOGGER = logging.getLogger(__name__)
 
 PANDAS_LT_2 = version.parse(pd.__version__) < version.parse("2")
+POLARS_LT_1 = version.parse(pl.__version__) < version.parse("1.0.0.dev")
 
 SINGLE_TABLE = "table"
 
@@ -72,7 +74,7 @@ _METADATA_SCHEMA = {
     "number_rows_per_row_group": np.dtype(int),
 }
 
-MetaPartitionInput = Union[pd.DataFrame, Sequence, "MetaPartition"] | None
+MetaPartitionInput = Union[pd.DataFrame, pl.DataFrame, Sequence, "MetaPartition"] | None
 
 
 def _predicates_to_named(predicates):
@@ -204,7 +206,7 @@ class MetaPartition(Iterable):
         label: str | None,
         file: str | None = None,
         table_name: str = SINGLE_TABLE,
-        data: pd.DataFrame | None = None,
+        data: pd.DataFrame | pl.DataFrame | None = None,
         indices: dict[Any, Any] | None = None,
         metadata_version: int | None = None,
         schema: SchemaWrapper | None = None,
@@ -742,8 +744,11 @@ class MetaPartition(Iterable):
         if schema is None:
             raise ValueError("Cannot reconstruct indices before the schema is loaded.")
 
-        # One of the few places `inplace=True` makes a significant difference
-        df.reset_index(drop=True, inplace=True)
+        # Handle both Pandas and Polars DataFrames
+        if isinstance(df, pd.DataFrame):
+            df.reset_index(drop=True, inplace=True)
+        else:  # Polars DataFrame
+            df = df.reset_index()
 
         index_names = [primary_key for primary_key, _ in key_indices]
         # The index might already be part of the dataframe which is recovered from the parquet file.
@@ -755,7 +760,10 @@ class MetaPartition(Iterable):
         ]
         if cleaned_original_columns != original_columns:
             # indexer call is slow, so only do that if really necessary
-            df = df.reindex(columns=cleaned_original_columns, copy=False)
+            if isinstance(df, pd.DataFrame):
+                df = df.reindex(columns=cleaned_original_columns, copy=False)
+            else:  # Polars DataFrame
+                df = df.select(cleaned_original_columns)
 
         pos = 0
         for primary_key, value in key_indices:
@@ -794,7 +802,13 @@ class MetaPartition(Iterable):
             else:
                 if convert_to_date:
                     value = pd.Timestamp(value).to_pydatetime().date()
-            df.insert(pos, primary_key, value)
+
+            if isinstance(df, pd.DataFrame):
+                df.insert(pos, primary_key, value)
+            else:  # Polars DataFrame
+                df = df.with_columns(
+                    pl.Series(name=primary_key, values=[value] * len(df))
+                )
             pos += 1
 
         return df
@@ -1015,7 +1029,12 @@ class MetaPartition(Iterable):
                     f"Column `{col}` could not be found in the partition `{self.label}` Please check for any typos and validate your dataset."
                 )
 
-            possible_values = possible_values | set(df[col].dropna().unique())
+            if isinstance(df, pd.DataFrame):
+                possible_values = possible_values | set(df[col].dropna().unique())
+            else:  # Polars DataFrame
+                possible_values = possible_values | set(
+                    df.get_column(col).unique().to_list()
+                )
 
             if self.schema is not None:
                 dtype = self.schema.field(col).type
@@ -1162,25 +1181,44 @@ class MetaPartition(Iterable):
         # if df.empty:
         #     return {}
 
-        data_df = df.drop(partition_on, axis="columns")
-        for value, group in data_df.groupby(
-            by=partition_keys, observed=True, sort=False
-        ):
-            partitioning_info = []
-            if pd.api.types.is_scalar(value):
-                value = [value]
-            if existing_indices:
-                partitioning_info.extend(quote_indices(existing_indices))
-            partitioning_info.extend(
-                quote_indices(zip(partition_on, value, strict=False))
-            )
-            partitioning_info.append(base_label)
-            new_label = "/".join(partitioning_info)
+        if isinstance(df, pd.DataFrame):
+            data_df = df.drop(partition_on, axis="columns")
+            for value, group in data_df.groupby(
+                by=partition_keys, observed=True, sort=False
+            ):
+                partitioning_info = []
+                if pd.api.types.is_scalar(value):
+                    value = [value]
+                if existing_indices:
+                    partitioning_info.extend(quote_indices(existing_indices))
+                partitioning_info.extend(
+                    quote_indices(zip(partition_on, value, strict=False))
+                )
+                partitioning_info.append(base_label)
+                new_label = "/".join(partitioning_info)
 
-            if new_label not in dct:
-                dct[new_label] = {}
-            dct[new_label] = group
-            size_after += len(group)
+                if new_label not in dct:
+                    dct[new_label] = {}
+                dct[new_label] = group
+                size_after += len(group)
+        else:  # Polars DataFrame
+            data_df = df.drop(partition_on)
+            for value, group in data_df.group_by(partition_on, maintain_order=False):
+                partitioning_info = []
+                if pd.api.types.is_scalar(value):
+                    value = [value]
+                if existing_indices:
+                    partitioning_info.extend(quote_indices(existing_indices))
+                partitioning_info.extend(
+                    quote_indices(zip(partition_on, value, strict=False))
+                )
+                partitioning_info.append(base_label)
+                new_label = "/".join(partitioning_info)
+
+                if new_label not in dct:
+                    dct[new_label] = {}
+                dct[new_label] = group
+                size_after += len(group)
 
         if size_before != size_after:
             raise ValueError(
@@ -1344,8 +1382,8 @@ def parse_input_to_metapartition(
 ) -> MetaPartition:
     """Parses given user input and return a MetaPartition.
 
-    The expected input is a :class:`pandas.DataFrame` or a list of
-    :class:`pandas.DataFrame`.
+    The expected input is a :class:`pandas.DataFrame`, :class:`polars.DataFrame` or a list of
+    :class:`pandas.DataFrame` or :class:`polars.DataFrame`.
 
     Every element of the list will be treated as a dedicated user input and will
     result in a physical file, if not specified otherwise.
@@ -1378,7 +1416,7 @@ def parse_input_to_metapartition(
                     table_name=table_name,
                 )
             )
-    elif isinstance(obj, pd.DataFrame):
+    elif isinstance(obj, pd.DataFrame | pl.DataFrame):
         mp = MetaPartition(
             label=gen_uuid(),
             data=obj,

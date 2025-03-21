@@ -10,6 +10,7 @@ from typing import (
 )
 
 import pandas as pd
+import polars as pl
 import pyarrow as pa
 import simplejson
 
@@ -18,7 +19,11 @@ from plateau.core import naming
 from plateau.core._compat import load_json
 from plateau.core._mixins import CopyMixin
 from plateau.core._zmsgpack import packb, unpackb
-from plateau.core.common_metadata import SchemaWrapper, read_schema_metadata
+from plateau.core.common_metadata import (
+    DataFrameType,
+    SchemaWrapper,
+    read_schema_metadata,
+)
 from plateau.core.docs import default_docs
 from plateau.core.index import (
     ExplicitSecondaryIndex,
@@ -494,6 +499,46 @@ class DatasetMetadataBase(CopyMixin):
 class DatasetMetadata(DatasetMetadataBase):
     """Containing holding all metadata of the dataset."""
 
+    def __init__(
+        self,
+        uuid: str,
+        partition_keys: list[str] | None = None,
+        metadata_version: int = 4,
+        metadata_storage_format: str = "msgpack",
+    ):
+        """Initialize the dataset metadata.
+
+        Parameters
+        ----------
+        uuid
+            Unique identifier for the dataset
+        partition_keys
+            List of partition keys
+        metadata_version
+            Version of the metadata format
+        metadata_storage_format
+            Format to use for storing metadata
+        """
+        self.uuid = uuid
+        self.partition_keys = partition_keys or []
+        self.metadata_version = metadata_version
+        self.metadata_storage_format = metadata_storage_format
+        self.partitions: dict[str, dict[str, Any]] = {}
+        self.indices: dict[str, dict[str, Any]] = {}
+        self.table_meta: dict[str, dict[str, Any]] = {}
+
+        super().__init__(
+            uuid=uuid,
+            partitions=None,
+            metadata=None,
+            indices=None,
+            metadata_version=metadata_version,
+            explicit_partitions=True,
+            partition_keys=partition_keys,
+            schema=None,
+            table_name=SINGLE_TABLE,
+        )
+
     def __repr__(self):
         return (
             f"DatasetMetadata(uuid={self.uuid}, "
@@ -684,22 +729,343 @@ class DatasetMetadata(DatasetMetadataBase):
                 )
         return builder.to_dataset()
 
+    def add_partition(
+        self, partition_label: str, partition_data: dict[str, Any]
+    ) -> None:
+        """Add a partition to the dataset.
+
+        Parameters
+        ----------
+        partition_label
+            Label for the partition
+        partition_data
+            Data for the partition
+        """
+        self.partitions[partition_label] = partition_data
+
+    def add_index(self, column: str, index_data: dict[str, Any]) -> None:
+        """Add an index to the dataset.
+
+        Parameters
+        ----------
+        column
+            Column name to index
+        index_data
+            Data for the index
+        """
+        self.indices[column] = index_data
+
+    def add_table_meta(self, table_name: str, table_data: dict[str, Any]) -> None:
+        """Add table metadata to the dataset.
+
+        Parameters
+        ----------
+        table_name
+            Name of the table
+        table_data
+            Data for the table
+        """
+        self.table_meta[table_name] = table_data
+
+    def get_partition(self, partition_label: str) -> dict[str, Any]:
+        """Get partition data.
+
+        Parameters
+        ----------
+        partition_label
+            Label for the partition
+
+        Returns
+        -------
+        Dict[str, Any]
+            Partition data
+        """
+        return self.partitions.get(partition_label, {})
+
+    def get_index(self, column: str) -> dict[str, Any]:
+        """Get index data.
+
+        Parameters
+        ----------
+        column
+            Column name to index
+
+        Returns
+        -------
+        Dict[str, Any]
+            Index data
+        """
+        return self.indices.get(column, {})
+
+    def get_table_meta(self, table_name: str) -> dict[str, Any]:
+        """Get table metadata.
+
+        Parameters
+        ----------
+        table_name
+            Name of the table
+
+        Returns
+        -------
+        Dict[str, Any]
+            Table metadata
+        """
+        return self.table_meta.get(table_name, {})
+
+    def to_dict(self) -> dict[str, Any]:
+        """Convert metadata to dictionary.
+
+        Returns
+        -------
+        Dict[str, Any]
+            Dictionary representation of metadata
+        """
+        return {
+            "uuid": self.uuid,
+            "partition_keys": self.partition_keys,
+            "metadata_version": self.metadata_version,
+            "metadata_storage_format": self.metadata_storage_format,
+            "partitions": self.partitions,
+            "indices": self.indices,
+            "table_meta": self.table_meta,
+        }
+
+    def get_schema(self, table_name: str) -> pa.Schema | None:
+        """Get schema for a table.
+
+        Parameters
+        ----------
+        table_name
+            Name of the table
+
+        Returns
+        -------
+        Optional[pa.Schema]
+            Schema for the table
+        """
+        table_meta = self.get_table_meta(table_name)
+        if not table_meta:
+            return None
+        schema_json = table_meta.get("schema")
+        if not schema_json:
+            return None
+        return pa.Schema.from_json(schema_json)
+
+    def validate_schema(self, df: DataFrameType, table_name: str) -> bool:
+        """Validate DataFrame schema against dataset schema.
+
+        Parameters
+        ----------
+        df
+            DataFrame to validate
+        table_name
+            Name of the table
+
+        Returns
+        -------
+        bool
+            True if schema is valid, False otherwise
+        """
+        schema = self.get_schema(table_name)
+        if not schema:
+            return True
+
+        if isinstance(df, pd.DataFrame):
+            df_schema = pa.Schema.from_pandas(df)
+        else:  # Polars DataFrame
+            df_schema = df.schema.to_arrow_schema()
+
+        return schema.equals(df_schema)
+
+    def get_partition_keys(self) -> list[str]:
+        """Get partition keys.
+
+        Returns
+        -------
+        List[str]
+            List of partition keys
+        """
+        return self.partition_keys
+
+    def get_partition_labels(self) -> list[str]:
+        """Get partition labels.
+
+        Returns
+        -------
+        List[str]
+            List of partition labels
+        """
+        return list(self.partitions.keys())
+
+    def get_index_columns(self) -> list[str]:
+        """Get index columns.
+
+        Returns
+        -------
+        List[str]
+            List of index columns
+        """
+        return list(self.indices.keys())
+
+    def get_table_names(self) -> list[str]:
+        """Get table names.
+
+        Returns
+        -------
+        List[str]
+            List of table names
+        """
+        return list(self.table_meta.keys())
+
 
 def _get_type_from_meta(
-    schema: SchemaWrapper | None,
-    column: str,
-    default: pa.DataType | None,
-) -> pa.DataType:
-    # use first schema that provides type information, since write path should ensure that types are normalized and
-    # equal
-    if schema is not None:
-        idx = schema.get_field_index(column)
-        return schema[idx].type
+    meta: dict[str, Any], column: str, table_name: str = SINGLE_TABLE
+) -> pa.DataType | None:
+    """Get type information from metadata.
 
-    if default is not None:
-        return default
+    Parameters
+    ----------
+    meta
+        Metadata dictionary
+    column
+        Column name
+    table_name
+        Name of the table
 
-    raise ValueError(f'Cannot find type information for partition column "{column}"')
+    Returns
+    -------
+    Optional[pa.DataType]
+        Type information for the column
+    """
+    table_meta = meta.get("table_meta", {}).get(table_name, {})
+    schema_json = table_meta.get("schema")
+    if not schema_json:
+        return None
+    schema = pa.Schema.from_json(schema_json)
+    if column not in schema:
+        return None
+    return schema[column].type
+
+
+def _get_partition_keys_from_meta(meta: dict[str, Any]) -> list[str]:
+    """Get partition keys from metadata.
+
+    Parameters
+    ----------
+    meta
+        Metadata dictionary
+
+    Returns
+    -------
+    List[str]
+        List of partition keys
+    """
+    return meta.get("partition_keys", [])
+
+
+def _get_partition_labels_from_meta(meta: dict[str, Any]) -> list[str]:
+    """Get partition labels from metadata.
+
+    Parameters
+    ----------
+    meta
+        Metadata dictionary
+
+    Returns
+    -------
+    List[str]
+        List of partition labels
+    """
+    return list(meta.get("partitions", {}).keys())
+
+
+def _get_index_columns_from_meta(meta: dict[str, Any]) -> list[str]:
+    """Get index columns from metadata.
+
+    Parameters
+    ----------
+    meta
+        Metadata dictionary
+
+    Returns
+    -------
+    List[str]
+        List of index columns
+    """
+    return list(meta.get("indices", {}).keys())
+
+
+def _get_table_names_from_meta(meta: dict[str, Any]) -> list[str]:
+    """Get table names from metadata.
+
+    Parameters
+    ----------
+    meta
+        Metadata dictionary
+
+    Returns
+    -------
+    List[str]
+        List of table names
+    """
+    return list(meta.get("table_meta", {}).keys())
+
+
+def _get_schema_from_meta(
+    meta: dict[str, Any], table_name: str = SINGLE_TABLE
+) -> pa.Schema | None:
+    """Get schema from metadata.
+
+    Parameters
+    ----------
+    meta
+        Metadata dictionary
+    table_name
+        Name of the table
+
+    Returns
+    -------
+    Optional[pa.Schema]
+        Schema for the table
+    """
+    table_meta = meta.get("table_meta", {}).get(table_name, {})
+    schema_json = table_meta.get("schema")
+    if not schema_json:
+        return None
+    return pa.Schema.from_json(schema_json)
+
+
+def _validate_schema_from_meta(
+    meta: dict[str, Any],
+    df: DataFrameType,
+    table_name: str = SINGLE_TABLE,
+) -> bool:
+    """Validate DataFrame schema against metadata schema.
+
+    Parameters
+    ----------
+    meta
+        Metadata dictionary
+    df
+        DataFrame to validate
+    table_name
+        Name of the table
+
+    Returns
+    -------
+    bool
+        True if schema is valid, False otherwise
+    """
+    schema = _get_schema_from_meta(meta, table_name)
+    if not schema:
+        return True
+
+    if isinstance(df, pd.DataFrame):
+        df_schema = pa.Schema.from_pandas(df)
+    else:  # Polars DataFrame
+        df_schema = df.schema.to_arrow_schema()
+
+    return schema.equals(df_schema)
 
 
 def _empty_partition_indices(
@@ -1047,3 +1413,806 @@ def _add_creation_time(
     if "creation_time" not in dataset_object.metadata:
         creation_time = plateau.core._time.datetime_utcnow().isoformat()
         dataset_object.metadata["creation_time"] = creation_time
+
+
+# Type hints for DataFrame types
+DataFrameType = pd.DataFrame | pl.DataFrame
+
+
+def _get_partition_data_from_meta(
+    meta: dict[str, Any], partition_label: str
+) -> dict[str, Any]:
+    """Get partition data from metadata.
+
+    Parameters
+    ----------
+    meta
+        Metadata dictionary
+    partition_label
+        Label for the partition
+
+    Returns
+    -------
+    Dict[str, Any]
+        Partition data
+    """
+    return meta.get("partitions", {}).get(partition_label, {})
+
+
+def _get_index_data_from_meta(meta: dict[str, Any], column: str) -> dict[str, Any]:
+    """Get index data from metadata.
+
+    Parameters
+    ----------
+    meta
+        Metadata dictionary
+    column
+        Column name to index
+
+    Returns
+    -------
+    Dict[str, Any]
+        Index data
+    """
+    return meta.get("indices", {}).get(column, {})
+
+
+def _get_table_data_from_meta(meta: dict[str, Any], table_name: str) -> dict[str, Any]:
+    """Get table data from metadata.
+
+    Parameters
+    ----------
+    meta
+        Metadata dictionary
+    table_name
+        Name of the table
+
+    Returns
+    -------
+    Dict[str, Any]
+        Table data
+    """
+    return meta.get("table_meta", {}).get(table_name, {})
+
+
+def _add_partition_to_meta(
+    meta: dict[str, Any], partition_label: str, partition_data: dict[str, Any]
+) -> None:
+    """Add partition data to metadata.
+
+    Parameters
+    ----------
+    meta
+        Metadata dictionary
+    partition_label
+        Label for the partition
+    partition_data
+        Data for the partition
+    """
+    if "partitions" not in meta:
+        meta["partitions"] = {}
+    meta["partitions"][partition_label] = partition_data
+
+
+def _add_index_to_meta(
+    meta: dict[str, Any], column: str, index_data: dict[str, Any]
+) -> None:
+    """Add index data to metadata.
+
+    Parameters
+    ----------
+    meta
+        Metadata dictionary
+    column
+        Column name to index
+    index_data
+        Data for the index
+    """
+    if "indices" not in meta:
+        meta["indices"] = {}
+    meta["indices"][column] = index_data
+
+
+def _add_table_to_meta(
+    meta: dict[str, Any], table_name: str, table_data: dict[str, Any]
+) -> None:
+    """Add table data to metadata.
+
+    Parameters
+    ----------
+    meta
+        Metadata dictionary
+    table_name
+        Name of the table
+    table_data
+        Data for the table
+    """
+    if "table_meta" not in meta:
+        meta["table_meta"] = {}
+    meta["table_meta"][table_name] = table_data
+
+
+def _remove_partition_from_meta(meta: dict[str, Any], partition_label: str) -> None:
+    """Remove partition data from metadata.
+
+    Parameters
+    ----------
+    meta
+        Metadata dictionary
+    partition_label
+        Label for the partition
+    """
+    if "partitions" in meta:
+        meta["partitions"].pop(partition_label, None)
+
+
+def _remove_index_from_meta(meta: dict[str, Any], column: str) -> None:
+    """Remove index data from metadata.
+
+    Parameters
+    ----------
+    meta
+        Metadata dictionary
+    column
+        Column name to index
+    """
+    if "indices" in meta:
+        meta["indices"].pop(column, None)
+
+
+def _remove_table_from_meta(meta: dict[str, Any], table_name: str) -> None:
+    """Remove table data from metadata.
+
+    Parameters
+    ----------
+    meta
+        Metadata dictionary
+    table_name
+        Name of the table
+    """
+    if "table_meta" in meta:
+        meta["table_meta"].pop(table_name, None)
+
+
+def _convert_to_polars(df: DataFrameType) -> pl.DataFrame:
+    """Convert DataFrame to Polars DataFrame.
+
+    Parameters
+    ----------
+    df
+        DataFrame to convert
+
+    Returns
+    -------
+    pl.DataFrame
+        Polars DataFrame
+    """
+    if isinstance(df, pd.DataFrame):
+        return pl.from_pandas(df)
+    return df
+
+
+def _convert_to_pandas(df: DataFrameType) -> pd.DataFrame:
+    """Convert DataFrame to Pandas DataFrame.
+
+    Parameters
+    ----------
+    df
+        DataFrame to convert
+
+    Returns
+    -------
+    pd.DataFrame
+        Pandas DataFrame
+    """
+    if isinstance(df, pl.DataFrame):
+        return df.to_pandas()
+    return df
+
+
+def _get_partition_values(
+    df: DataFrameType, partition_keys: list[str]
+) -> dict[str, Any]:
+    """Get partition values from DataFrame.
+
+    Parameters
+    ----------
+    df
+        DataFrame to get values from
+    partition_keys
+        List of partition keys
+
+    Returns
+    -------
+    Dict[str, Any]
+        Dictionary mapping partition keys to values
+    """
+    if isinstance(df, pd.DataFrame):
+        return {key: df[key].iloc[0] for key in partition_keys}
+    else:  # Polars DataFrame
+        return {key: df.get_column(key)[0] for key in partition_keys}
+
+
+def _filter_df(
+    df: DataFrameType, predicates: list[tuple[str, str, Any]]
+) -> DataFrameType:
+    """Filter DataFrame based on predicates.
+
+    Parameters
+    ----------
+    df
+        DataFrame to filter
+    predicates
+        List of predicates (column, operator, value)
+
+    Returns
+    -------
+    DataFrameType
+        Filtered DataFrame
+    """
+    if isinstance(df, pd.DataFrame):
+        for col, op, val in predicates:
+            if op == "==":
+                df = df[df[col] == val]
+            elif op == "!=":
+                df = df[df[col] != val]
+            elif op == ">":
+                df = df[df[col] > val]
+            elif op == ">=":
+                df = df[df[col] >= val]
+            elif op == "<":
+                df = df[df[col] < val]
+            elif op == "<=":
+                df = df[df[col] <= val]
+            elif op == "in":
+                df = df[df[col].isin(val)]
+            elif op == "not in":
+                df = df[~df[col].isin(val)]
+    else:  # Polars DataFrame
+        for col, op, val in predicates:
+            if op == "==":
+                df = df.filter(pl.col(col) == val)
+            elif op == "!=":
+                df = df.filter(pl.col(col) != val)
+            elif op == ">":
+                df = df.filter(pl.col(col) > val)
+            elif op == ">=":
+                df = df.filter(pl.col(col) >= val)
+            elif op == "<":
+                df = df.filter(pl.col(col) < val)
+            elif op == "<=":
+                df = df.filter(pl.col(col) <= val)
+            elif op == "in":
+                df = df.filter(pl.col(col).is_in(val))
+            elif op == "not in":
+                df = df.filter(~pl.col(col).is_in(val))
+    return df
+
+
+def _sort_df(df: DataFrameType, by: list[str], ascending: bool = True) -> DataFrameType:
+    """Sort DataFrame by columns.
+
+    Parameters
+    ----------
+    df
+        DataFrame to sort
+    by
+        List of columns to sort by
+    ascending
+        Sort ascending or descending
+
+    Returns
+    -------
+    DataFrameType
+        Sorted DataFrame
+    """
+    if isinstance(df, pd.DataFrame):
+        return df.sort_values(by=by, ascending=ascending)
+    else:  # Polars DataFrame
+        sort_exprs = [pl.col(col) if ascending else pl.col(col).desc() for col in by]
+        return df.sort(sort_exprs)
+
+
+def _concat_dfs(dfs: list[DataFrameType]) -> DataFrameType:
+    """Concatenate DataFrames.
+
+    Parameters
+    ----------
+    dfs
+        List of DataFrames to concatenate
+
+    Returns
+    -------
+    DataFrameType
+        Concatenated DataFrame
+    """
+    if not dfs:
+        return None
+    if isinstance(dfs[0], pd.DataFrame):
+        return pd.concat(dfs, ignore_index=True)
+    else:  # Polars DataFrame
+        return pl.concat(dfs)
+
+
+def _group_df(df: DataFrameType, by: list[str]) -> DataFrameType:
+    """Group DataFrame by columns.
+
+    Parameters
+    ----------
+    df
+        DataFrame to group
+    by
+        List of columns to group by
+
+    Returns
+    -------
+    DataFrameType
+        Grouped DataFrame
+    """
+    if isinstance(df, pd.DataFrame):
+        return df.groupby(by=by, as_index=False)
+    else:  # Polars DataFrame
+        return df.group_by(by)
+
+
+def _select_columns(df: DataFrameType, columns: list[str]) -> DataFrameType:
+    """Select columns from DataFrame.
+
+    Parameters
+    ----------
+    df
+        DataFrame to select from
+    columns
+        List of columns to select
+
+    Returns
+    -------
+    DataFrameType
+        DataFrame with selected columns
+    """
+    if isinstance(df, pd.DataFrame):
+        return df[columns]
+    else:  # Polars DataFrame
+        return df.select(columns)
+
+
+def _drop_columns(df: DataFrameType, columns: list[str]) -> DataFrameType:
+    """Drop columns from DataFrame.
+
+    Parameters
+    ----------
+    df
+        DataFrame to drop from
+    columns
+        List of columns to drop
+
+    Returns
+    -------
+    DataFrameType
+        DataFrame with dropped columns
+    """
+    if isinstance(df, pd.DataFrame):
+        return df.drop(columns=columns)
+    else:  # Polars DataFrame
+        return df.drop(columns)
+
+
+def _rename_columns(df: DataFrameType, rename_dict: dict[str, str]) -> DataFrameType:
+    """Rename columns in DataFrame.
+
+    Parameters
+    ----------
+    df
+        DataFrame to rename
+    rename_dict
+        Dictionary mapping old column names to new ones
+
+    Returns
+    -------
+    DataFrameType
+        DataFrame with renamed columns
+    """
+    if isinstance(df, pd.DataFrame):
+        return df.rename(columns=rename_dict)
+    else:  # Polars DataFrame
+        return df.rename(rename_dict)
+
+
+def _cast_columns(df: DataFrameType, type_dict: dict[str, Any]) -> DataFrameType:
+    """Cast columns to specified types.
+
+    Parameters
+    ----------
+    df
+        DataFrame to cast
+    type_dict
+        Dictionary mapping column names to types
+
+    Returns
+    -------
+    DataFrameType
+        DataFrame with cast columns
+    """
+    if isinstance(df, pd.DataFrame):
+        return df.astype(type_dict)
+    else:  # Polars DataFrame
+        for col, dtype in type_dict.items():
+            df = df.with_columns(pl.col(col).cast(dtype))
+        return df
+
+
+def _fill_na(df: DataFrameType, value: Any = None) -> DataFrameType:
+    """Fill NA values in DataFrame.
+
+    Parameters
+    ----------
+    df
+        DataFrame to fill
+    value
+        Value to fill with
+
+    Returns
+    -------
+    DataFrameType
+        DataFrame with filled NA values
+    """
+    if isinstance(df, pd.DataFrame):
+        return df.fillna(value)
+    else:  # Polars DataFrame
+        return df.fill_null(value)
+
+
+def _drop_na(df: DataFrameType) -> DataFrameType:
+    """Drop NA values from DataFrame.
+
+    Parameters
+    ----------
+    df
+        DataFrame to drop from
+
+    Returns
+    -------
+    DataFrameType
+        DataFrame with dropped NA values
+    """
+    if isinstance(df, pd.DataFrame):
+        return df.dropna()
+    else:  # Polars DataFrame
+        return df.drop_nulls()
+
+
+def _unique_values(df: DataFrameType, column: str) -> set[Any]:
+    """Get unique values from DataFrame column.
+
+    Parameters
+    ----------
+    df
+        DataFrame to get values from
+    column
+        Column name
+
+    Returns
+    -------
+    Set[Any]
+        Set of unique values
+    """
+    if isinstance(df, pd.DataFrame):
+        return set(df[column].unique())
+    else:  # Polars DataFrame
+        return set(df.get_column(column).unique().to_list())
+
+
+def _value_counts(df: DataFrameType, column: str) -> dict[Any, int]:
+    """Get value counts from DataFrame column.
+
+    Parameters
+    ----------
+    df
+        DataFrame to get counts from
+    column
+        Column name
+
+    Returns
+    -------
+    Dict[Any, int]
+        Dictionary mapping values to counts
+    """
+    if isinstance(df, pd.DataFrame):
+        return df[column].value_counts().to_dict()
+    else:  # Polars DataFrame
+        return df.get_column(column).value_counts().to_dict()
+
+
+def _merge_dfs(
+    left: DataFrameType,
+    right: DataFrameType,
+    on: list[str],
+    how: str = "inner",
+) -> DataFrameType:
+    """Merge DataFrames.
+
+    Parameters
+    ----------
+    left
+        Left DataFrame
+    right
+        Right DataFrame
+    on
+        List of columns to merge on
+    how
+        Type of merge to perform
+
+    Returns
+    -------
+    DataFrameType
+        Merged DataFrame
+    """
+    if isinstance(left, pd.DataFrame):
+        return pd.merge(left, right, on=on, how=how)
+    else:  # Polars DataFrame
+        return left.join(right, on=on, how=how)
+
+
+def _to_arrow_table(df: DataFrameType) -> pa.Table:
+    """Convert DataFrame to Arrow table.
+
+    Parameters
+    ----------
+    df
+        DataFrame to convert
+
+    Returns
+    -------
+    pa.Table
+        Arrow table
+    """
+    if isinstance(df, pd.DataFrame):
+        return pa.Table.from_pandas(df)
+    else:  # Polars DataFrame
+        return df.to_arrow()
+
+
+def _from_arrow_table(table: pa.Table, output_type: str = "pandas") -> DataFrameType:
+    """Convert Arrow table to DataFrame.
+
+    Parameters
+    ----------
+    table
+        Arrow table to convert
+    output_type
+        Type of DataFrame to return ("pandas" or "polars")
+
+    Returns
+    -------
+    DataFrameType
+        DataFrame
+    """
+    if output_type == "pandas":
+        return table.to_pandas()
+    else:  # output_type == "polars"
+        return pl.from_arrow(table)
+
+
+def _to_parquet(df: DataFrameType, path: str) -> None:
+    """Write DataFrame to Parquet file.
+
+    Parameters
+    ----------
+    df
+        DataFrame to write
+    path
+        Path to write to
+    """
+    if isinstance(df, pd.DataFrame):
+        df.to_parquet(path)
+    else:  # Polars DataFrame
+        df.write_parquet(path)
+
+
+def _read_parquet(path: str, output_type: str = "pandas") -> DataFrameType:
+    """Read DataFrame from Parquet file.
+
+    Parameters
+    ----------
+    path
+        Path to read from
+    output_type
+        Type of DataFrame to return ("pandas" or "polars")
+
+    Returns
+    -------
+    DataFrameType
+        DataFrame
+    """
+    if output_type == "pandas":
+        return pd.read_parquet(path)
+    else:  # output_type == "polars"
+        return pl.read_parquet(path)
+
+
+def _to_csv(df: DataFrameType, path: str) -> None:
+    """Write DataFrame to CSV file.
+
+    Parameters
+    ----------
+    df
+        DataFrame to write
+    path
+        Path to write to
+    """
+    if isinstance(df, pd.DataFrame):
+        df.to_csv(path, index=False)
+    else:  # Polars DataFrame
+        df.write_csv(path)
+
+
+def _read_csv(path: str, output_type: str = "pandas") -> DataFrameType:
+    """Read DataFrame from CSV file.
+
+    Parameters
+    ----------
+    path
+        Path to read from
+    output_type
+        Type of DataFrame to return ("pandas" or "polars")
+
+    Returns
+    -------
+    DataFrameType
+        DataFrame
+    """
+    if output_type == "pandas":
+        return pd.read_csv(path)
+    else:  # output_type == "polars"
+        return pl.read_csv(path)
+
+
+def _to_json(df: DataFrameType, path: str) -> None:
+    """Write DataFrame to JSON file.
+
+    Parameters
+    ----------
+    df
+        DataFrame to write
+    path
+        Path to write to
+    """
+    if isinstance(df, pd.DataFrame):
+        df.to_json(path)
+    else:  # Polars DataFrame
+        df.write_json(path)
+
+
+def _read_json(path: str, output_type: str = "pandas") -> DataFrameType:
+    """Read DataFrame from JSON file.
+
+    Parameters
+    ----------
+    path
+        Path to read from
+    output_type
+        Type of DataFrame to return ("pandas" or "polars")
+
+    Returns
+    -------
+    DataFrameType
+        DataFrame
+    """
+    if output_type == "pandas":
+        return pd.read_json(path)
+    else:  # output_type == "polars"
+        return pl.read_json(path)
+
+
+def _get_schema(df: DataFrameType) -> pa.Schema:
+    """Get Arrow schema from DataFrame.
+
+    Parameters
+    ----------
+    df
+        DataFrame to get schema from
+
+    Returns
+    -------
+    pa.Schema
+        Arrow schema
+    """
+    if isinstance(df, pd.DataFrame):
+        return pa.Schema.from_pandas(df)
+    else:  # Polars DataFrame
+        return df.schema.to_arrow_schema()
+
+
+def _validate_schema(df: DataFrameType, schema: pa.Schema) -> bool:
+    """Validate DataFrame schema against Arrow schema.
+
+    Parameters
+    ----------
+    df
+        DataFrame to validate
+    schema
+        Arrow schema to validate against
+
+    Returns
+    -------
+    bool
+        True if schema is valid, False otherwise
+    """
+    df_schema = _get_schema(df)
+    return schema.equals(df_schema)
+
+
+def _get_column_names(df: DataFrameType) -> list[str]:
+    """Get column names from DataFrame.
+
+    Parameters
+    ----------
+    df
+        DataFrame to get column names from
+
+    Returns
+    -------
+    List[str]
+        List of column names
+    """
+    if isinstance(df, pd.DataFrame):
+        return list(df.columns)
+    else:  # Polars DataFrame
+        return df.columns
+
+
+def _get_dtypes(df: DataFrameType) -> dict[str, Any]:
+    """Get data types from DataFrame.
+
+    Parameters
+    ----------
+    df
+        DataFrame to get data types from
+
+    Returns
+    -------
+    Dict[str, Any]
+        Dictionary mapping column names to data types
+    """
+    if isinstance(df, pd.DataFrame):
+        return df.dtypes.to_dict()
+    else:  # Polars DataFrame
+        return {col: df.schema[col] for col in df.columns}
+
+
+def _get_shape(df: DataFrameType) -> tuple[int, int]:
+    """Get shape of DataFrame.
+
+    Parameters
+    ----------
+    df
+        DataFrame to get shape from
+
+    Returns
+    -------
+    Tuple[int, int]
+        Tuple of (number of rows, number of columns)
+    """
+    if isinstance(df, pd.DataFrame):
+        return df.shape
+    else:  # Polars DataFrame
+        return (df.height, df.width)
+
+
+def _get_memory_usage(df: DataFrameType) -> dict[str, int]:
+    """Get memory usage of DataFrame.
+
+    Parameters
+    ----------
+    df
+        DataFrame to get memory usage from
+
+    Returns
+    -------
+    Dict[str, int]
+        Dictionary mapping column names to memory usage in bytes
+    """
+    if isinstance(df, pd.DataFrame):
+        return df.memory_usage(deep=True).to_dict()
+    else:  # Polars DataFrame
+        return {col: df.get_column(col).estimated_size() for col in df.columns}
