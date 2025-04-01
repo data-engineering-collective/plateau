@@ -179,7 +179,7 @@ def _get_dask_meta_for_dataset(ds_factory, columns, categoricals, dates_as_objec
     )
 
     if categoricals:
-        meta = meta.astype({col: "category" for col in categoricals})
+        meta = meta.astype(dict.fromkeys(categoricals, "category"))
         meta = dd.utils.clear_known_categories(meta, categoricals)
 
     categoricals_from_index = _maybe_get_categoricals_from_index(
