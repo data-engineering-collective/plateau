@@ -58,7 +58,7 @@ class CsvSerializer(DataFrameSerializer):
 
         dtype: dict[str, str] | None
         if categories:
-            dtype = {cat: "category" for cat in categories}
+            dtype = dict.fromkeys(categories, "category")
         else:
             dtype = None
 

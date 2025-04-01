@@ -242,7 +242,7 @@ def test_sort_categorical_multiple_cols():
         ]
     )
     df_expected = df.copy().sort_values(by=["ColA", "ColB"]).reset_index(drop=True)
-    df = df.astype({col: "category" for col in ["ColA", "ColB"]})
+    df = df.astype(dict.fromkeys(["ColA", "ColB"], "category"))
     # Correct order
     # {"ColA": "A", "ColB": "A", "Payload": 3},
     # {"ColA": "B", "ColB": "A", "Payload": 2},

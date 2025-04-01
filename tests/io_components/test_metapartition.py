@@ -937,7 +937,7 @@ def test_reconstruct_index_categories(store):
             ]
         )
     )
-    df_expected = df_expected.astype({col: "category" for col in categories})
+    df_expected = df_expected.astype(dict.fromkeys(categories, "category"))
     pdt.assert_frame_equal(df_actual, df_expected)
 
 
