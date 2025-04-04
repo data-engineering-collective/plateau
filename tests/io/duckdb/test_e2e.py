@@ -7,6 +7,9 @@ import pytest
 from minimalkv import get_store_from_url
 
 from plateau.io.duckdb.dataframe import read_table_as_ddb, store_dataset_from_ddb
+from plateau.io.duckdb.dataframe_fast import (
+    read_table_as_ddb as fast_read_table_as_ddb,
+)
 from plateau.io.eager import read_table, store_dataframes_as_dataset
 
 
@@ -87,4 +90,9 @@ def test_example_fast_read(store_url):
         store_url, "partitioned_dataset", [df], partition_on="B"
     )
 
-    # con2 = fast_read_table_as_ddb("partitioned_dataset", store_url, table="my_df")
+    con2 = fast_read_table_as_ddb("partitioned_dataset", store_url, table="my_df")
+
+    round_trip_df = con2.table("my_df").to_df()
+    round_trip_df = round_trip_df[df.columns]  # align column order
+
+    assert round_trip_df.compare(df).empty
