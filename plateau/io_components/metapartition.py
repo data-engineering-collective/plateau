@@ -10,6 +10,7 @@ from functools import wraps
 from typing import (
     TYPE_CHECKING,
     Any,
+    Self,
     Union,
     cast,
 )
@@ -48,6 +49,7 @@ from plateau.serialization import (
     default_serializer,
     filter_df_from_predicates,
 )
+from plateau.serialization._parquet import ParquetSerializer
 
 if TYPE_CHECKING:
     import numpy.typing as npt
@@ -204,7 +206,7 @@ class MetaPartition(Iterable):
         label: str | None,
         file: str | None = None,
         table_name: str = SINGLE_TABLE,
-        data: pd.DataFrame | None = None,
+        data: pd.DataFrame | pa.Table | None = None,
         indices: dict[Any, Any] | None = None,
         metadata_version: int | None = None,
         schema: SchemaWrapper | None = None,
@@ -254,7 +256,7 @@ class MetaPartition(Iterable):
         self.schema = schema
         self.table_name = table_name
         if data is not None and schema is None:
-            self.schema = make_meta(
+            self.schema = make_meta(  # handles pa.Table as well
                 data, origin=f"{table_name}/{label}", partition_keys=partition_keys
             )
 
@@ -382,7 +384,7 @@ class MetaPartition(Iterable):
     @staticmethod
     def from_partition(
         partition: Partition,
-        data: pd.DataFrame | None = None,
+        data: pd.DataFrame | pa.Table | None = None,
         indices: dict | None = None,
         metadata_version: int | None = None,
         schema: SchemaWrapper | None = None,
@@ -592,6 +594,7 @@ class MetaPartition(Iterable):
         categoricals: Sequence[str] | None = None,
         dates_as_object: bool = True,
         predicates: PredicatesType = None,
+        arrow_mode: bool = False,
     ) -> "MetaPartition":
         """Load the dataframes of the partitions from store into memory.
 
@@ -677,7 +680,10 @@ class MetaPartition(Iterable):
             ]
 
         start = time.time()
-        df = DataFrameSerializer.restore_dataframe(
+
+        serializer = ParquetSerializer if arrow_mode else DataFrameSerializer
+
+        df_or_arrow = serializer.restore_dataframe(
             key=self.file,
             store=store,
             columns=table_columns_to_io,
@@ -685,38 +691,59 @@ class MetaPartition(Iterable):
             predicate_pushdown_to_io=predicate_pushdown_to_io,
             predicates=filtered_predicates,
             date_as_object=dates_as_object,
+            **{"return_pyarrow_table": True}
+            if arrow_mode
+            else {},  # dirty hack for now
         )
         LOGGER.debug(
             "Loaded dataframe %s in %s seconds.", self.file, time.time() - start
         )
         # Metadata version >=4 parse the index columns and add them back to the dataframe
 
-        df = self._reconstruct_index_columns(
-            df=df,
+        if arrow_mode:
+            df_or_arrow.rename_columns(
+                [ensure_string_type(name) for name in df_or_arrow.column_names]
+            )
+        else:
+            df_or_arrow.columns = df_or_arrow.columns.map(ensure_string_type)
+
+        reconstruction = (
+            self._reconstruct_index_columns
+            if not arrow_mode
+            else self._reconstruct_index_columns_arrow
+        )
+        df_or_arrow = reconstruction(
+            df_or_arrow,
             key_indices=indices,
             columns=columns,
             categories=categoricals,
             date_as_object=dates_as_object,
         )
 
-        df.columns = df.columns.map(ensure_string_type)
         if columns is not None:
             # TODO: When the write-path ensures that all partitions have the same column set, this check can be
             #       moved before `DataFrameSerializer.restore_dataframe`. At the position of the current check we
             #       may want to double check the columns of the loaded DF and raise an exception indicating an
             #       inconsistent dataset state instead.
-            missing_cols = set(columns).difference(df.columns)
+            missing_cols = (
+                set(columns).difference(df_or_arrow.columns)
+                if not arrow_mode
+                else set(columns).difference(df_or_arrow.column_names)
+            )
             if missing_cols:
                 raise ValueError(
                     "Columns cannot be found in stored dataframe: {}".format(
                         ", ".join(sorted(missing_cols))
                     )
                 )
+            # Really ugly, refactor later!
+            if arrow_mode and list(df_or_arrow.column_names) != columns:
+                # Arrow tables are immutable, so we need to create a new table
+                df_or_arrow = df_or_arrow.select(columns)
+            elif not arrow_mode and list(df_or_arrow.columns) != columns:
+                df_or_arrow = df_or_arrow.reindex(columns=columns, copy=False)
 
-            if list(df.columns) != columns:
-                df = df.reindex(columns=columns, copy=False)
-
-        return self.copy(data=df)
+        return self.copy(data=df_or_arrow)
 
     @_apply_to_list
     def load_schema(self, store: StoreInput, dataset_uuid: str) -> "MetaPartition":
@@ -730,9 +757,86 @@ class MetaPartition(Iterable):
             )
         return self
 
+    def _reconstruct_index_columns_arrow(
+        self,
+        table: pa.Table,
+        key_indices: list[tuple[str, Any]],
+        columns: Sequence[str] | None,
+        categories: Sequence[str] | None,
+        date_as_object: bool,
+    ) -> pa.Table:
+        if len(key_indices) == 0:
+            return table
+
+        schema = self.schema
+        if schema is None:
+            raise ValueError("Cannot reconstruct indices before the schema is loaded.")
+
+        index_names = [name for name, _ in key_indices]
+
+        # Remove existing index columns to avoid duplication
+        cleaned_names = [name for name in table.schema.names if name not in index_names]
+        if cleaned_names != table.schema.names:
+            table = table.select(cleaned_names)
+
+        num_rows = table.num_rows
+        new_columns = []
+
+        for name, value in key_indices:
+            if columns is not None and name not in columns:
+                continue
+
+            pa_type = schema.field(name).type
+            dtype = pa_type.to_pandas_dtype()
+            # CONVERT TO DATE?
+
+            if isinstance(dtype, type):
+                value = dtype(value)
+            elif isinstance(dtype, np.dtype):
+                if is_datetime64_any_dtype(dtype):
+                    # Coerce all datetime64 units to nanoseconds to maintain consistency with serializers.
+                    value = (
+                        pd.Timestamp(value)
+                        if PANDAS_LT_2
+                        else pd.Timestamp(value).as_unit("ns")
+                    )
+                else:
+                    value = dtype.type(value)
+            else:
+                raise RuntimeError(
+                    f"Unexpected object encountered: ({dtype}, {type(dtype)})"
+                )
+
+            # Create an array filled with the repeated key value
+            if categories and name in categories:
+                # Use dictionary type (categorical)
+                dictionary_array = pa.DictionaryArray.from_arrays(
+                    pa.array([0] * num_rows, type=pa.int32()),
+                    pa.array([value], type=pa_type),
+                )
+                arrow_value = dictionary_array
+            else:
+                arrow_value = pa.array([value] * num_rows, type=pa_type)
+
+            new_columns.append((name, arrow_value))
+
+        # Prepend new index columns
+        for name, array in reversed(new_columns):  # insert in reverse to maintain order
+            table = table.append_column(name, array)
+
+        # move newly added column to front
+        new_names = [name for name, _ in new_columns]
+        column_names = new_names + [
+            n
+            for n in table.schema.names
+            if n not in new_names and n != "__index_level_0__"
+        ]
+        table = table.select(column_names)
+        return table
+
     def _reconstruct_index_columns(
         self, df, key_indices, columns, categories, date_as_object
-    ):
+    ) -> pd.DataFrame:
         if len(key_indices) == 0:
             return df
 
@@ -994,14 +1098,6 @@ class MetaPartition(Iterable):
 
     @_apply_to_list
     def build_indices(self, columns: Iterable[str]):
-        """This builds the indices for this metapartition for the given
-        columns. The indices for the passed columns are rebuilt, so existing
-        index entries in the metapartition are overwritten.
-
-        :param columns: A list of columns from which the indices over
-            all dataframes in the metapartition are overwritten
-        :return: self
-        """
         if self.label is None:
             return self
 
@@ -1009,25 +1105,37 @@ class MetaPartition(Iterable):
         for col in columns:
             possible_values: set[str] = set()
 
-            df = self.data
-            if not self.is_sentinel and col not in df:
-                raise RuntimeError(
-                    f"Column `{col}` could not be found in the partition `{self.label}` Please check for any typos and validate your dataset."
-                )
+            df_or_table = self.data
 
-            possible_values = possible_values | set(df[col].dropna().unique())
+            # Check for column existence
+            if isinstance(df_or_table, pd.DataFrame):
+                if not self.is_sentinel and col not in df_or_table.columns:
+                    raise RuntimeError(
+                        f"Column `{col}` could not be found in the partition `{self.label}`. Please check for any typos and validate your dataset."
+                    )
+                possible_values = set(df_or_table[col].dropna().unique())
 
-            if self.schema is not None:
-                dtype = self.schema.field(col).type
+            elif isinstance(df_or_table, pa.Table):
+                if not self.is_sentinel and col not in df_or_table.column_names:
+                    raise RuntimeError(
+                        f"Column `{col}` could not be found in the partition `{self.label}`. Please check for any typos and validate your dataset."
+                    )
+                column = df_or_table[col]
+                non_null_array = column.drop_null()
+                possible_values = set(non_null_array.unique().to_pylist())
             else:
-                dtype = None
+                raise TypeError(f"Unsupported data type: {type(df_or_table)}")
+
+            # Get dtype if schema is available
+            dtype = self.schema.field(col).type if self.schema is not None else None
 
             new_index = ExplicitSecondaryIndex(
                 column=col,
                 index_dct={value: [self.label] for value in possible_values},
                 dtype=dtype,
             )
-            if (col in self.indices) and self.indices[col].loaded:
+
+            if col in self.indices and self.indices[col].loaded:
                 new_indices[col] = self.indices[col].update(new_index)
             else:
                 new_indices[col] = new_index
@@ -1218,7 +1326,7 @@ class MetaPartition(Iterable):
         return new_label
 
     @staticmethod
-    def concat_metapartitions(metapartitions, label_merger=None):
+    def concat_metapartitions(metapartitions: list["MetaPartition"], label_merger=None):
         LOGGER.debug("Concatenating metapartitions")
 
         new_metadata_version = -1
@@ -1251,6 +1359,38 @@ class MetaPartition(Iterable):
             metadata_version=new_metadata_version,
             schema=new_schema,
             partition_keys=partition_keys,
+        )
+
+        return new_mp
+
+    @staticmethod
+    def concat_metapartitions_arrow(
+        metapartitions: list["MetaPartition"], label_merger=None
+    ) -> Self:
+        LOGGER.debug("Concatenating metapartitions")
+
+        new_metadata_version = -1
+        data = []
+        schema = []
+        for mp in metapartitions:
+            new_metadata_version = max(new_metadata_version, mp.metadata_version)
+            data.append(mp.data)
+            schema.append(mp.schema)
+
+        new_table = pa.concat_tables(data)
+
+        # TODO: What about align_categories?
+
+        new_schema = validate_compatible(schema)
+
+        new_label = MetaPartition._merge_labels(metapartitions, label_merger)
+
+        new_mp = MetaPartition(
+            label=new_label,
+            data=new_table,
+            metadata_version=new_metadata_version,
+            schema=new_schema,
+            partition_keys=None,
         )
 
         return new_mp

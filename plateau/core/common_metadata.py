@@ -245,9 +245,13 @@ def make_meta(obj, origin, partition_keys=None):
     """
     if isinstance(obj, SchemaWrapper):
         return obj
-    if isinstance(obj, pa.Schema):
+    elif isinstance(obj, pa.Schema):
         return normalize_column_order(
             SchemaWrapper(obj, origin), partition_keys=partition_keys
+        )
+    elif isinstance(obj, pa.Table):
+        return normalize_column_order(
+            SchemaWrapper(obj.schema, origin), partition_keys=partition_keys
         )
 
     if not isinstance(obj, pd.DataFrame):

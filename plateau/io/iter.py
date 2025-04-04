@@ -1,5 +1,6 @@
+from collections.abc import Generator
 from functools import partial
-from typing import cast
+from typing import Any, cast
 
 from plateau.core.docs import default_docs
 from plateau.core.factory import _ensure_factory
@@ -46,7 +47,8 @@ def read_dataset_as_metapartitions__iterator(
     predicates=None,
     factory=None,
     dispatch_by=None,
-):
+    arrow_mode: bool = False,
+) -> Generator[MetaPartition, Any, None]:
     """A Python iterator to retrieve a dataset from store where each partition
     is loaded as a :class:`~plateau.io_components.metapartition.MetaPartition`.
 
@@ -73,7 +75,13 @@ def read_dataset_as_metapartitions__iterator(
 
     for mp in mps:
         if dispatch_by is not None:
-            mp = MetaPartition.concat_metapartitions(
+            print("HERE\n\n")
+            concatenate = (
+                MetaPartition.concat_metapartitions_arrow
+                if arrow_mode
+                else MetaPartition.concat_metapartitions
+            )  # Dirty, refactor later
+            mp = concatenate(
                 [
                     mp_inner.load_dataframes(
                         store=store,
@@ -81,11 +89,13 @@ def read_dataset_as_metapartitions__iterator(
                         categoricals=categoricals,
                         predicate_pushdown_to_io=predicate_pushdown_to_io,
                         predicates=predicates,
+                        arrow_mode=arrow_mode,
                     )
                     for mp_inner in mp
                 ]
             )
         else:
+            print("THERE\n\n")
             mp = cast(MetaPartition, mp)
             mp = mp.load_dataframes(
                 store=store,
@@ -94,6 +104,7 @@ def read_dataset_as_metapartitions__iterator(
                 predicate_pushdown_to_io=predicate_pushdown_to_io,
                 dates_as_object=dates_as_object,
                 predicates=predicates,
+                arrow_mode=arrow_mode,
             )
         yield mp
 
