@@ -265,7 +265,6 @@ class ParquetSerializer(DataFrameSerializer):
                         table = pq.read_pandas(reader, columns=columns)
             finally:
                 reader.close()
-
         if columns is not None:
             missing_columns = set(columns) - set(table.schema.names)
             if missing_columns:
@@ -278,7 +277,8 @@ class ParquetSerializer(DataFrameSerializer):
         table = _reset_dictionary_columns(table, exclude=categories)
 
         # HACK: Cast bytes to object in metadata until Pandas bug is fixed: https://github.com/pandas-dev/pandas/issues/50127
-        table = table.cast(schema_metadata_bytes_to_object(table.schema))
+        if table.schema.metadata:
+            table = table.cast(schema_metadata_bytes_to_object(table.schema))
 
         if return_pyarrow_table:
             return table
@@ -358,7 +358,7 @@ class ParquetSerializer(DataFrameSerializer):
             f"date_as_object: {date_as_object}, predicates: {predicates}."
         ) from raised_error
 
-    def store(self, store, key_prefix, df):
+    def store(self, store, key_prefix, df: pd.DataFrame | pa.Table):
         key = f"{key_prefix}.parquet"
         if isinstance(df, pa.Table):
             table = df

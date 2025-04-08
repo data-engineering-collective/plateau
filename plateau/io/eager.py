@@ -3,6 +3,7 @@ from functools import partial
 from typing import Any, cast
 
 import pandas as pd
+import pyarrow as pa
 from minimalkv import KeyValueStore
 
 from plateau.core.common_metadata import (
@@ -441,7 +442,7 @@ def _maybe_infer_files_attribute(metapartition, dataset_uuid):
 def store_dataframes_as_dataset(
     store: KeyValueStore,
     dataset_uuid: str,
-    dfs: list[pd.DataFrame | dict[str, pd.DataFrame]],
+    dfs: list[pd.DataFrame | pa.Table | dict[str, pd.DataFrame | pa.Table]],
     metadata: dict[str, dict[str, Any]] | None = None,
     partition_on: list[str] | None = None,
     df_serializer: DataFrameSerializer | None = None,

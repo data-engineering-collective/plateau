@@ -75,7 +75,6 @@ def read_dataset_as_metapartitions__iterator(
 
     for mp in mps:
         if dispatch_by is not None:
-            print("HERE\n\n")
             concatenate = (
                 MetaPartition.concat_metapartitions_arrow
                 if arrow_mode
@@ -95,7 +94,6 @@ def read_dataset_as_metapartitions__iterator(
                 ]
             )
         else:
-            print("THERE\n\n")
             mp = cast(MetaPartition, mp)
             mp = mp.load_dataframes(
                 store=store,
@@ -296,9 +294,9 @@ def store_dataframes_as_dataset__iter(
     raise_if_indices_overlap(partition_on, secondary_indices)
 
     new_partitions = []
-    for df in df_generator:
+    for df_or_table in df_generator:
         mp = parse_input_to_metapartition(
-            df, metadata_version=metadata_version, table_name=table_name
+            df_or_table, metadata_version=metadata_version, table_name=table_name
         )
 
         if partition_on:

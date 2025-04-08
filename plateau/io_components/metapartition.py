@@ -42,7 +42,7 @@ from plateau.core.typing import StoreInput
 from plateau.core.urlencode import decode_key, quote_indices
 from plateau.core.utils import ensure_store, ensure_string_type, verify_metadata_version
 from plateau.core.uuid import gen_uuid
-from plateau.io_components.utils import align_categories
+from plateau.io_components.utils import align_categories, group_table_by_partition_keys
 from plateau.serialization import (
     DataFrameSerializer,
     PredicatesType,
@@ -74,7 +74,7 @@ _METADATA_SCHEMA = {
     "number_rows_per_row_group": np.dtype(int),
 }
 
-MetaPartitionInput = Union[pd.DataFrame, Sequence, "MetaPartition"] | None
+MetaPartitionInput = Union[pd.DataFrame, pa.Table, Sequence, "MetaPartition"] | None
 
 
 def _predicates_to_named(predicates):
@@ -691,9 +691,9 @@ class MetaPartition(Iterable):
             predicate_pushdown_to_io=predicate_pushdown_to_io,
             predicates=filtered_predicates,
             date_as_object=dates_as_object,
-            **{"return_pyarrow_table": True}
-            if arrow_mode
-            else {},  # dirty hack for now
+            **(
+                {"return_pyarrow_table": True} if arrow_mode else {}
+            ),  # dirty hack for now
         )
         LOGGER.debug(
             "Loaded dataframe %s in %s seconds.", self.file, time.time() - start
@@ -786,9 +786,12 @@ class MetaPartition(Iterable):
             if columns is not None and name not in columns:
                 continue
 
-            pa_type = schema.field(name).type
-            dtype = pa_type.to_pandas_dtype()
-            # CONVERT TO DATE?
+            pa_type: pa.DataType = schema.field(name).type
+            dtype = (
+                pa_type.value_type.to_pandas_dtype()  # native dictionary type conversion is not supported, thus we cast values to the underlying value type of the dictionary
+                if isinstance(pa_type, pa.DictionaryType)
+                else pa_type.to_pandas_dtype()
+            )
 
             if isinstance(dtype, type):
                 value = dtype(value)
@@ -808,11 +811,12 @@ class MetaPartition(Iterable):
                 )
 
             # Create an array filled with the repeated key value
+            # FIXME: remove pdb.set_trace()
             if categories and name in categories:
                 # Use dictionary type (categorical)
                 dictionary_array = pa.DictionaryArray.from_arrays(
                     pa.array([0] * num_rows, type=pa.int32()),
-                    pa.array([value], type=pa_type),
+                    pa.array([value], type=pa_type.value_type),
                 )
                 arrow_value = dictionary_array
             else:
@@ -968,19 +972,26 @@ class MetaPartition(Iterable):
             table=self.table_name,
         )
         if self.data is not None:
-            df = self.data
+            df_or_table = self.data
             try:
-                file = df_serializer.store(actual_store, key, df)
+                file = df_serializer.store(actual_store, key, df_or_table)
             except Exception as exc:
                 try:
-                    if isinstance(df, pd.DataFrame):
+                    if isinstance(df_or_table, pd.DataFrame):
                         buf = io.StringIO()
-                        df.info(buf=buf)
+                        df_or_table.info(buf=buf)
                         LOGGER.error(
                             "Writing dataframe failed.\n%s\n%s\n%s",
                             exc,
                             buf.getvalue(),
-                            df.head(),
+                            df_or_table.head(),
+                        )
+                    elif isinstance(df_or_table, pa.Table):
+                        buf = io.StringIO()
+                        LOGGER.error(
+                            "Writing Arrow table failed.\n%s\n%s",
+                            exc,
+                            df_or_table.slice(0, 5),
                         )
                     else:
                         LOGGER.error("Storage of dask dataframe failed.")
@@ -1199,7 +1210,7 @@ class MetaPartition(Iterable):
             partition_on = [partition_on]
         partition_on = self._ensure_compatible_partitioning(partition_on)
 
-        new_data = self._partition_data(partition_on)
+        new_data = self._partition_data(partition_on)  # WIP: needs arrow compatibility
 
         for label, data in new_data.items():
             tmp_mp = MetaPartition(
@@ -1235,24 +1246,26 @@ class MetaPartition(Iterable):
                 f"Partition on called with: `{partition_on}`"
             )
 
-    def _partition_data(self, partition_on):
+    def _partition_data(self, partition_on) -> dict[str, pa.Table | pd.DataFrame]:
         existing_indices, base_label = cast(
             tuple[list, str], decode_key(f"uuid/table/{self.label}")[2:]
         )
         dct: dict[str, Any] = {}
-        df = self.data
+        df_or_table: pd.DataFrame | pa.Table = self.data
 
         # Check that data sizes do not change. This might happen if the
         # groupby below drops data, e.g. nulls
         size_after = 0
-        size_before = len(df)
+        size_before = len(df_or_table)
 
         # Implementation from pyarrow
         # See https://github.com/apache/arrow/blob/b33dfd9c6bd800308bb1619b237dbf24dea159be/python/pyarrow/parquet.py#L1030  # noqa: E501
 
         # column sanity checks
-        data_cols = set(df.columns).difference(partition_on)
-        missing_po_cols = set(partition_on).difference(df.columns)
+        arrow_mode = isinstance(df_or_table, pa.Table)
+        column_names = df_or_table.column_names if arrow_mode else df_or_table.columns
+        data_cols = set(column_names).difference(partition_on)
+        missing_po_cols = set(partition_on).difference(column_names)
         if missing_po_cols:
             raise ValueError(
                 "Partition column(s) missing: {}".format(
@@ -1262,25 +1275,32 @@ class MetaPartition(Iterable):
         if len(data_cols) == 0:
             raise ValueError("No data left to save outside partition columns")
 
-        # To be aligned with open source tooling we drop the index columns and recreate
-        # them upon reading as it is done by fastparquet and pyarrow
-        partition_keys = [df[col] for col in partition_on]
+        if arrow_mode:
+            groupby_result = group_table_by_partition_keys(
+                df_or_table, partition_on=partition_on
+            )
+        else:
+            # To be aligned with open source tooling we drop the index columns and recreate
+            # them upon reading as it is done by fastparquet and pyarrow
+            partition_keys = [df_or_table[col] for col in partition_on]
 
-        # # The handling of empty dfs is not part of the arrow implementation
-        # if df.empty:
-        #     return {}
+            # # The handling of empty dfs is not part of the arrow implementation
+            # if df.empty:
+            #     return {}
 
-        data_df = df.drop(partition_on, axis="columns")
-        for value, group in data_df.groupby(
-            by=partition_keys, observed=True, sort=False
-        ):
+            data_df = df_or_table.drop(partition_on, axis="columns")
+            groupby_result = data_df.groupby(
+                by=partition_keys, observed=True, sort=False
+            )
+
+        for key, group in groupby_result:
             partitioning_info = []
-            if pd.api.types.is_scalar(value):
-                value = [value]
+            if pd.api.types.is_scalar(key):
+                key = [key]
             if existing_indices:
                 partitioning_info.extend(quote_indices(existing_indices))
             partitioning_info.extend(
-                quote_indices(zip(partition_on, value, strict=False))
+                quote_indices(zip(partition_on, key, strict=False))
             )
             partitioning_info.append(base_label)
             new_label = "/".join(partitioning_info)
@@ -1518,7 +1538,7 @@ def parse_input_to_metapartition(
                     table_name=table_name,
                 )
             )
-    elif isinstance(obj, pd.DataFrame):
+    elif isinstance(obj, pd.DataFrame | pa.Table):
         mp = MetaPartition(
             label=gen_uuid(),
             data=obj,

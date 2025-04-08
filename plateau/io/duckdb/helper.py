@@ -56,6 +56,8 @@ def align_categories(tables: list[pa.Table], categoricals: list[str]) -> list[pa
 
     # Process each categorical column
     for column in categoricals:
+        all_types = [table[column].type for table in tables]
+
         union_values = set()
         baseline_categories = None
         baseline_num_rows = -1
@@ -68,8 +70,8 @@ def align_categories(tables: list[pa.Table], categoricals: list[str]) -> list[pa
 
             col = table[column]
             # Ensure the column is dictionary encoded.
-            if not pa.types.is_dictionary(col.type):
-                col = pc.dictionary_encode(col)
+            # if not pa.types.is_dictionary(col.type):
+            #     col = pc.dictionary_encode(col)
 
             # Combine chunks to get a single Array (if needed)
             col_combined = (

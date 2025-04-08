@@ -146,6 +146,37 @@ class SchemaWrapper:
     set.__doc__ = pa.Schema.set.__doc__
 
 
+def gen_metadata(schema: SchemaWrapper) -> dict[str, Any]:
+    assert isinstance(
+        schema.internal(), pa.Schema
+    ), "Internal schema must be a pyarrow schema"
+
+    pandas_metadata = {
+        "columns": [],
+        "index_columns": [],  # this function is only called if no pandas metadata is present, ergo we do not have any index columns
+        "pandas_version": pd.__version__,
+        "creator": {
+            "library": "plateau/core/common_metadata.py:gen_metadata",
+            # instead of {'library': 'pyarrow', 'version': '19.0.1'}
+        },
+    }
+
+    for field in schema:
+        pandas_metadata["columns"].append(
+            {
+                "name": field.name,
+                "field_name": field.name,
+                # the following fields are NOT accessed when resorting the columns
+                # "pandas_type": str(field.type),  # optional
+                # "numpy_type": str(field.type),  # optional
+                # "metadata": field.metadata,  # optional: decode if needed
+            }
+        )
+
+    return pandas_metadata
+    # > {'columns': [{'name': 'A', 'field_name': 'A'}, {'name': 'B', 'field_name': 'B'}, {'name': 'C', 'field_name': 'C'}, {'name': 'D', 'field_name': 'D'}, {'name': 'E', 'field_name': 'E'}, {'name': 'F', 'field_name': 'F'}], 'index_columns': [], 'pandas_version': '2.2.3'}
+
+
 def normalize_column_order(schema, partition_keys=None):
     """Normalize column order in schema.
 
@@ -175,7 +206,7 @@ def normalize_column_order(schema, partition_keys=None):
     else:
         partition_keys = list(partition_keys)
 
-    pandas_metadata = schema.pandas_metadata
+    pandas_metadata = schema.pandas_metadata or gen_metadata(schema)
     origin = schema.origin
 
     cols_partition = {}
@@ -210,10 +241,11 @@ def normalize_column_order(schema, partition_keys=None):
     pandas_metadata["columns"] = [cmd for cmd, _ in ordered]
     fields = [f for _, f in ordered if f is not None]
 
-    metadata = schema.metadata
+    metadata = schema.metadata or {}  # fallback
     metadata[b"pandas"] = _dict_to_binary(pandas_metadata)
-    schema = pa.schema(fields, metadata)
-    return SchemaWrapper(schema, origin)
+
+    pa_schema = pa.schema(fields, metadata)
+    return SchemaWrapper(pa_schema, origin)
 
 
 def make_meta(obj, origin, partition_keys=None):
@@ -250,9 +282,11 @@ def make_meta(obj, origin, partition_keys=None):
             SchemaWrapper(obj, origin), partition_keys=partition_keys
         )
     elif isinstance(obj, pa.Table):
-        return normalize_column_order(
-            SchemaWrapper(obj.schema, origin), partition_keys=partition_keys
-        )
+        return obj.schema
+
+    # normalize_column_order(
+    #         SchemaWrapper(obj.schema, origin), partition_keys=partition_keys
+    #     )
 
     if not isinstance(obj, pd.DataFrame):
         raise ValueError("Input must be a pyarrow schema, or a pandas dataframe")
