@@ -24,6 +24,7 @@ click = "*"
 prompt-toolkit = "*"
 pyyaml = "*"
 python-duckdb = ">=1.2.0,<2"
+polars = ">=1.26.0,<2"
 
 
 [host-dependencies]
