@@ -10,7 +10,6 @@ from functools import wraps
 from typing import (
     TYPE_CHECKING,
     Any,
-    Self,
     Union,
     cast,
 )
@@ -1381,7 +1380,7 @@ class MetaPartition(Iterable):
     @staticmethod
     def concat_metapartitions_arrow(
         metapartitions: list["MetaPartition"], label_merger=None
-    ) -> Self:
+    ) -> "MetaPartition":
         LOGGER.debug("Concatenating metapartitions")
 
         new_metadata_version = -1
