@@ -20,6 +20,7 @@ from ._generic import (
     check_predicates,
     filter_df,
     filter_df_from_predicates,
+    filter_table_from_predicates,
 )
 from ._io_buffer import BlockBuffer
 from ._util import ensure_unicode_string_type, schema_metadata_bytes_to_object
@@ -41,13 +42,13 @@ BACKOFF_TIME = 0.01  # 10 ms
 PARQUET_VERSION = "2.4"
 
 
-def _empty_table_from_schema(parquet_file):
+def _empty_table_from_schema(parquet_file: ParquetFile) -> pa.Table:
     schema = parquet_file.schema.to_arrow_schema()
 
     return schema.empty_table()
 
 
-def _reset_dictionary_columns(table, exclude=None):
+def _reset_dictionary_columns(table: pa.Table, exclude=None) -> pa.Table:
     """We need to ensure that the dtype is exactly as requested, see GH227."""
     if exclude is None:
         exclude = []
@@ -190,7 +191,8 @@ class ParquetSerializer(DataFrameSerializer):
         categories: Iterable[str] | None = None,
         predicates: PredicatesType | None = None,
         date_as_object: bool = False,
-    ) -> pd.DataFrame:
+        return_pyarrow_table: bool = False,
+    ) -> pd.DataFrame | pa.Table:
         check_predicates(predicates)
         # If we want to do columnar access we can benefit from partial reads
         # otherwise full read en block is the better option.
@@ -262,7 +264,6 @@ class ParquetSerializer(DataFrameSerializer):
                         table = pq.read_pandas(reader, columns=columns)
             finally:
                 reader.close()
-
         if columns is not None:
             missing_columns = set(columns) - set(table.schema.names)
             if missing_columns:
@@ -275,7 +276,24 @@ class ParquetSerializer(DataFrameSerializer):
         table = _reset_dictionary_columns(table, exclude=categories)
 
         # HACK: Cast bytes to object in metadata until Pandas bug is fixed: https://github.com/pandas-dev/pandas/issues/50127
-        table = table.cast(schema_metadata_bytes_to_object(table.schema))
+        if table.schema.metadata:
+            table = table.cast(schema_metadata_bytes_to_object(table.schema))
+
+        if return_pyarrow_table:
+            table.rename_columns(
+                [ensure_unicode_string_type(name) for name in table.column_names]
+            )
+
+            if filter_query:
+                raise ValueError(
+                    "filter_query is not supported when 'return_pyarrow_table' is True (if you use arrow_mode)."
+                    "Hint: please express your filter query as predicates."
+                )
+
+            if predicates:
+                table = filter_table_from_predicates(table, predicates)
+
+            return table if columns is None else table.select(columns)
 
         _coerce = {"coerce_temporal_nanoseconds": True}
         df = table.to_pandas(date_as_object=date_as_object, **_coerce)
@@ -309,7 +327,8 @@ class ParquetSerializer(DataFrameSerializer):
         categories: Iterable[str] | None = None,
         predicates: PredicatesType | None = None,
         date_as_object: bool = False,
-    ) -> pd.DataFrame:
+        return_pyarrow_table: bool = False,
+    ) -> pd.DataFrame | pa.Table:
         # https://github.com/JDASoftwareGroup/plateau/issues/407  We have been seeing weird `IOError`s while reading
         # Parquet files from Azure Blob Store. These errors have caused long running computations to fail.
         # The workaround is to retry the serialization here and gain more stability for long running tasks.
@@ -325,6 +344,7 @@ class ParquetSerializer(DataFrameSerializer):
                     categories=categories,
                     predicates=predicates,
                     date_as_object=date_as_object,
+                    return_pyarrow_table=return_pyarrow_table,
                 )
             # We only retry OSErrors (note that IOError inherits from OSError), as these kind of errors may benefit
             # from retries.
@@ -350,7 +370,7 @@ class ParquetSerializer(DataFrameSerializer):
             f"date_as_object: {date_as_object}, predicates: {predicates}."
         ) from raised_error
 
-    def store(self, store, key_prefix, df):
+    def store(self, store, key_prefix, df: pd.DataFrame | pa.Table):
         key = f"{key_prefix}.parquet"
         if isinstance(df, pa.Table):
             table = df
