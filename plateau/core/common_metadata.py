@@ -147,9 +147,9 @@ class SchemaWrapper:
 
 
 def gen_metadata(schema: SchemaWrapper) -> dict[str, Any]:
-    assert isinstance(
-        schema.internal(), pa.Schema
-    ), "Internal schema must be a pyarrow schema"
+    assert isinstance(schema.internal(), pa.Schema), (
+        "Internal schema must be a pyarrow schema"
+    )
 
     pandas_metadata = {
         "columns": [],

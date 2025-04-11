@@ -12,16 +12,13 @@ Available constants
 :meta public:
 """
 
-import pdb
 import warnings
-from duckdb import arrow
-import pyarrow as pa
-import pyarrow.compute as pc
 from collections.abc import Iterable
 from typing import TYPE_CHECKING, TypeVar
 
 import numpy as np
 import pandas as pd
+import pyarrow as pa
 from minimalkv import KeyValueStore
 from pandas.api.types import is_list_like
 

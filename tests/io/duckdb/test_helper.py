@@ -1,9 +1,8 @@
+import pandas as pd
+import pandas.testing as pdt
 import pyarrow as pa
 import pyarrow.compute as pc
 import pytest
-import numpy as np
-import pandas as pd
-import pandas.testing as pdt
 
 from plateau.io.duckdb.helper import (
     align_categories,

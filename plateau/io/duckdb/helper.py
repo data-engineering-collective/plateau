@@ -55,7 +55,6 @@ def align_categories(tables: list[pa.Table], categoricals: list[str]) -> list[pa
         return tables
 
     for column in categoricals:
-
         union_values = set()
         baseline_categories = None
         baseline_num_rows = -1
