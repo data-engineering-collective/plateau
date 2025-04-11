@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """This module contains functionality for persisting/serialising DataFrames.
 
 Available constants
@@ -13,7 +12,11 @@ Available constants
 :meta public:
 """
 
+import pdb
 import warnings
+from duckdb import arrow
+import pyarrow as pa
+import pyarrow.compute as pc
 from collections.abc import Iterable
 from typing import TYPE_CHECKING, TypeVar
 
@@ -265,6 +268,61 @@ def columns_in_predicates(predicates: PredicatesType) -> set[str]:
     return columns
 
 
+def _filter_df_or_table_from_predicates(
+    df_or_table: pd.DataFrame | pa.Table,
+    predicates: PredicatesType | None,
+    strict_date_types: bool = False,
+    arrow_mode: bool = False,
+) -> pd.DataFrame | pa.Table:
+    if predicates is None:
+        return df_or_table
+    indexer: npt.NDArray[np.bool_] = np.zeros(len(df_or_table), dtype=bool)
+    for conjunction in predicates:
+        inner_indexer: npt.NDArray[np.bool_] = np.ones(len(df_or_table), dtype=bool)
+        for column, op, value in conjunction:
+            column_name = ensure_unicode_string_type(column)
+            values = (
+                df_or_table.column(column_name).to_numpy()
+                if arrow_mode
+                else df_or_table[column_name].values
+            )
+            filter_array_like(
+                values,
+                op,
+                value,
+                inner_indexer,
+                inner_indexer,
+                strict_date_types=strict_date_types,
+                column_name=column_name,
+            )
+        indexer = inner_indexer | indexer
+
+    if not arrow_mode:
+        return df_or_table[indexer]
+
+    table_mask = pa.array(indexer, type=pa.bool_())
+    return df_or_table.filter(table_mask)
+
+
+# Casting pyarrow structures to numpy ones might introduce some overhead
+# but we do not have to maintain twice the logic for filtering from predicates
+def filter_table_from_predicates(table: pa.Table, predicates: PredicatesType):
+    """Filter a `pyarrow.Table` based on predicates in disjunctive normal
+    form.
+
+    See Also
+    --------
+    * :ref:`predicate_pushdown`
+    * :ref:`filter_df_from_predicates`
+    """
+    return _filter_df_or_table_from_predicates(
+        df_or_table=table,
+        predicates=predicates,
+        strict_date_types=False,
+        arrow_mode=True,
+    )
+
+
 def filter_df_from_predicates(
     df: pd.DataFrame,
     predicates: PredicatesType | None,
@@ -288,24 +346,12 @@ def filter_df_from_predicates(
     --------
     * :ref:`predicate_pushdown`
     """
-    if predicates is None:
-        return df
-    indexer: npt.NDArray[np.bool_] = np.zeros(len(df), dtype=bool)
-    for conjunction in predicates:
-        inner_indexer: npt.NDArray[np.bool_] = np.ones(len(df), dtype=bool)
-        for column, op, value in conjunction:
-            column_name = ensure_unicode_string_type(column)
-            filter_array_like(
-                df[column_name].values,
-                op,
-                value,
-                inner_indexer,
-                inner_indexer,
-                strict_date_types=strict_date_types,
-                column_name=column_name,
-            )
-        indexer = inner_indexer | indexer
-    return df[indexer]
+    return _filter_df_or_table_from_predicates(
+        df_or_table=df,
+        predicates=predicates,
+        strict_date_types=strict_date_types,
+        arrow_mode=False,
+    )
 
 
 def _handle_categorical_data(array_like, require_ordered):

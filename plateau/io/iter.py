@@ -79,7 +79,7 @@ def read_dataset_as_metapartitions__iterator(
                 MetaPartition.concat_metapartitions_arrow
                 if arrow_mode
                 else MetaPartition.concat_metapartitions
-            )  # Dirty, refactor later
+            )
             mp = concatenate(
                 [
                     mp_inner.load_dataframes(

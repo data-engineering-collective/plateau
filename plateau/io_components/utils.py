@@ -126,15 +126,17 @@ def _ensure_compatible_indices(
 def group_table_by_partition_keys(table: pa.Table, partition_on: list[str]):
     """Yield tuples of partition keys and pyarrow tables (excluding the partition_on columns) using polars.
 
-    Pyarrow's groupby is not really useful for this specific purpose, thus the detour through polars."""
+    Pyarrow's groupby is not really useful for this specific purpose, thus the detour through polars.
+    """
 
     df = pl.from_arrow(table)
 
     groups = df.group_by(partition_on, maintain_order=True)
 
     for key, group in groups:
-        arrow_table = group.drop(partition_on).to_arrow() # drop partition keys
+        arrow_table = group.drop(partition_on).to_arrow()  # drop partition keys
         yield key, arrow_table
+
 
 def validate_partition_keys(
     dataset_uuid,

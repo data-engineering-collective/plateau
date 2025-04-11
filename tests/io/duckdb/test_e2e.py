@@ -7,9 +7,10 @@ import pytest
 from minimalkv import get_store_from_url
 
 from plateau.io.duckdb.dataframe import (
-    read_table_as_ddb as fast_read_table_as_ddb,
-    store_dataset_from_ddb as fast_store_dataframes_as_dataset,
+    read_table_as_ddb,
+    store_dataset_from_ddb,
 )
+from plateau.io.eager import store_dataframes_as_dataset
 
 
 @pytest.fixture
@@ -41,21 +42,33 @@ def df() -> pd.DataFrame:
     )
 
 
-def test_example_fast_read(df: pd.DataFrame, store_url):
+def test_read_write(df: pd.DataFrame, store_url):
     table = duckdb.execute("CREATE TABLE my_df AS SELECT * FROM df").table("my_df")
 
-    fast_store_dataframes_as_dataset(
+    store_dataset_from_ddb(
         store_url, "partitioned_dataset", [table], partition_on=["B", "E"]
     )
 
-    con2 = fast_read_table_as_ddb(
+    con2 = read_table_as_ddb(
         "partitioned_dataset",
         store_url,
-        table="my_df",
-        categoricals="E",
+        as_table="my_df",
     )
 
     round_trip_df = con2.table("my_df").to_df()
     round_trip_df = round_trip_df[df.columns]  # align column order
 
     assert round_trip_df.compare(df).empty
+
+
+def test_filter(df: pd.DataFrame, store_url):
+    store_dataframes_as_dataset(store=store_url, dataset_uuid="dataset", dfs=[df])
+
+    con = read_table_as_ddb(
+        "dataset", store_url, predicates=[[("E", "==", "train")]], as_table="my_df"
+    )
+    round_trip_df = con.table("my_df").to_df()
+    round_trip_df = round_trip_df[df.columns]  # align column order
+
+    expected = df.iloc[[1, 3]].reset_index(drop=True)
+    assert round_trip_df.compare(expected).empty

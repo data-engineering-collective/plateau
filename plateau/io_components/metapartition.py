@@ -256,7 +256,7 @@ class MetaPartition(Iterable):
         self.schema = schema
         self.table_name = table_name
         if data is not None and schema is None:
-            self.schema = make_meta(  # handles pa.Table as well
+            self.schema = make_meta(
                 data, origin=f"{table_name}/{label}", partition_keys=partition_keys
             )
 
@@ -691,9 +691,7 @@ class MetaPartition(Iterable):
             predicate_pushdown_to_io=predicate_pushdown_to_io,
             predicates=filtered_predicates,
             date_as_object=dates_as_object,
-            **(
-                {"return_pyarrow_table": True} if arrow_mode else {}
-            ),  # dirty hack for now
+            **({"return_pyarrow_table": True} if arrow_mode else {}),
         )
         LOGGER.debug(
             "Loaded dataframe %s in %s seconds.", self.file, time.time() - start
@@ -736,7 +734,6 @@ class MetaPartition(Iterable):
                         ", ".join(sorted(missing_cols))
                     )
                 )
-            # Really ugly, refactor later!
             if arrow_mode and list(df_or_arrow.column_names) != columns:
                 # Arrow tables are immutable, so we need to create a new table
                 df_or_arrow = df_or_arrow.select(columns)
@@ -811,7 +808,6 @@ class MetaPartition(Iterable):
                 )
 
             # Create an array filled with the repeated key value
-            # FIXME: remove pdb.set_trace()
             if categories and name in categories:
                 # Use dictionary type (categorical)
                 dictionary_array = pa.DictionaryArray.from_arrays(
@@ -824,8 +820,7 @@ class MetaPartition(Iterable):
 
             new_columns.append((name, arrow_value))
 
-        # Prepend new index columns
-        for name, array in reversed(new_columns):  # insert in reverse to maintain order
+        for name, array in reversed(new_columns):
             table = table.append_column(name, array)
 
         # move newly added column to front
@@ -1210,7 +1205,7 @@ class MetaPartition(Iterable):
             partition_on = [partition_on]
         partition_on = self._ensure_compatible_partitioning(partition_on)
 
-        new_data = self._partition_data(partition_on)  # WIP: needs arrow compatibility
+        new_data = self._partition_data(partition_on)
 
         for label, data in new_data.items():
             tmp_mp = MetaPartition(
@@ -1398,8 +1393,6 @@ class MetaPartition(Iterable):
             schema.append(mp.schema)
 
         new_table = pa.concat_tables(data)
-
-        # TODO: What about align_categories?
 
         new_schema = validate_compatible(schema)
 

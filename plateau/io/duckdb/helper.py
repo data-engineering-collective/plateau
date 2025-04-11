@@ -54,9 +54,7 @@ def align_categories(tables: list[pa.Table], categoricals: list[str]) -> list[pa
     if not categoricals:
         return tables
 
-    # Process each categorical column
     for column in categoricals:
-        all_types = [table[column].type for table in tables]
 
         union_values = set()
         baseline_categories = None
@@ -69,15 +67,9 @@ def align_categories(tables: list[pa.Table], categoricals: list[str]) -> list[pa
                 continue
 
             col = table[column]
-            # Ensure the column is dictionary encoded.
-            # if not pa.types.is_dictionary(col.type):
-            #     col = pc.dictionary_encode(col)
-
-            # Combine chunks to get a single Array (if needed)
             col_combined = (
                 col.combine_chunks() if isinstance(col, pa.ChunkedArray) else col
             )
-            # Extract the dictionary as a Python list.
             cats = col_combined.dictionary.to_pylist()
             union_values.update(cats)
             if table.num_rows > baseline_num_rows:
@@ -85,13 +77,12 @@ def align_categories(tables: list[pa.Table], categoricals: list[str]) -> list[pa
                 baseline_categories = cats
 
         if baseline_categories is None:
-            # No table contained this column.
             continue
 
         # Build the new dictionary order: use the baseline order then add any additional values
+        # stay consistent with the utils:align_categories function
         extra = union_values - set(baseline_categories)
         new_dictionary = baseline_categories + sorted(extra)
-        # Build a lookup map for quick conversion: value -> new index
         union_map = {val: idx for idx, val in enumerate(new_dictionary)}
 
         # Second pass: recast the column in every table to use the new dictionary
@@ -104,24 +95,20 @@ def align_categories(tables: list[pa.Table], categoricals: list[str]) -> list[pa
             col = table[column]
             if not pa.types.is_dictionary(col.type):
                 col = pc.dictionary_encode(col)
-            # Decode the column to its raw values (as a Python list)
             col_combined = (
                 col.combine_chunks() if isinstance(col, pa.ChunkedArray) else col
             )
             decoded = col_combined.to_pylist()
-            # Map each value to the new dictionary index (preserving nulls)
             new_indices = [
                 union_map[val] if val is not None else None for val in decoded
             ]
             new_indices_array = pa.array(new_indices, type=pa.int32())
-            # Create a new dictionary array with the new dictionary
             new_dict_array = pa.DictionaryArray.from_arrays(
                 new_indices_array, pa.array(new_dictionary, type=col.type.value_type)
             )
-            # Replace the column in the table
             col_index = table.schema.get_field_index(column)
             table = table.set_column(col_index, column, new_dict_array)
             new_tables.append(table)
-        tables = new_tables  # update tables for next categorical column
+        tables = new_tables
 
     return tables

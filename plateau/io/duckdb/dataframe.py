@@ -23,7 +23,7 @@ LOGGER = logging.getLogger(__name__)
 def read_table_as_ddb(
     uuid: str,
     store: KeyValueStore,
-    table: str,
+    as_table: str,
     predicates: list[list[tuple[str, str, Any]]] | None = None,
     **kwargs,  # support for everything else
 ) -> duckdb.DuckDBPyConnection:
@@ -37,7 +37,7 @@ def read_table_as_ddb(
 
     table_obj = read_table_as_arrow(uuid, store=store, predicates=predicates, **kwargs)
     con = duckdb.connect()
-    con.register(table, table_obj)
+    con.register(as_table, table_obj)
     return con
 
 

@@ -166,15 +166,11 @@ def gen_metadata(schema: SchemaWrapper) -> dict[str, Any]:
             {
                 "name": field.name,
                 "field_name": field.name,
-                # the following fields are NOT accessed when resorting the columns
-                # "pandas_type": str(field.type),  # optional
-                # "numpy_type": str(field.type),  # optional
-                # "metadata": field.metadata,  # optional: decode if needed
+                # other are NOT accessed when resorting the columns
             }
         )
 
     return pandas_metadata
-    # > {'columns': [{'name': 'A', 'field_name': 'A'}, {'name': 'B', 'field_name': 'B'}, {'name': 'C', 'field_name': 'C'}, {'name': 'D', 'field_name': 'D'}, {'name': 'E', 'field_name': 'E'}, {'name': 'F', 'field_name': 'F'}], 'index_columns': [], 'pandas_version': '2.2.3'}
 
 
 def normalize_column_order(schema, partition_keys=None):
@@ -283,10 +279,6 @@ def make_meta(obj, origin, partition_keys=None):
         )
     elif isinstance(obj, pa.Table):
         return obj.schema
-
-    # normalize_column_order(
-    #         SchemaWrapper(obj.schema, origin), partition_keys=partition_keys
-    #     )
 
     if not isinstance(obj, pd.DataFrame):
         raise ValueError("Input must be a pyarrow schema, or a pandas dataframe")

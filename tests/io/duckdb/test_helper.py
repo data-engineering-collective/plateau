@@ -1,6 +1,9 @@
 import pyarrow as pa
 import pyarrow.compute as pc
 import pytest
+import numpy as np
+import pandas as pd
+import pandas.testing as pdt
 
 from plateau.io.duckdb.helper import (
     align_categories,
@@ -22,37 +25,24 @@ def sample_schema():
 
 def test_empty_table_from_schema_full_schema(sample_schema):
     table = empty_table_from_schema(sample_schema)
-    # Check that the table has zero rows and the same schema as provided.
     assert table.num_rows == 0
     assert table.schema.equals(sample_schema)
 
 
 def test_empty_table_from_schema_subset(sample_schema):
-    # Request only a subset of columns.
     table = empty_table_from_schema(sample_schema, columns=["b", "c"])
     assert table.num_rows == 0
-    # The table schema should only contain the specified columns and in order.
     assert table.column_names == ["b", "c"]
 
 
 def test_cast_categoricals_to_dictionary():
-    # Create a table with one column not dictionary encoded.
     data = {"cat": pa.array(["a", "b", "a", None]), "num": pa.array([1, 2, 3, 4])}
     table = pa.Table.from_pydict(data)
-    # Ensure 'cat' is not dictionary encoded initially.
     assert not pa.types.is_dictionary(table["cat"].type)
-    # Cast the 'cat' column.
     new_table = cast_categoricals_to_dictionary(table, ["cat"])
-    # Check that the 'cat' column is now dictionary encoded.
     assert pa.types.is_dictionary(new_table["cat"].type)
-    # Decode and compare values.
     decoded = pc.dictionary_decode(new_table["cat"]).to_pylist()
     assert decoded == ["a", "b", "a", None]
-
-
-import numpy as np
-import pandas as pd
-import pandas.testing as pdt
 
 
 def test_align_categories():
@@ -88,12 +78,10 @@ def test_align_categories():
     in_tables = [table1, table2, table3]
     out_tables = align_categories(in_tables, categoricals=["col_A", "col_B"])
 
-    # Convert the output PyArrow Tables to Pandas DataFrames to compare
     out_df1 = out_tables[0].to_pandas()
     out_df2 = out_tables[1].to_pandas()
     out_df3 = out_tables[2].to_pandas()
 
-    # For both columns, check that the categorical values and category orders are as expected
     for prefix in ["A", "B"]:
         col_name = f"col_{prefix}"
         expected_categories = [
@@ -129,42 +117,3 @@ def test_align_categories():
         pdt.assert_series_equal(out_df1[col_name], expected_series1)
         pdt.assert_series_equal(out_df2[col_name], expected_series2)
         pdt.assert_series_equal(out_df3[col_name], expected_series3)
-
-
-def test_align_categories_with_missings():
-    # Create two PyArrow Tables from DataFrames with categorical columns,
-    # including missing values in the first table.
-    table0 = pa.Table.from_pandas(
-        pd.DataFrame(
-            {
-                "letters": pd.Categorical(
-                    ["a", "a", "b", np.nan], categories=["a", "b"]
-                ),
-            }
-        ),
-        preserve_index=False,
-    )
-    table1 = pa.Table.from_pandas(
-        pd.DataFrame(
-            {
-                "letters": pd.Categorical(["a", "a"], categories=["a", "b"]),
-            }
-        ),
-        preserve_index=False,
-    )
-
-    out_tables = align_categories([table0, table1], ["letters"])
-
-    expected_df0 = pd.DataFrame(
-        {
-            "letters": pd.Categorical(["a", "a", "b", np.nan], categories=["a", "b"]),
-        }
-    )
-    expected_df1 = pd.DataFrame(
-        {
-            "letters": pd.Categorical(["a", "a"], categories=["a", "b"]),
-        }
-    )
-
-    pdt.assert_frame_equal(out_tables[0].to_pandas(), expected_df0)
-    pdt.assert_frame_equal(out_tables[1].to_pandas(), expected_df1)

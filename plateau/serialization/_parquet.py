@@ -20,6 +20,7 @@ from ._generic import (
     check_predicates,
     filter_df,
     filter_df_from_predicates,
+    filter_table_from_predicates,
 )
 from ._io_buffer import BlockBuffer
 from ._util import ensure_unicode_string_type, schema_metadata_bytes_to_object
@@ -47,7 +48,7 @@ def _empty_table_from_schema(parquet_file: ParquetFile) -> pa.Table:
     return schema.empty_table()
 
 
-def _reset_dictionary_columns(table: pa.Table, exclude=None):
+def _reset_dictionary_columns(table: pa.Table, exclude=None) -> pa.Table:
     """We need to ensure that the dtype is exactly as requested, see GH227."""
     if exclude is None:
         exclude = []
@@ -197,9 +198,7 @@ class ParquetSerializer(DataFrameSerializer):
         # otherwise full read en block is the better option.
         if (not predicate_pushdown_to_io) or (columns is None and predicates is None):
             with pa.BufferReader(store.get(key)) as reader:
-                table = pq.read_pandas(
-                    reader, columns=columns
-                )  # TODO: is this relevant?
+                table = pq.read_pandas(reader, columns=columns)
         else:
             if HAVE_BOTO and isinstance(store, BotoStore):
                 # Parquet and seeks on S3 currently leak connections thus
@@ -281,7 +280,20 @@ class ParquetSerializer(DataFrameSerializer):
             table = table.cast(schema_metadata_bytes_to_object(table.schema))
 
         if return_pyarrow_table:
-            return table
+            table.rename_columns(
+                [ensure_unicode_string_type(name) for name in table.column_names]
+            )
+
+            if filter_query:
+                raise ValueError(
+                    "filter_query is not supported when 'return_pyarrow_table' is True (if you use arrow_mode)."
+                    "Hint: please express your filter query as predicates."
+                )
+
+            if predicates:
+                table = filter_table_from_predicates(table, predicates)
+
+            return table if columns is None else table.select(columns)
 
         _coerce = {"coerce_temporal_nanoseconds": True}
         df = table.to_pandas(date_as_object=date_as_object, **_coerce)
