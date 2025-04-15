@@ -161,7 +161,7 @@ def read_dataset_as_metapartitions(
     predicates=None,
     factory=None,
     dispatch_by=None,
-    arrow_mode: bool = False,
+    table_backend: bool = False,
 ) -> list[MetaPartition]:
     """Read a dataset as a list of
     :class:`plateau.io_components.metapartition.MetaPartition`.
@@ -206,7 +206,7 @@ def read_dataset_as_metapartitions(
         predicates=predicates,
         factory=ds_factory,
         dispatch_by=dispatch_by,
-        arrow_mode=arrow_mode,
+        table_backend=table_backend,
     )
     return list(ds_iter)
 

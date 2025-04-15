@@ -175,8 +175,8 @@ dispatch_metadata:
     the MetaPartition instances generated.
     Note: This feature is deprecated and this feature toggle is only
     introduced to allow for easier transition.""",
-    "arrow_mode": """
-arrow_mode: bool
+    "table_backend": """
+table_backend: bool
     If True, the data is read as Arrow tables instead of Pandas DataFrames.
     This can speed up your application if you don't need to use Pandas.""",
 }

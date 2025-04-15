@@ -286,7 +286,7 @@ class ParquetSerializer(DataFrameSerializer):
 
             if filter_query:
                 raise ValueError(
-                    "filter_query is not supported when 'return_pyarrow_table' is True (if you use arrow_mode)."
+                    "filter_query is not supported when 'return_pyarrow_table' is True (if you use table_backend)."
                     "Hint: please express your filter query as predicates."
                 )
 

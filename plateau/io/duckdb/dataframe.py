@@ -108,7 +108,7 @@ def read_dataset_as_arrow_tables(
         predicates=predicates,
         factory=ds_factory,
         dispatch_by=dispatch_by,
-        arrow_mode=True,
+        table_backend=True,
     )
     return [mp.data for mp in mps]
 

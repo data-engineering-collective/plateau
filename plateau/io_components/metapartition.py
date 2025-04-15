@@ -593,7 +593,7 @@ class MetaPartition(Iterable):
         categoricals: Sequence[str] | None = None,
         dates_as_object: bool = True,
         predicates: PredicatesType = None,
-        arrow_mode: bool = False,
+        table_backend: bool = False,
     ) -> "MetaPartition":
         """Load the dataframes of the partitions from store into memory.
 
@@ -680,7 +680,7 @@ class MetaPartition(Iterable):
 
         start = time.time()
 
-        serializer = ParquetSerializer if arrow_mode else DataFrameSerializer
+        serializer = ParquetSerializer if table_backend else DataFrameSerializer
 
         df_or_arrow = serializer.restore_dataframe(
             key=self.file,
@@ -690,14 +690,14 @@ class MetaPartition(Iterable):
             predicate_pushdown_to_io=predicate_pushdown_to_io,
             predicates=filtered_predicates,
             date_as_object=dates_as_object,
-            **({"return_pyarrow_table": True} if arrow_mode else {}),
+            **({"return_pyarrow_table": True} if table_backend else {}),
         )
         LOGGER.debug(
             "Loaded dataframe %s in %s seconds.", self.file, time.time() - start
         )
         # Metadata version >=4 parse the index columns and add them back to the dataframe
 
-        if arrow_mode:
+        if table_backend:
             df_or_arrow.rename_columns(
                 [ensure_string_type(name) for name in df_or_arrow.column_names]
             )
@@ -706,7 +706,7 @@ class MetaPartition(Iterable):
 
         reconstruction = (
             self._reconstruct_index_columns
-            if not arrow_mode
+            if not table_backend
             else self._reconstruct_index_columns_arrow
         )
         df_or_arrow = reconstruction(
@@ -724,7 +724,7 @@ class MetaPartition(Iterable):
             #       inconsistent dataset state instead.
             missing_cols = (
                 set(columns).difference(df_or_arrow.columns)
-                if not arrow_mode
+                if not table_backend
                 else set(columns).difference(df_or_arrow.column_names)
             )
             if missing_cols:
@@ -733,10 +733,10 @@ class MetaPartition(Iterable):
                         ", ".join(sorted(missing_cols))
                     )
                 )
-            if arrow_mode and list(df_or_arrow.column_names) != columns:
+            if table_backend and list(df_or_arrow.column_names) != columns:
                 # Arrow tables are immutable, so we need to create a new table
                 df_or_arrow = df_or_arrow.select(columns)
-            elif not arrow_mode and list(df_or_arrow.columns) != columns:
+            elif not table_backend and list(df_or_arrow.columns) != columns:
                 df_or_arrow = df_or_arrow.reindex(columns=columns, copy=False)
 
         return self.copy(data=df_or_arrow)
@@ -1256,8 +1256,10 @@ class MetaPartition(Iterable):
         # See https://github.com/apache/arrow/blob/b33dfd9c6bd800308bb1619b237dbf24dea159be/python/pyarrow/parquet.py#L1030  # noqa: E501
 
         # column sanity checks
-        arrow_mode = isinstance(df_or_table, pa.Table)
-        column_names = df_or_table.column_names if arrow_mode else df_or_table.columns
+        table_backend = isinstance(df_or_table, pa.Table)
+        column_names = (
+            df_or_table.column_names if table_backend else df_or_table.columns
+        )
         data_cols = set(column_names).difference(partition_on)
         missing_po_cols = set(partition_on).difference(column_names)
         if missing_po_cols:
@@ -1269,7 +1271,7 @@ class MetaPartition(Iterable):
         if len(data_cols) == 0:
             raise ValueError("No data left to save outside partition columns")
 
-        if arrow_mode:
+        if table_backend:
             groupby_result = group_table_by_partition_keys(
                 df_or_table, partition_on=partition_on
             )

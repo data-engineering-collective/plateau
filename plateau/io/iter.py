@@ -47,7 +47,7 @@ def read_dataset_as_metapartitions__iterator(
     predicates=None,
     factory=None,
     dispatch_by=None,
-    arrow_mode: bool = False,
+    table_backend: bool = False,
 ) -> Generator[MetaPartition, Any, None]:
     """A Python iterator to retrieve a dataset from store where each partition
     is loaded as a :class:`~plateau.io_components.metapartition.MetaPartition`.
@@ -77,7 +77,7 @@ def read_dataset_as_metapartitions__iterator(
         if dispatch_by is not None:
             concatenate = (
                 MetaPartition.concat_metapartitions_arrow
-                if arrow_mode
+                if table_backend
                 else MetaPartition.concat_metapartitions
             )
             mp = concatenate(
@@ -88,7 +88,7 @@ def read_dataset_as_metapartitions__iterator(
                         categoricals=categoricals,
                         predicate_pushdown_to_io=predicate_pushdown_to_io,
                         predicates=predicates,
-                        arrow_mode=arrow_mode,
+                        table_backend=table_backend,
                     )
                     for mp_inner in mp
                 ]
@@ -102,7 +102,7 @@ def read_dataset_as_metapartitions__iterator(
                 predicate_pushdown_to_io=predicate_pushdown_to_io,
                 dates_as_object=dates_as_object,
                 predicates=predicates,
-                arrow_mode=arrow_mode,
+                table_backend=table_backend,
             )
         yield mp
 

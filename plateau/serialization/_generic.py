@@ -269,7 +269,7 @@ def _filter_df_or_table_from_predicates(
     df_or_table: pd.DataFrame | pa.Table,
     predicates: PredicatesType | None,
     strict_date_types: bool = False,
-    arrow_mode: bool = False,
+    table_backend: bool = False,
 ) -> pd.DataFrame | pa.Table:
     if predicates is None:
         return df_or_table
@@ -280,7 +280,7 @@ def _filter_df_or_table_from_predicates(
             column_name = ensure_unicode_string_type(column)
             values = (
                 df_or_table.column(column_name).to_numpy()
-                if arrow_mode
+                if table_backend
                 else df_or_table[column_name].values
             )
             filter_array_like(
@@ -294,7 +294,7 @@ def _filter_df_or_table_from_predicates(
             )
         indexer = inner_indexer | indexer
 
-    if not arrow_mode:
+    if not table_backend:
         return df_or_table[indexer]
 
     table_mask = pa.array(indexer, type=pa.bool_())
@@ -316,7 +316,7 @@ def filter_table_from_predicates(table: pa.Table, predicates: PredicatesType):
         df_or_table=table,
         predicates=predicates,
         strict_date_types=False,
-        arrow_mode=True,
+        table_backend=True,
     )
 
 
@@ -347,7 +347,7 @@ def filter_df_from_predicates(
         df_or_table=df,
         predicates=predicates,
         strict_date_types=strict_date_types,
-        arrow_mode=False,
+        table_backend=False,
     )
 
 
