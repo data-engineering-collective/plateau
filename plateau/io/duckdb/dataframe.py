@@ -10,7 +10,6 @@ from plateau.core.factory import DatasetFactory, _ensure_factory
 from plateau.io.duckdb.helper import (
     align_categories,
     cast_categoricals_to_dictionary,
-    empty_table_from_schema,
 )
 from plateau.io.eager import (
     read_dataset_as_metapartitions,
@@ -65,19 +64,12 @@ def read_table_as_arrow(
         factory=ds_factory,
     )
 
-    empty_table = empty_table_from_schema(
-        schema=ds_factory.schema.internal(),
-        columns=columns,
-    )
+    empty_table = ds_factory.schema.internal().empty_table()
 
     if categoricals:
         empty_table = cast_categoricals_to_dictionary(empty_table, categoricals)
 
     tables = list(partitions) + [empty_table]
-
-    for table in tables:
-        print(table)
-        print()
 
     if categoricals:
         tables = align_categories(tables, categoricals)
