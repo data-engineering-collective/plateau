@@ -7,7 +7,6 @@ import pytest
 from plateau.io.duckdb.helper import (
     align_categories,
     cast_categoricals_to_dictionary,
-    empty_table_from_schema,
 )
 
 
@@ -20,18 +19,6 @@ def sample_schema():
             ("c", pa.float64()),
         ]
     )
-
-
-def test_empty_table_from_schema_full_schema(sample_schema):
-    table = empty_table_from_schema(sample_schema)
-    assert table.num_rows == 0
-    assert table.schema.equals(sample_schema)
-
-
-def test_empty_table_from_schema_subset(sample_schema):
-    table = empty_table_from_schema(sample_schema, columns=["b", "c"])
-    assert table.num_rows == 0
-    assert table.column_names == ["b", "c"]
 
 
 def test_cast_categoricals_to_dictionary():

@@ -2,16 +2,6 @@ import pyarrow as pa
 import pyarrow.compute as pc
 
 
-def empty_table_from_schema(schema: pa.Schema, columns=None) -> pa.Table:
-    """Create an empty pyarrow.Table from a schema, optionally selecting only certain columns."""
-    if columns is not None:
-        # Build a new schema using only the specified column names
-        fields = [schema.field(name) for name in columns if name in schema.names]
-        schema = pa.schema(fields)
-    arrays = [pa.array([], type=field.type) for field in schema]
-    return pa.Table.from_arrays(arrays, schema=schema)
-
-
 def cast_categoricals_to_dictionary(
     table: pa.Table, categoricals: list[str]
 ) -> pa.Table:
