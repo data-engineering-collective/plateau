@@ -2,6 +2,13 @@
 Changelog
 =========
 
+Plateau 4.6.0 (2025-04-15)
+==========================
+
+* Add support to read/write pyarrow tables without a conversion to pandas
+* Add duckdb API functions to write a duckdb table to a dataset or load a dataset into a duckdb table
+
+
 Plateau 4.5.0 (XXXX-XX-XX)
 ==========================
 
