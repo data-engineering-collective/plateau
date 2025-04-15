@@ -1,10 +1,12 @@
-from tempfile import TemporaryDirectory
+from collections.abc import Generator
+from typing import Any
 
 import duckdb
 import numpy as np
 import pandas as pd
 import pytest
 from minimalkv import get_store_from_url
+from minimalkv._key_value_store import KeyValueStore
 
 from plateau.io.duckdb.dataframe import (
     read_table_as_ddb,
@@ -14,13 +16,8 @@ from plateau.io.eager import store_dataframes_as_dataset
 
 
 @pytest.fixture
-def store_url():
-    dataset_dir = TemporaryDirectory()
-    store_url = f"hfs://{dataset_dir.name}"
-
-    yield get_store_from_url(store_url)
-
-    dataset_dir.cleanup()
+def store_url(tmpdir) -> Generator[KeyValueStore, Any, None]:
+    yield get_store_from_url(f"hfs://{tmpdir}")
 
 
 @pytest.fixture
