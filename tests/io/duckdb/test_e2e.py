@@ -9,6 +9,7 @@ from minimalkv import get_store_from_url
 from minimalkv._key_value_store import KeyValueStore
 
 from plateau.io.duckdb.dataframe import (
+    read_dataset_as_arrow_tables,
     read_table_as_ddb,
     store_dataset_from_ddb,
 )
@@ -69,3 +70,21 @@ def test_filter(df: pd.DataFrame, store_url):
 
     expected = df.iloc[[1, 3]].reset_index(drop=True)
     assert round_trip_df.compare(expected).empty
+
+
+def test_underlying_arrow_func(df: pd.DataFrame, store_url):
+    store_dataframes_as_dataset(
+        store=store_url, dataset_uuid="dataset", dfs=[df], partition_on=["B", "E"]
+    )
+
+    tables = read_dataset_as_arrow_tables(
+        dataset_uuid="dataset",
+        store=store_url,
+        columns=["A", "B", "E"],
+        dispatch_by=["B", "E"],
+        categoricals=["E"],
+    )
+
+    assert len(tables) == 4
+    for table in tables:
+        assert table.column_names == ["A", "B", "E"]

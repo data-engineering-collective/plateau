@@ -808,10 +808,17 @@ class MetaPartition(Iterable):
 
             # Create an array filled with the repeated key value
             if categories and name in categories:
-                # Use dictionary type (categorical)
+                # Use dictionary type (categorical) if the column is categorical
+                # extract the pure type from the dictionary type
+                pure_type = (
+                    pa_type.value_type
+                    if isinstance(pa_type, pa.DictionaryType)
+                    else pa_type
+                )
+
                 dictionary_array = pa.DictionaryArray.from_arrays(
                     pa.array([0] * num_rows, type=pa.int32()),
-                    pa.array([value], type=pa_type.value_type),
+                    pa.array([value], type=pure_type),
                 )
                 arrow_value = dictionary_array
             else:

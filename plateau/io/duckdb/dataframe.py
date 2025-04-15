@@ -93,7 +93,7 @@ def read_dataset_as_arrow_tables(
     predicates: list[list[tuple[str, str, Any]]] | None = None,
     factory: DatasetFactory | None = None,
     dispatch_by: list[str] | None = None,
-):
+) -> list[pa.Table]:
     ds_factory = _ensure_factory(
         dataset_uuid=dataset_uuid,
         store=store,
@@ -125,7 +125,7 @@ def store_dataset_from_ddb(
     store_dataframes_as_dataset(
         store=store,
         dataset_uuid=dataset_uuid,
-        dfs=arrow_tables,  # TODO: naming of variable?
+        dfs=arrow_tables,
         partition_on=partition_on,
         **kwargs,
     )
