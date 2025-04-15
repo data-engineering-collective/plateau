@@ -35,7 +35,7 @@ class SchemaWrapper:
     """Wrapper object for pyarrow.Schema to handle forwards and backwards
     compatibility."""
 
-    def __init__(self, schema, origin: str | set[str]):
+    def __init__(self, schema: pa.Schema, origin: str | set[str]):
         if isinstance(origin, str):
             origin = {origin}
         elif isinstance(origin, set):
@@ -147,10 +147,6 @@ class SchemaWrapper:
 
 
 def gen_metadata(schema: SchemaWrapper) -> dict[str, Any]:
-    assert isinstance(schema.internal(), pa.Schema), (
-        "Internal schema must be a pyarrow schema"
-    )
-
     pandas_metadata = {
         "columns": [],
         "index_columns": [],  # this function is only called if no pandas metadata is present, ergo we do not have any index columns
