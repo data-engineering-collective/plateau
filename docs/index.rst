@@ -12,7 +12,8 @@ it presents as pandas DataFrames to the user. Datasets are a collection of
 files with the same schema that reside in a blob store. plateau uses a
 metadata definition to handle these datasets efficiently. For distributed
 access and manipulation of datasets, plateau offers a `Dask
-<https://dask.org>`_ interface (:mod:`plateau.io.dask`).
+<https://dask.org>`_ interface (:mod:`plateau.io.dask`). Pyarrow tables and
+a minimal duckdb integration allow for faster dataset operations.
 
 Storing data distributed over multiple files in a blob store (S3, ABS, GCS,
 etc.) allows for a fast, cost-efficient and highly scalable data
@@ -40,7 +41,8 @@ head to the description of the :doc:`spec/format_specification` or head straight
    Mutating Datasets <guide/mutating_datasets>
    Dask indexing <guide/dask_indexing>
    Examples <guide/examples>
-
+   DuckDB <guide/duckdb>
+   Pyarrow/Table backend <guide/pyarrow>
 
 .. toctree::
    :maxdepth: 2
