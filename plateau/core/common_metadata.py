@@ -150,7 +150,7 @@ def gen_metadata(schema: SchemaWrapper) -> dict[str, Any]:
     pandas_metadata = {
         "columns": [],
         "index_columns": [],  # this function is only called if no pandas metadata is present, ergo we do not have any index columns
-        "pandas_version": pd.__version__,
+        "pandas_version": "2.0.0",
         "creator": {
             "library": "plateau/core/common_metadata.py:gen_metadata",
             # instead of {'library': 'pyarrow', 'version': '19.0.1'}
