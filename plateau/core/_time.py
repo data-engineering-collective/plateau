@@ -21,4 +21,4 @@ def datetime_utcnow():
 
     Same as datetime.datetime.utcnow
     """
-    return datetime.datetime.utcnow()
+    return datetime.datetime.now(datetime.UTC)
