@@ -282,7 +282,9 @@ def _id(x):
 
 def _commit_update_from_reduction(df_mps, **kwargs):
     partitions = pd.Series(
-        filter(lambda mp: not mp.is_sentinel, df_mps.values.flatten())
+        filter(
+            lambda mp: mp is not np.nan and not mp.is_sentinel, df_mps.values.flatten()
+        )
     ).dropna()
     return update_dataset_from_partitions(
         partition_list=partitions,
@@ -292,7 +294,9 @@ def _commit_update_from_reduction(df_mps, **kwargs):
 
 def _commit_store_from_reduction(df_mps, **kwargs):
     partitions = pd.Series(
-        filter(lambda mp: not mp.is_sentinel, df_mps.values.flatten())
+        filter(
+            lambda mp: mp is not np.nan and not mp.is_sentinel, df_mps.values.flatten()
+        )
     ).dropna()
     return store_dataset_from_partitions(
         partition_list=partitions,

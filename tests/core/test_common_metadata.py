@@ -11,7 +11,7 @@ import simplejson
 from dask.dataframe.utils import make_meta as dask_make_meta
 from packaging.version import parse as parse_version
 
-from plateau.core._compat import arrow_uses_large_string, pandas_infer_string
+from plateau.core._compat import PANDAS_3, pandas_infer_string
 from plateau.core.common_metadata import (
     SchemaWrapper,
     _diff_schemas,
@@ -85,7 +85,7 @@ def test_store_schema_metadata(store, df_all_types):
         pa.field("uint64", pa.uint64()),
         pa.field("uint8", pa.uint64()),
     ]
-    if ARROW_VERSION < parse_version("20.0.0"):
+    if not PANDAS_3:
         fields.append(pa.field("unicode", pa.string()))
     else:
         fields.append(pa.field("unicode", pa.large_string()))
@@ -558,9 +558,7 @@ def test_make_meta_column_normalization_pyarrow_schema():
     )
     fields = [
         pa.field("part", pa.int64()),
-        pa.field(
-            "col1", pa.large_string() if arrow_uses_large_string() else pa.string()
-        ),
+        pa.field("col1", pa.large_string() if PANDAS_3 else pa.string()),
         pa.field("id", pa.int64()),
     ]
     expected_schema = pa.schema(fields)

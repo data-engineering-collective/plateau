@@ -133,22 +133,22 @@ def unpack_payload_pandas(
 
     def _inner(partition):
         return pd.concat(
-            partition.map(deserialize_bytes)[_PAYLOAD_COL].values,
+            partition[_PAYLOAD_COL].map(deserialize_bytes).values,
             ignore_index=True,
         )
 
     if not group_cols:
         return _inner(partition)
-    return (
+    final = (
         partition.groupby(
             group_cols,
             sort=False,
             observed=True,
-            as_index=True,
         )
         .apply(_inner)
         .reset_index()[unpack_meta.columns]
     )
+    return final
 
 
 def unpack_payload(df: dd.DataFrame, unpack_meta: pd.DataFrame) -> dd.DataFrame:

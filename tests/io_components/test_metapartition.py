@@ -397,12 +397,12 @@ def test_build_indices():
     loc_index = ExplicitSecondaryIndex(
         "location",
         {"Loc1": ["partition_label"], "Loc2": ["partition_label"]},
-        dtype=pa.large_string() if pandas_infer_string() else np.dtype("O"),
+        dtype=pa.large_string() if pandas_infer_string() else None,
     )
     prod_index = ExplicitSecondaryIndex(
         "product",
         {"Product1": ["partition_label"], "Product2": ["partition_label"]},
-        dtype=pa.large_string() if pandas_infer_string() else np.dtype("O"),
+        dtype=pa.large_string() if pandas_infer_string() else None,
     )
 
     assert result["location"] == loc_index

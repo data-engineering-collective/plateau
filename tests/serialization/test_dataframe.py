@@ -626,7 +626,7 @@ def test_predicate_parsing_null_values(
 
     assert_frame_equal_non_strict(
         result.reset_index(drop=True),
-        expected.reset_index(drop=True).fillna(np.nan),
+        expected.reset_index(drop=True),
         check_dtype=serialiser.type_stable,
     )
 
