@@ -21,6 +21,9 @@ htmlcov/
 docs/_build
 pip-wheel-metadata/
 
+# IDE
+.vscode/
+
 # dask.distributed tests
 dask-worker-space/
 _test_worker-*
