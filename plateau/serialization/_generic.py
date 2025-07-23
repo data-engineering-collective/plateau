@@ -331,15 +331,21 @@ def _handle_null_arrays(array_like, value_dtype):
     # Determine the type using the `kind` interface since this is common for a numpy array, pandas series and pandas extension arrays
     if array_like.dtype.kind == "f" and np.isnan(array_like).all():
         if array_like.dtype.kind != value_dtype.kind:
-            array_like = array_like.astype(value_dtype)
+            if isinstance(value_dtype, pd.api.extensions.ExtensionDtype):
+                array_like = pd.Series(array_like, dtype=value_dtype).values
+            else:
+                array_like = array_like.astype(value_dtype)
     return array_like, array_like.dtype
 
 
 def _handle_timelike_values(array_value_type, value, value_dtype, strict_date_types):
+    def _cast_one_value(val):
+        return pd.Series(val, dtype=array_value_type).iloc[0].to_datetime64()
+
     if is_list_like(value):
-        value = [pd.Timestamp(val).to_datetime64() for val in value]
+        value = [_cast_one_value(val) for val in value]
     else:
-        value = pd.Timestamp(value).to_datetime64()
+        value = _cast_one_value(value)
     value_dtype = pd.Series(value).dtype
     return value, value_dtype
 

@@ -169,9 +169,6 @@ def test_filter_df_from_predicates(op, data, value):
 
     if isinstance(df["A"].dtype, pd.CategoricalDtype):
         df["A"] = df["A"].astype(df["A"].cat.as_ordered().dtype)
-    if isinstance(value, datetime.date) and (df["A"].dtype == "datetime64[ns]"):
-        # Pandas will not cast datetimes automatically during 'in' operation from 3.0 onwards.
-        value = pd.Timestamp(value)
 
     if op == "in":
         value = [value]
@@ -179,6 +176,8 @@ def test_filter_df_from_predicates(op, data, value):
     predicates = [[("A", op, value)]]
     actual = filter_df_from_predicates(df, predicates)
 
+    if isinstance(value, datetime.date) and (df["A"].dtype != "object"):
+        value = pd.Timestamp(value)
     if op == "in":
         expected = df[df["A"].isin(value)]
     else:

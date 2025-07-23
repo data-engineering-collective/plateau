@@ -36,6 +36,7 @@ import pandas.testing as pdt
 import pytest
 from minimalkv import get_store_from_url
 
+from plateau.core._compat import pandas_infer_string
 from plateau.io.eager import store_dataframes_as_dataset
 from plateau.io.iter import store_dataframes_as_dataset__iter
 from plateau.io_components.metapartition import SINGLE_TABLE, MetaPartition
@@ -568,7 +569,11 @@ def test_empty_predicate_pushdown_empty_col_projection(
 
     # Ignore the different types of indices pandas generates after `reset_index`.
     pdt.assert_frame_equal(
-        res, pd.DataFrame(index=res.index, columns=pd.Index([], dtype="object"))
+        res,
+        pd.DataFrame(
+            index=res.index,
+            columns=pd.Index([], dtype=str if pandas_infer_string() else "object"),
+        ),
     )
 
 

@@ -11,6 +11,7 @@ import pytest
 from packaging.version import Version
 from pyarrow.parquet import ParquetFile
 
+from plateau.core._compat import pandas_infer_string
 from plateau.serialization import (
     CsvSerializer,
     DataFrameSerializer,
@@ -619,9 +620,13 @@ def test_predicate_parsing_null_values(
         predicate_pushdown_to_io=predicate_pushdown_to_io,
         predicates=predicates,
     )
+    if pandas_infer_string() and (not expected.select_dtypes(include=["object"]).empty):
+        object_types = expected.select_dtypes(include=["object"]).columns.to_list()
+        expected[object_types] = expected[object_types].astype(str)
+
     assert_frame_equal_non_strict(
         result.reset_index(drop=True),
-        expected.reset_index(drop=True),
+        expected.reset_index(drop=True).fillna(np.nan),
         check_dtype=serialiser.type_stable,
     )
 

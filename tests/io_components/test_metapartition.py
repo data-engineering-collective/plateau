@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from datetime import date, datetime
+from datetime import date
 
 import numpy as np
 import pandas as pd
@@ -1001,13 +1001,17 @@ def test_reconstruct_date_index(store, metadata_version, dates_as_object):
     mp = mp.load_dataframes(store, dates_as_object=dates_as_object)
     df_actual = mp.data
     if dates_as_object:
-        dt_constructor = date
+        index_col = [date(2018, 6, 2), date(2018, 6, 2)]
     else:
-        dt_constructor = datetime
+        # TODO: Review if this all makes still sense.
+        index_col = pd.Series(
+            [pd.Timestamp("2018-06-02"), pd.Timestamp("2018-06-02")],
+            dtype="datetime64[ns]",
+        )
     df_expected = pd.DataFrame(
         OrderedDict(
             [
-                ("index_col", [dt_constructor(2018, 6, 2), dt_constructor(2018, 6, 2)]),
+                ("index_col", index_col),
                 ("column", list("ab")),
             ]
         )

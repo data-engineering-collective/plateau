@@ -611,15 +611,13 @@ def collect_dataset_metadata(
     return ddf
 
 
-def _unpack_hash(df, unpack_meta, subset):
-    df = unpack_payload_pandas(df, unpack_meta)
-    if subset:
-        df = df[subset]
-    return df.reset_index().groupby(df.index).apply(_hash_partition)
+def _unpack_hash(df, group_key, unpack_meta, subset):
+    df = unpack_payload_pandas(df, unpack_meta).set_index(group_key, drop=True)
+    return df.groupby(df.index).apply(_hash_partition, subset=subset)
 
 
-def _hash_partition(part):
-    return pd.util.hash_pandas_object(part, index=False).sum()
+def _hash_partition(part, subset):
+    return pd.util.hash_pandas_object(part.reset_index()[subset], index=False).sum()
 
 
 @default_docs
@@ -676,12 +674,16 @@ def hash_dataset(
     with dask.config.set(
         {"dataframe.convert-string": False, "dataframe.shuffle.method": "tasks"}
     ):
+        subset = subset or ddf.columns.to_list()
         if not group_key:
-            return ddf.map_partitions(_hash_partition, meta=(None, "uint64"))
+            return ddf.map_partitions(
+                _hash_partition, subset=subset, meta=(None, "uint64")
+            )
         else:
             ddf2 = pack_payload(ddf, group_key=group_key)
             final = ddf2.shuffle(on=group_key).map_partitions(
                 _unpack_hash,
+                group_key=group_key,
                 unpack_meta=ddf._meta,
                 subset=subset,
                 meta=(None, "uint64"),

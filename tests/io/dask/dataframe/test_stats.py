@@ -101,7 +101,6 @@ def test_collect_dataset_metadata_predicates_on_index(store_factory):
             "row_group_uncompressed_size",
             "serialized_size",
         ],
-        axis=1,
     )
 
     expected = pd.DataFrame(
@@ -111,7 +110,6 @@ def test_collect_dataset_metadata_predicates_on_index(store_factory):
             "number_row_groups": [1],
             "number_rows_per_row_group": [5],
         },
-        index=[0],
     )
     pd.testing.assert_frame_equal(actual, expected)
 
@@ -149,7 +147,6 @@ def test_collect_dataset_metadata_predicates_row_group_size(store_factory):
             "row_group_uncompressed_size",
             "serialized_size",
         ],
-        axis=1,
     )
 
     expected = pd.DataFrame(
