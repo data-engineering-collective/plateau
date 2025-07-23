@@ -1039,11 +1039,7 @@ class MetaPartition(Iterable):
         return self.copy(indices=new_indices)
 
     @_apply_to_list
-    def partition_on(
-        self,
-        partition_on: str | Sequence[str],
-        bucket_by: str | Sequence[str] | None = None,
-    ):
+    def partition_on(self, partition_on: str | Sequence[str]):
         """Partition all dataframes assigned to this MetaPartition according
         the the given columns.
 
