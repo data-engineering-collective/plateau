@@ -2,7 +2,7 @@ import pandas as pd
 import simplejson
 from packaging.version import parse as parse_version
 
-PANDAS_3 = parse_version("3.0.0").major >= 3
+PANDAS_3 = parse_version(pd.__version__).major >= 3
 
 
 def pandas_infer_string():
