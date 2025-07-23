@@ -9,7 +9,10 @@ import pandas as pd
 
 from plateau.core.typing import StoreFactory
 from plateau.io.dask.compression import pack_payload, unpack_payload_pandas
-from plateau.io_components.metapartition import MetaPartition
+from plateau.io_components.metapartition import (
+    MetaPartition,
+    parse_input_to_metapartition,
+)
 from plateau.io_components.write import write_partition
 from plateau.serialization import DataFrameSerializer
 
@@ -108,8 +111,8 @@ def shuffle_store_dask_partitions(
 
     unpacked_meta = ddf._meta
 
-    ddf = pack_payload(ddf, group_key=group_cols)
-    ddf_grouped = ddf.shuffle(on=group_cols)
+    ddf2 = pack_payload(ddf, group_key=group_cols)
+    ddf_grouped = ddf2.shuffle(on=group_cols)
 
     unpack = partial(
         _unpack_store_partition,
@@ -142,11 +145,8 @@ def _unpack_store_partition(
     unpacked_meta: pd.DataFrame,
 ) -> MetaPartition:
     """Unpack payload data and store partition."""
-    df = unpack_payload_pandas(df, unpacked_meta)
-    if _KTK_HASH_BUCKET in df:
-        df = df.drop(_KTK_HASH_BUCKET, axis=1)
-    return write_partition(
-        partition_df=df,
+    df2 = unpack_payload_pandas(df, unpacked_meta)
+    kwargs = dict(
         secondary_indices=secondary_indices,
         sort_partitions_by=sort_partitions_by,
         dataset_table_name=table,
@@ -156,3 +156,12 @@ def _unpack_store_partition(
         df_serializer=df_serializer,
         metadata_version=metadata_version,
     )
+    if _KTK_HASH_BUCKET in df2:
+        mps = df2.groupby(_KTK_HASH_BUCKET, observed=True).apply(
+            write_partition, **kwargs
+        )
+        if mps.empty:
+            return MetaPartition(None)
+        return parse_input_to_metapartition(mps.to_list())
+    else:
+        return write_partition(partition_df=df2, **kwargs)

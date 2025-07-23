@@ -21,7 +21,6 @@ def test_collect_dataset_metadata(store_session_factory, dataset):
             "row_group_uncompressed_size",
             "serialized_size",
         ],
-        axis=1,
     )
     actual.sort_values(by=["partition_label", "row_group_id"], inplace=True)
 
@@ -53,8 +52,7 @@ def test_collect_dataset_metadata_predicates(store_session_factory, dataset):
             "row_group_compressed_size",
             "row_group_uncompressed_size",
             "serialized_size",
-        ],
-        axis=1,
+        ]
     )
     actual.sort_values(by=["partition_label", "row_group_id"], inplace=True)
 

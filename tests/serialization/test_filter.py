@@ -175,11 +175,12 @@ def test_filter_df_from_predicates(op, data, value):
 
     predicates = [[("A", op, value)]]
     actual = filter_df_from_predicates(df, predicates)
-
-    if isinstance(value, datetime.date) and (df["A"].dtype != "object"):
-        value = pd.Timestamp(value)
+    # Note that the predicates above include the value without any casting.
+    # plateau is actually more forgiving w.r.t. matching data types. For the
+    # eval below we want to ensure that the types match exactly
+    value = pd.Series(value, dtype=df["A"].dtype).iloc[0]
     if op == "in":
-        expected = df[df["A"].isin(value)]
+        expected = df[df["A"].isin([value])]
     else:
         expected = eval(f"df[df['A'] {op} value]")
     pdt.assert_frame_equal(actual, expected, check_categorical=False)

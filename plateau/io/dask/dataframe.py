@@ -510,7 +510,7 @@ def update_dataset_from_ddf(
             bucket_by=bucket_by,
         )
 
-    return mp_ser.reduction(
+    final = mp_ser.reduction(
         chunk=_id,
         aggregate=_commit_update_from_reduction,
         split_every=False,
@@ -525,6 +525,7 @@ def update_dataset_from_ddf(
             "metadata_merger": metadata_merger,
         },
     )
+    return final
 
 
 @default_docs

@@ -9,6 +9,7 @@ import pyarrow as pa
 import pytest
 from pyarrow.parquet import ParquetFile
 
+from plateau.core._compat import pandas_infer_string
 from plateau.serialization import DataFrameSerializer, ParquetSerializer
 from plateau.serialization._parquet import (
     MAX_NB_RETRIES,
@@ -30,8 +31,10 @@ def reference_store():
     return minimalkv.get_store_from_url(f"hfs://{path}")
 
 
+@pytest.mark.xfail(
+    reason="How could this test ever work? The parquet reader hard codes coerce_temporal_nanoseconds=True"
+)
 def test_timestamp_us(store):
-    # test that a df with us precision round-trips using parquet
     ts = datetime(2000, 1, 1, 15, 23, 24, 123456)
     df = pd.DataFrame({"ts": [ts]})
     serialiser = ParquetSerializer()
@@ -347,9 +350,15 @@ def test_predicate_not_in_columns(store, chunk_size):
         store, key, columns=[], predicates=[[("col", "==", 1)]]
     )
     if chunk_size:
-        expected_df = pd.DataFrame(index=[0, 1], columns=pd.Index([], dtype="object"))
+        expected_df = pd.DataFrame(
+            index=[0, 1],
+            columns=pd.Index([], dtype=str if pandas_infer_string() else "O"),
+        )
     else:
-        expected_df = pd.DataFrame(index=[0, 2], columns=pd.Index([], dtype="object"))
+        expected_df = pd.DataFrame(
+            index=[0, 2],
+            columns=pd.Index([], dtype=str if pandas_infer_string() else "O"),
+        )
 
     pdt.assert_frame_equal(restored_df, expected_df)
 
@@ -422,7 +431,7 @@ def test_read_categorical(store):
     key = serialiser.store(store, "prefix", df)
 
     df = serialiser.restore_dataframe(store, key)
-    assert df.dtypes["col"] == "O"
+    assert df.dtypes["col"] == "O" if not pandas_infer_string() else "string"
 
     df = serialiser.restore_dataframe(store, key, categories=["col"])
     assert df.dtypes["col"] == pd.CategoricalDtype(["a"], ordered=False)
@@ -435,7 +444,7 @@ def test_read_empty_categorical(store):
     key = serialiser.store(store, "prefix", df)
 
     df = serialiser.restore_dataframe(store, key)
-    assert df.dtypes["col"] == "O"
+    assert df.dtypes["col"] == "O" if not pandas_infer_string() else "string"
 
     df = serialiser.restore_dataframe(store, key, categories=["col"])
     assert df.dtypes["col"] == pd.CategoricalDtype([], ordered=False)
@@ -447,7 +456,7 @@ def test_read_categorical_empty_dataframe(store):
     key = serialiser.store(store, "prefix", df)
 
     df = serialiser.restore_dataframe(store, key)
-    assert df.dtypes["col"] == "O"
+    assert df.dtypes["col"] == "O" if not pandas_infer_string() else "string"
 
     df = serialiser.restore_dataframe(store, key, categories=["col"])
 

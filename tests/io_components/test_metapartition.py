@@ -4,8 +4,10 @@ from datetime import date
 import numpy as np
 import pandas as pd
 import pandas.testing as pdt
+import pyarrow as pa
 import pytest
 
+from plateau.core._compat import pandas_infer_string
 from plateau.core.common_metadata import make_meta, store_schema_metadata
 from plateau.core.index import ExplicitSecondaryIndex
 from plateau.core.naming import DEFAULT_METADATA_VERSION
@@ -393,10 +395,14 @@ def test_build_indices():
     result_mp = mp.build_indices(columns)
     result = result_mp.indices
     loc_index = ExplicitSecondaryIndex(
-        "location", {"Loc1": ["partition_label"], "Loc2": ["partition_label"]}
+        "location",
+        {"Loc1": ["partition_label"], "Loc2": ["partition_label"]},
+        dtype=pa.large_string() if pandas_infer_string() else np.dtype("O"),
     )
     prod_index = ExplicitSecondaryIndex(
-        "product", {"Product1": ["partition_label"], "Product2": ["partition_label"]}
+        "product",
+        {"Product1": ["partition_label"], "Product2": ["partition_label"]},
+        dtype=pa.large_string() if pandas_infer_string() else np.dtype("O"),
     )
 
     assert result["location"] == loc_index
@@ -1273,14 +1279,12 @@ def test_get_parquet_metadata_empty_df(store):
     meta_partition = mp.store_dataframes(store=store, dataset_uuid="dataset_uuid")
 
     actual = meta_partition.get_parquet_metadata(store=store)
-    actual.drop(
+    actual = actual.drop(
         columns=[
             "serialized_size",
             "row_group_compressed_size",
             "row_group_uncompressed_size",
-        ],
-        axis=1,
-        inplace=True,
+        ]
     )
 
     expected = pd.DataFrame(
@@ -1305,14 +1309,12 @@ def test_get_parquet_metadata_row_group_size(store):
         store=store, dataset_uuid="dataset_uuid", df_serializer=ps
     )
     actual = meta_partition.get_parquet_metadata(store=store)
-    actual.drop(
+    actual = actual.drop(
         columns=[
             "serialized_size",
             "row_group_compressed_size",
             "row_group_uncompressed_size",
         ],
-        axis=1,
-        inplace=True,
     )
 
     expected = pd.DataFrame(

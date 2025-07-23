@@ -130,6 +130,15 @@ def unpack_payload_pandas(
     if partition.empty:
         return unpack_meta.iloc[:0]
     group_cols = list(set(partition.columns) - {_PAYLOAD_COL})
+
+    def _inner(partition):
+        return pd.concat(
+            partition.map(deserialize_bytes)[_PAYLOAD_COL].values,
+            ignore_index=True,
+        )
+
+    if not group_cols:
+        return _inner(partition)
     return (
         partition.groupby(
             group_cols,
@@ -137,7 +146,7 @@ def unpack_payload_pandas(
             observed=True,
             as_index=True,
         )
-        .apply(lambda x: deserialize_bytes(x[_PAYLOAD_COL].iloc[0]))
+        .apply(_inner)
         .reset_index()[unpack_meta.columns]
     )
 

@@ -6,6 +6,7 @@ from collections import OrderedDict
 import pandas as pd
 import pandas.testing as pdt
 
+from plateau.core._compat import pandas_infer_string
 from plateau.core.dataset import DatasetMetadata
 from plateau.core.index import ExplicitSecondaryIndex
 
@@ -105,6 +106,8 @@ def test_dataset_get_indices_as_dataframe_predicates():
     )
     empty_index = pd.Index([], name="partition")
     expected = pd.DataFrame(columns=["l_external_code"], index=empty_index)
+    if pandas_infer_string():
+        expected["l_external_code"] = expected["l_external_code"].astype(str)
     pdt.assert_frame_equal(result, expected)
 
 
