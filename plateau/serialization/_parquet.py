@@ -454,7 +454,7 @@ def _normalize_value(value, pa_type, column_name=None):
     if pa.types.is_dictionary(pa_type):
         pa_type = pa_type.value_type
 
-    if pa.types.is_string(pa_type):
+    if pa.types.is_string(pa_type) or pa.types.is_large_string(pa_type):
         if isinstance(value, bytes):
             return value.decode("utf-8")
         elif isinstance(value, str):

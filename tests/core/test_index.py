@@ -660,13 +660,13 @@ def test_eval_operators_type_safety():
     with pytest.raises(
         TypeError,
         match=r"Unexpected type for predicate: Column 'col' has pandas type 'int64', "
-        r"but predicate value '1234' has pandas type 'object' \(Python type '<class 'str'>'\).",
+        r"but predicate value '1234'",
     ):
         ind.eval_operator("==", "1234")
     with pytest.raises(
         TypeError,
         match=r"Unexpected type for predicate: Column 'col' has pandas type 'int64', "
-        r"but predicate value 1234.0 has pandas type 'float64' \(Python type '<class 'float'>'\).",
+        r"but predicate value 1234.0",
     ):
         ind.eval_operator("==", 1234.0)
 

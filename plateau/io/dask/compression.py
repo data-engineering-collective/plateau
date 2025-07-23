@@ -129,10 +129,23 @@ def unpack_payload_pandas(
 
     if partition.empty:
         return unpack_meta.iloc[:0]
-
-    mapped = partition[_PAYLOAD_COL].map(deserialize_bytes)
-
-    return pd.concat(mapped.values, copy=False, ignore_index=True)
+    group_cols = list(set(partition.columns) - {_PAYLOAD_COL})
+    if group_cols:
+        return (
+            partition.groupby(
+                group_cols,
+                sort=False,
+                observed=True,
+                as_index=True,
+            )
+            .apply(lambda x: deserialize_bytes(x[_PAYLOAD_COL].iloc[0]))
+            .reset_index()[unpack_meta.columns]
+            .set_index(group_cols)
+        )
+    else:
+        return pd.concat(
+            partition.map(deserialize_bytes)[_PAYLOAD_COL].values, ignore_index=True
+        )
 
 
 def unpack_payload(df: dd.DataFrame, unpack_meta: pd.DataFrame) -> dd.DataFrame:

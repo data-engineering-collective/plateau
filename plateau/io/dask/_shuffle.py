@@ -109,7 +109,7 @@ def shuffle_store_dask_partitions(
     unpacked_meta = ddf._meta
 
     ddf = pack_payload(ddf, group_key=group_cols)
-    ddf_grouped = ddf.groupby(by=group_cols)
+    ddf_grouped = ddf.shuffle(on=group_cols)
 
     unpack = partial(
         _unpack_store_partition,
@@ -125,7 +125,7 @@ def shuffle_store_dask_partitions(
     )
     return cast(
         da.Array,  # Output type depends on meta but mypy cannot infer this easily.
-        ddf_grouped.apply(unpack, meta=("MetaPartition", "object")),
+        ddf_grouped.map_partitions(unpack, meta=("MetaPartition", "object")),
     )
 
 
