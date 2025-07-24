@@ -1025,7 +1025,6 @@ class MetaPartition(Iterable):
             else:
                 dtype = None
 
-            # TODO: What happens if I query an object type index with a string type value and vice versa?
             new_index = ExplicitSecondaryIndex(
                 column=col,
                 index_dct={value: [self.label] for value in possible_values},

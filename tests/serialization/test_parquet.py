@@ -10,7 +10,7 @@ import pytest
 from pyarrow.parquet import ParquetFile
 
 from plateau.core._compat import pandas_infer_string
-from plateau.serialization import DataFrameSerializer, ParquetSerializer
+from plateau.serialization import ParquetSerializer
 from plateau.serialization._parquet import (
     MAX_NB_RETRIES,
     ParquetReadError,
@@ -29,17 +29,6 @@ def reference_store():
         "pyarrow-bugs",
     )
     return minimalkv.get_store_from_url(f"hfs://{path}")
-
-
-@pytest.mark.xfail(
-    reason="How could this test ever work? The parquet reader hard codes coerce_temporal_nanoseconds=True"
-)
-def test_timestamp_us(store):
-    ts = datetime(2000, 1, 1, 15, 23, 24, 123456)
-    df = pd.DataFrame({"ts": [ts]})
-    serialiser = ParquetSerializer()
-    key = serialiser.store(store, "prefix", df)
-    pdt.assert_frame_equal(DataFrameSerializer.restore_dataframe(store, key), df)
 
 
 @pytest.fixture(params=[1, 5, None])
