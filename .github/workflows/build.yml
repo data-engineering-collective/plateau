@@ -33,20 +33,13 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
-    environment: pypi
+    environment:
+      name: pypi
+      url: https://pypi.org/p/plateau
     steps:
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: artifact
           path: dist
-      - name: Publish package on TestPyPi
-        uses: pypa/gh-action-pypi-publish@76f52bc884231f62b9a034ebfe128415bbaabdfc # v1.12.4
-        with:
-          repository-url: https://test.pypi.org/legacy/
-          user: __token__
-          password: ${{ secrets.PYPI_PASSWORD }}
       - name: Publish package on PyPi
         uses: pypa/gh-action-pypi-publish@76f52bc884231f62b9a034ebfe128415bbaabdfc # v1.12.4
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_PASSWORD }}
