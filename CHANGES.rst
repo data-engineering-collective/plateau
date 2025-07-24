@@ -2,7 +2,7 @@
 Changelog
 =========
 
-Plateau 4.5.0 (XXXX-XX-XX)
+Plateau 4.5.0 (2025-07-24)
 ==========================
 
 * Include pyarrow 17.0.0, 18.0.1, 19.0.1 and 20.0.0 in CI
