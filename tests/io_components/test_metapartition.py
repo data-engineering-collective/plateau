@@ -1009,7 +1009,6 @@ def test_reconstruct_date_index(store, metadata_version, dates_as_object):
     if dates_as_object:
         index_col = [date(2018, 6, 2), date(2018, 6, 2)]
     else:
-        # TODO: Review if this all makes still sense.
         index_col = pd.Series(
             [pd.Timestamp("2018-06-02"), pd.Timestamp("2018-06-02")],
             dtype="datetime64[ns]",

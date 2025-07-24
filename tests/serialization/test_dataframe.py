@@ -188,9 +188,10 @@ def assert_frame_almost_equal(df_left, df_right):
             ):
                 df_left[col] = pd.to_datetime(df_left[col], unit="ns")
                 df_right[col] = pd.to_datetime(df_right[col], unit="ns")
-        elif pd.api.types.is_object_dtype(df_left[col].dtype) and isinstance(
-            df_right[col].dtype, pd.CategoricalDtype
-        ):
+        elif (
+            pd.api.types.is_object_dtype(df_left[col].dtype)
+            or pd.api.types.is_string_dtype(df_left[col].dtype)
+        ) and isinstance(df_right[col].dtype, pd.CategoricalDtype):
             df_left[col] = df_left[col].astype(df_right[col].dtype)
     pdt.assert_frame_equal(
         df_left.reset_index(drop=True), df_right.reset_index(drop=True)
@@ -229,15 +230,13 @@ def assert_frame_almost_equal(df_left, df_right):
             ),
             {"date_as_object": True},
         ),
-        # TODO: Stored categorical data is no longer read back as such but
-        # rather as string.
-        # (
-        #     pd.DataFrame(
-        #         {"categorical_ü": list("abcd")},
-        #         dtype=pd.api.types.CategoricalDtype(list("abcd"), ordered=True),
-        #     ),
-        #     {},
-        # ),
+        (
+            pd.DataFrame(
+                {"categorical_ü": list("abcd")},
+                dtype=pd.api.types.CategoricalDtype(list("abcd"), ordered=True),
+            ),
+            {},
+        ),
     ],
 )
 @predicate_serialisers
