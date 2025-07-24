@@ -866,8 +866,6 @@ class MetaPartition(Iterable):
         )
         if self.data is not None:
             df = self.data
-            # if df.empty:
-            #     return self.as_sentinel()
             try:
                 file = df_serializer.store(actual_store, key, df)
             except Exception as exc:
