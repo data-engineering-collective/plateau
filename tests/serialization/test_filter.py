@@ -186,6 +186,36 @@ def test_filter_df_from_predicates(op, data, value):
     pdt.assert_frame_equal(actual, expected, check_categorical=False)
 
 
+@pytest.mark.parametrize("op", ["==", "!=", "<", "<=", ">", ">="])
+@pytest.mark.parametrize("unit_input", ["s", "ms", "us", "ns"])
+@pytest.mark.parametrize("unit_value", ["s", "ms", "us", "ns"])
+@pytest.mark.parametrize(
+    "type_value",
+    [str, pd.Timestamp, datetime.datetime, np.datetime64],
+)
+def test_filter_datetime_varying_precissions(unit_input, unit_value, op, type_value):
+    datetime_series = pd.Series(
+        pd.date_range("2019-01-01", periods=10, freq="D", unit=unit_input)
+    )
+
+    value = pd.Timestamp(datetime_series[5], unit=unit_value)
+    if type_value is str:
+        value = value.isoformat()
+    elif type_value is datetime.datetime:
+        value = value.to_pydatetime()
+    elif type_value is np.datetime64:
+        value = value.to_datetime64()
+    elif type_value is pd.Timestamp:
+        # pd.Timestamp already in the correct format
+        pass
+
+    data_ns = datetime_series.astype("datetime64[ns]")
+    expected = filter_array_like(data_ns, op, data_ns[5])
+    actual = filter_array_like(datetime_series, op, value)
+
+    assert (actual == expected).all()
+
+
 @pytest.mark.parametrize("op", ["==", "!="])
 @pytest.mark.parametrize("col", list("AB"))
 def test_filter_df_from_predicates_bool(op, col):
