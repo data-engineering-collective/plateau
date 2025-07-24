@@ -281,7 +281,11 @@ def _id(x):
 
 
 def _commit_update_from_reduction(df_mps, **kwargs):
-    partitions = pd.Series(df_mps.values.flatten()).dropna()
+    partitions = pd.Series(
+        filter(
+            lambda mp: mp is not np.nan and not mp.is_sentinel, df_mps.values.flatten()
+        )
+    ).dropna()
     return update_dataset_from_partitions(
         partition_list=partitions,
         **kwargs,
@@ -289,7 +293,11 @@ def _commit_update_from_reduction(df_mps, **kwargs):
 
 
 def _commit_store_from_reduction(df_mps, **kwargs):
-    partitions = pd.Series(df_mps.values.flatten()).dropna()
+    partitions = pd.Series(
+        filter(
+            lambda mp: mp is not np.nan and not mp.is_sentinel, df_mps.values.flatten()
+        )
+    ).dropna()
     return store_dataset_from_partitions(
         partition_list=partitions,
         **kwargs,
@@ -506,7 +514,7 @@ def update_dataset_from_ddf(
             bucket_by=bucket_by,
         )
 
-    return mp_ser.reduction(
+    final = mp_ser.reduction(
         chunk=_id,
         aggregate=_commit_update_from_reduction,
         split_every=False,
@@ -521,6 +529,7 @@ def update_dataset_from_ddf(
             "metadata_merger": metadata_merger,
         },
     )
+    return final
 
 
 @default_docs
@@ -607,15 +616,13 @@ def collect_dataset_metadata(
     return ddf
 
 
-def _unpack_hash(df, unpack_meta, subset):
-    df = unpack_payload_pandas(df, unpack_meta)
-    if subset:
-        df = df[subset]
-    return _hash_partition(df)
+def _unpack_hash(df, group_key, unpack_meta, subset):
+    df = unpack_payload_pandas(df, unpack_meta).set_index(group_key, drop=True)
+    return df.groupby(df.index).apply(_hash_partition, subset=subset)
 
 
-def _hash_partition(part):
-    return pd.util.hash_pandas_object(part, index=False).sum()
+def _hash_partition(part, subset):
+    return pd.util.hash_pandas_object(part.reset_index()[subset], index=False).sum()
 
 
 @default_docs
@@ -672,19 +679,19 @@ def hash_dataset(
     with dask.config.set(
         {"dataframe.convert-string": False, "dataframe.shuffle.method": "tasks"}
     ):
+        subset = subset or ddf.columns.to_list()
         if not group_key:
-            return ddf.map_partitions(_hash_partition, meta=(None, "uint64")).astype(
-                "uint64"
+            return ddf.map_partitions(
+                _hash_partition, subset=subset, meta=(None, "uint64")
             )
         else:
             ddf2 = pack_payload(ddf, group_key=group_key)
-            return (
-                ddf2.groupby(group_key)
-                .apply(
-                    _unpack_hash,
-                    unpack_meta=ddf._meta,
-                    subset=subset,
-                    meta=(None, "uint64"),
-                )
-                .astype("uint64")
+            final = ddf2.shuffle(on=group_key).map_partitions(
+                _unpack_hash,
+                group_key=group_key,
+                unpack_meta=ddf._meta,
+                subset=subset,
+                meta=(None, "uint64"),
             )
+
+            return final

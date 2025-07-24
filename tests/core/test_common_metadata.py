@@ -11,6 +11,7 @@ import simplejson
 from dask.dataframe.utils import make_meta as dask_make_meta
 from packaging.version import parse as parse_version
 
+from plateau.core._compat import PANDAS_3, pandas_infer_string
 from plateau.core.common_metadata import (
     SchemaWrapper,
     _diff_schemas,
@@ -26,9 +27,8 @@ from plateau.serialization import ParquetSerializer
 from plateau.serialization._parquet import PARQUET_VERSION
 
 try:
-    arrow_version = parse_version(pa.__version__)
-    ARROW_DEV = arrow_version.is_devrelease
-    del arrow_version
+    ARROW_VERSION = parse_version(pa.__version__)
+    ARROW_DEV = ARROW_VERSION.is_devrelease
 except Exception:
     ARROW_DEV = True
 
@@ -45,18 +45,30 @@ def test_store_schema_metadata(store, df_all_types):
     assert key in store.keys()
     pq_file = pq.ParquetFile(store.open(key))
     actual_schema = pq_file.schema.to_arrow_schema()
+    # The list types hold a field which is the data type. They appear to be constructed differently
+    # pa.list_(pa.field("item", pa.float64()))
+    if ARROW_VERSION < parse_version("20.0.0"):
+        nested_element_label = "item"
+    else:
+        nested_element_label = "element"
     fields = [
-        pa.field("array_float32", pa.list_(pa.float64())),
-        pa.field("array_float64", pa.list_(pa.float64())),
-        pa.field("array_int16", pa.list_(pa.int64())),
-        pa.field("array_int32", pa.list_(pa.int64())),
-        pa.field("array_int64", pa.list_(pa.int64())),
-        pa.field("array_int8", pa.list_(pa.int64())),
-        pa.field("array_uint16", pa.list_(pa.uint64())),
-        pa.field("array_uint32", pa.list_(pa.uint64())),
-        pa.field("array_uint64", pa.list_(pa.uint64())),
-        pa.field("array_uint8", pa.list_(pa.uint64())),
-        pa.field("array_unicode", pa.list_(pa.string())),
+        pa.field(
+            "array_float32", pa.list_(pa.field(nested_element_label, pa.float64()))
+        ),
+        pa.field(
+            "array_float64", pa.list_(pa.field(nested_element_label, pa.float64()))
+        ),
+        pa.field("array_int16", pa.list_(pa.field(nested_element_label, pa.int64()))),
+        pa.field("array_int32", pa.list_(pa.field(nested_element_label, pa.int64()))),
+        pa.field("array_int64", pa.list_(pa.field(nested_element_label, pa.int64()))),
+        pa.field("array_int8", pa.list_(pa.field(nested_element_label, pa.int64()))),
+        pa.field("array_uint16", pa.list_(pa.field(nested_element_label, pa.uint64()))),
+        pa.field("array_uint32", pa.list_(pa.field(nested_element_label, pa.uint64()))),
+        pa.field("array_uint64", pa.list_(pa.field(nested_element_label, pa.uint64()))),
+        pa.field("array_uint8", pa.list_(pa.field(nested_element_label, pa.uint64()))),
+        pa.field(
+            "array_unicode", pa.list_(pa.field(nested_element_label, pa.string()))
+        ),
         pa.field("bool", pa.bool_()),
         pa.field("byte", pa.binary()),
         pa.field("date", pa.date32()),
@@ -72,8 +84,11 @@ def test_store_schema_metadata(store, df_all_types):
         pa.field("uint32", pa.uint64()),
         pa.field("uint64", pa.uint64()),
         pa.field("uint8", pa.uint64()),
-        pa.field("unicode", pa.string()),
     ]
+    if not PANDAS_3:
+        fields.append(pa.field("unicode", pa.string()))
+    else:
+        fields.append(pa.field("unicode", pa.large_string()))
     expected_schema = pa.schema(fields)
 
     assert actual_schema.remove_metadata() == expected_schema
@@ -461,11 +476,13 @@ def test_diff_schemas(df_all_types):
  uint32: uint64
 
 """
-    expected_pandas_diff = """Pandas_metadata:
+    expected_pandas_diff = (
+        f"""Pandas_metadata:
 @@ -3,12 +3,7 @@
 
                       'name': None,
-                      'numpy_type': 'object',
+                      'numpy_type': '{"str" if pandas_infer_string() else "object"}',"""
+        + """
                       'pandas_type': 'unicode'}],
 - 'columns': [{'field_name': 'array_float32',
 -              'metadata': None,
@@ -502,6 +519,7 @@ def test_diff_schemas(df_all_types):
               {'field_name': 'null',
                'metadata': None,
                'name': 'null',"""
+    )
 
     assert diff == expected_arrow_diff + expected_pandas_diff
 
@@ -540,7 +558,7 @@ def test_make_meta_column_normalization_pyarrow_schema():
     )
     fields = [
         pa.field("part", pa.int64()),
-        pa.field("col1", pa.string()),
+        pa.field("col1", pa.large_string() if PANDAS_3 else pa.string()),
         pa.field("id", pa.int64()),
     ]
     expected_schema = pa.schema(fields)

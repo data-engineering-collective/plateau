@@ -22,6 +22,7 @@ from packaging import version
 from pandas.api.types import is_datetime64_any_dtype
 
 from plateau.core import naming
+from plateau.core._compat import pandas_infer_string
 from plateau.core.common_metadata import (
     SchemaWrapper,
     make_meta,
@@ -62,7 +63,7 @@ _Literal = namedtuple("_Literal", ["column", "op", "value"])
 _SplitPredicate = namedtuple("_SplitPredicate", ["key_part", "content_part"])
 
 _METADATA_SCHEMA = {
-    "partition_label": np.dtype("O"),
+    "partition_label": np.dtype("O") if not pandas_infer_string() else str,
     "row_group_id": np.dtype(int),
     "row_group_compressed_size": np.dtype(int),
     "row_group_uncompressed_size": np.dtype(int),

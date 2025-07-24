@@ -174,7 +174,7 @@ class IndexBase(CopyMixin):
             raise ValueError(
                 "Cannot normalize index values as long as dtype is not set"
             )
-        elif pa.types.is_string(dtype):
+        elif pa.types.is_string(dtype) or pa.types.is_large_string(dtype):
             if isinstance(value, bytes):
                 return value.decode("utf-8")
             else:

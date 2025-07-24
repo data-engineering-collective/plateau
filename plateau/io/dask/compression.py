@@ -5,6 +5,8 @@ import dask
 import dask.dataframe as dd
 import pandas as pd
 
+from plateau.core._compat import PANDAS_3
+
 _logger = logging.getLogger()
 _PAYLOAD_COL = "__ktk_shuffle_payload"
 
@@ -129,10 +131,25 @@ def unpack_payload_pandas(
 
     if partition.empty:
         return unpack_meta.iloc[:0]
+    group_cols = list(set(partition.columns) - {_PAYLOAD_COL})
 
-    mapped = partition[_PAYLOAD_COL].map(deserialize_bytes)
+    def _inner(partition):
+        return pd.concat(
+            partition[_PAYLOAD_COL].map(deserialize_bytes).values,
+            ignore_index=True,
+        )
 
-    return pd.concat(mapped.values, copy=False, ignore_index=True)
+    if not group_cols:
+        return _inner(partition)
+    return (
+        partition.groupby(
+            group_cols,
+            sort=False,
+            observed=True,
+        )
+        .apply(_inner)
+        .reset_index(drop=not PANDAS_3)[unpack_meta.columns]
+    )
 
 
 def unpack_payload(df: dd.DataFrame, unpack_meta: pd.DataFrame) -> dd.DataFrame:

@@ -7,9 +7,13 @@ import dask.dataframe as dd
 import numpy as np
 import pandas as pd
 
+from plateau.core._compat import PANDAS_3
 from plateau.core.typing import StoreFactory
 from plateau.io.dask.compression import pack_payload, unpack_payload_pandas
-from plateau.io_components.metapartition import MetaPartition
+from plateau.io_components.metapartition import (
+    MetaPartition,
+    parse_input_to_metapartition,
+)
 from plateau.io_components.write import write_partition
 from plateau.serialization import DataFrameSerializer
 
@@ -108,25 +112,45 @@ def shuffle_store_dask_partitions(
 
     unpacked_meta = ddf._meta
 
-    ddf = pack_payload(ddf, group_key=group_cols)
-    ddf_grouped = ddf.groupby(by=group_cols)
+    ddf2 = pack_payload(ddf, group_key=group_cols)
+    if PANDAS_3:
+        ddf_grouped = ddf2.shuffle(on=group_cols)
 
-    unpack = partial(
-        _unpack_store_partition,
-        secondary_indices=secondary_indices,
-        sort_partitions_by=sort_partitions_by,
-        table=table,
-        dataset_uuid=dataset_uuid,
-        partition_on=partition_on,
-        store_factory=store_factory,
-        df_serializer=df_serializer,
-        metadata_version=metadata_version,
-        unpacked_meta=unpacked_meta,
-    )
-    return cast(
-        da.Array,  # Output type depends on meta but mypy cannot infer this easily.
-        ddf_grouped.apply(unpack, meta=("MetaPartition", "object")),
-    )
+        unpack = partial(
+            _unpack_store_partition,
+            secondary_indices=secondary_indices,
+            sort_partitions_by=sort_partitions_by,
+            table=table,
+            dataset_uuid=dataset_uuid,
+            partition_on=partition_on,
+            store_factory=store_factory,
+            df_serializer=df_serializer,
+            metadata_version=metadata_version,
+            unpacked_meta=unpacked_meta,
+        )
+        return cast(
+            da.Array,  # Output type depends on meta but mypy cannot infer this easily.
+            ddf_grouped.map_partitions(unpack, meta=("MetaPartition", "object")),
+        )
+    else:
+        ddf_grouped = ddf2.groupby(by=group_cols)
+
+        unpack = partial(
+            _unpack_store_partition,
+            secondary_indices=secondary_indices,
+            sort_partitions_by=sort_partitions_by,
+            table=table,
+            dataset_uuid=dataset_uuid,
+            partition_on=partition_on,
+            store_factory=store_factory,
+            df_serializer=df_serializer,
+            metadata_version=metadata_version,
+            unpacked_meta=unpacked_meta,
+        )
+        return cast(
+            da.Array,  # Output type depends on meta but mypy cannot infer this easily.
+            ddf_grouped.apply(unpack, meta=("MetaPartition", "object")),
+        )
 
 
 def _unpack_store_partition(
@@ -142,11 +166,8 @@ def _unpack_store_partition(
     unpacked_meta: pd.DataFrame,
 ) -> MetaPartition:
     """Unpack payload data and store partition."""
-    df = unpack_payload_pandas(df, unpacked_meta)
-    if _KTK_HASH_BUCKET in df:
-        df = df.drop(_KTK_HASH_BUCKET, axis=1)
-    return write_partition(
-        partition_df=df,
+    df2 = unpack_payload_pandas(df, unpacked_meta)
+    kwargs = dict(
         secondary_indices=secondary_indices,
         sort_partitions_by=sort_partitions_by,
         dataset_table_name=table,
@@ -156,3 +177,16 @@ def _unpack_store_partition(
         df_serializer=df_serializer,
         metadata_version=metadata_version,
     )
+    if PANDAS_3 and _KTK_HASH_BUCKET in df2:
+        mps = df2.groupby(
+            _KTK_HASH_BUCKET,
+            observed=True,
+        ).apply(write_partition, **kwargs)
+        if mps.empty:
+            return MetaPartition(None)
+        if isinstance(mps, pd.Series):
+            return parse_input_to_metapartition(mps.to_list())
+        else:
+            return parse_input_to_metapartition(mps[mps.columns[-1]].to_list())
+    else:
+        return write_partition(partition_df=df2, **kwargs)

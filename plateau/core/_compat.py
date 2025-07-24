@@ -1,4 +1,14 @@
+import pandas as pd
 import simplejson
+from packaging.version import parse as parse_version
+
+PANDAS_3 = parse_version(pd.__version__).major >= 3
+
+
+def pandas_infer_string():
+    return (
+        pd.get_option("future.infer_string") or parse_version(pd.__version__).major >= 3
+    )
 
 
 def load_json(buf, **kwargs):

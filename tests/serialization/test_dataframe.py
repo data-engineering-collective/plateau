@@ -11,6 +11,7 @@ import pytest
 from packaging.version import Version
 from pyarrow.parquet import ParquetFile
 
+from plateau.core._compat import pandas_infer_string
 from plateau.serialization import (
     CsvSerializer,
     DataFrameSerializer,
@@ -172,7 +173,7 @@ def assert_frame_almost_equal(df_left, df_right):
         if pd.api.types.is_datetime64_dtype(
             df_left[col].dtype
         ) and pd.api.types.is_object_dtype(df_right[col].dtype):
-            df_right[col] = pd.to_datetime(df_right[col])
+            df_right[col] = pd.to_datetime(df_right[col], unit="ns")
         elif pd.api.types.is_object_dtype(
             df_left[col].dtype
         ) and pd.api.types.is_datetime64_dtype(df_right[col].dtype):
@@ -185,11 +186,12 @@ def assert_frame_almost_equal(df_left, df_right):
             if isinstance(df_left[col].iloc[0], datetime.date) or isinstance(
                 df_right[col].iloc[0], datetime.date
             ):
-                df_left[col] = pd.to_datetime(df_left[col])
-                df_right[col] = pd.to_datetime(df_right[col])
-        elif pd.api.types.is_object_dtype(df_left[col].dtype) and isinstance(
-            df_right[col].dtype, pd.CategoricalDtype
-        ):
+                df_left[col] = pd.to_datetime(df_left[col], unit="ns")
+                df_right[col] = pd.to_datetime(df_right[col], unit="ns")
+        elif (
+            pd.api.types.is_object_dtype(df_left[col].dtype)
+            or pd.api.types.is_string_dtype(df_left[col].dtype)
+        ) and isinstance(df_right[col].dtype, pd.CategoricalDtype):
             df_left[col] = df_left[col].astype(df_right[col].dtype)
     pdt.assert_frame_equal(
         df_left.reset_index(drop=True), df_right.reset_index(drop=True)
@@ -617,6 +619,10 @@ def test_predicate_parsing_null_values(
         predicate_pushdown_to_io=predicate_pushdown_to_io,
         predicates=predicates,
     )
+    if pandas_infer_string() and (not expected.select_dtypes(include=["object"]).empty):
+        object_types = expected.select_dtypes(include=["object"]).columns.to_list()
+        expected[object_types] = expected[object_types].astype(str)
+
     assert_frame_equal_non_strict(
         result.reset_index(drop=True),
         expected.reset_index(drop=True),

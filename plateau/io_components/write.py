@@ -2,6 +2,7 @@ from collections.abc import Iterable
 from functools import partial
 from typing import cast
 
+import pandas as pd
 import pyarrow as pa
 from minimalkv import KeyValueStore
 
@@ -51,7 +52,16 @@ def write_partition(
     in the correct order.
     """
     store = ensure_store(store_factory)
+    try:
+        from plateau.io.dask._shuffle import _KTK_HASH_BUCKET
 
+        if (
+            isinstance(partition_df, pd.DataFrame)
+            and _KTK_HASH_BUCKET in partition_df.columns
+        ):
+            partition_df = partition_df.drop(columns=_KTK_HASH_BUCKET)
+    except ModuleNotFoundError:
+        pass
     # I don't have access to the group values
     mps = parse_input_to_metapartition(
         partition_df,

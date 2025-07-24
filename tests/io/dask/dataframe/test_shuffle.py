@@ -75,8 +75,8 @@ def test_update_shuffle_no_partition_on(store_factory, bucket_by):
         shuffle=True,
         bucket_by=bucket_by,
     ).compute()
-    assert len(res_default.partitions) == 1
 
+    assert len(res_default.partitions) == 1
     res = update_dataset_from_ddf(
         ddf,
         store_factory,
@@ -158,7 +158,7 @@ def test_update_shuffle_buckets(
         partition_on=["primary"],
     )
 
-    dataset = dataset_comp.compute()
+    dataset = dataset_comp.compute(scheduler="sync")
     dataset = dataset.load_all_indices(store_factory())
 
     assert len(dataset.partitions) <= num_buckets * unique_primaries

@@ -169,21 +169,51 @@ def test_filter_df_from_predicates(op, data, value):
 
     if isinstance(df["A"].dtype, pd.CategoricalDtype):
         df["A"] = df["A"].astype(df["A"].cat.as_ordered().dtype)
-    if isinstance(value, datetime.date) and (df["A"].dtype == "datetime64[ns]"):
-        # Pandas will not cast datetimes automatically during 'in' operation from 3.0 onwards.
-        value = pd.Timestamp(value)
 
     if op == "in":
         value = [value]
 
     predicates = [[("A", op, value)]]
     actual = filter_df_from_predicates(df, predicates)
-
+    # Note that the predicates above include the value without any casting.
+    # plateau is actually more forgiving w.r.t. matching data types. For the
+    # eval below we want to ensure that the types match exactly
+    value = pd.Series(value, dtype=df["A"].dtype).iloc[0]
     if op == "in":
-        expected = df[df["A"].isin(value)]
+        expected = df[df["A"].isin([value])]
     else:
         expected = eval(f"df[df['A'] {op} value]")
     pdt.assert_frame_equal(actual, expected, check_categorical=False)
+
+
+@pytest.mark.parametrize("op", ["==", "!=", "<", "<=", ">", ">="])
+@pytest.mark.parametrize("unit_input", ["s", "ms", "us", "ns"])
+@pytest.mark.parametrize("unit_value", ["s", "ms", "us", "ns"])
+@pytest.mark.parametrize(
+    "type_value",
+    [str, pd.Timestamp, datetime.datetime, np.datetime64],
+)
+def test_filter_datetime_varying_units(unit_input, unit_value, op, type_value):
+    datetime_series = pd.Series(
+        pd.date_range("2019-01-01", periods=10, freq="D", unit=unit_input)
+    )
+
+    value = pd.Timestamp(datetime_series[5], unit=unit_value)
+    if type_value is str:
+        value = value.isoformat()
+    elif type_value is datetime.datetime:
+        value = value.to_pydatetime()
+    elif type_value is np.datetime64:
+        value = value.to_datetime64()
+    elif type_value is pd.Timestamp:
+        # pd.Timestamp already in the correct format
+        pass
+
+    data_ns = datetime_series.astype("datetime64[ns]")
+    expected = filter_array_like(data_ns, op, data_ns[5])
+    actual = filter_array_like(datetime_series, op, value)
+
+    assert (actual == expected).all()
 
 
 @pytest.mark.parametrize("op", ["==", "!="])
