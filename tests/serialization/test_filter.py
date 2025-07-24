@@ -193,7 +193,7 @@ def test_filter_df_from_predicates(op, data, value):
     "type_value",
     [str, pd.Timestamp, datetime.datetime, np.datetime64],
 )
-def test_filter_datetime_varying_precissions(unit_input, unit_value, op, type_value):
+def test_filter_datetime_varying_units(unit_input, unit_value, op, type_value):
     datetime_series = pd.Series(
         pd.date_range("2019-01-01", periods=10, freq="D", unit=unit_input)
     )
