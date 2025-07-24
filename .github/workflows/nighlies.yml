@@ -23,10 +23,10 @@ jobs:
       matrix:
         environment: [
             # nightlies (e.g. pyarrow) will be installed in the following steps
-            "py310-pyarrow18-1",
-            "py311-pyarrow18-1",
-            "py312-pyarrow18-1",
-            "py313-pyarrow18-1",
+            "py310-pyarrow20-0",
+            "py311-pyarrow20-0",
+            "py312-pyarrow20-0",
+            "py313-pyarrow20-0",
           ]
 
     steps:
