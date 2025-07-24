@@ -6,7 +6,6 @@ PANDAS_3 = parse_version(pd.__version__).major >= 3
 
 
 def pandas_infer_string():
-    # This option is available since pandas 1.5.0
     return (
         pd.get_option("future.infer_string") or parse_version(pd.__version__).major >= 3
     )
