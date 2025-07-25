@@ -6,6 +6,7 @@ to fake certain fixed times.
 """
 
 import datetime
+import sys
 
 
 def datetime_now():
@@ -21,4 +22,6 @@ def datetime_utcnow():
 
     Same as datetime.datetime.utcnow
     """
-    return datetime.datetime.utcnow()
+    if sys.version_info < (3, 11):
+        return datetime.datetime.utcnow()
+    return datetime.datetime.now(datetime.UTC)
