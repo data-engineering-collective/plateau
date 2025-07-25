@@ -22,6 +22,6 @@ def datetime_utcnow():
 
     Same as datetime.datetime.utcnow
     """
-    if sys.version_info <= (3, 10):
+    if sys.version_info < (3, 11):
         return datetime.datetime.utcnow()
     return datetime.datetime.now(datetime.UTC)
