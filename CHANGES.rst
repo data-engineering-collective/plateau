@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Plateau 4.5.1 (XXXX-YY-ZZ)
+==========================
+
+* Avoid a data copy when loading data as categorical
+
 Plateau 4.5.0 (2025-07-24)
 ==========================
 
