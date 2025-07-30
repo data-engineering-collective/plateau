@@ -284,7 +284,7 @@ class ParquetSerializer(DataFrameSerializer):
         if categories:
             for col in categories:
                 if col in df:
-                    df[col] = df[col].astype("category")
+                    df[col] = df[col].astype("category", copy=False)
 
         df.columns = df.columns.map(ensure_unicode_string_type)
         if predicates:
