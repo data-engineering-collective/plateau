@@ -13,7 +13,7 @@ decorator = "*"
 msgpack-python = ">=0.5.2"
 numpy = ">1.23,<3"
 pandas = ">=2"
-pyarrow = ">=15, !=19.0.0"
+pyarrow = ">=17, !=19.0.0"
 simplejson = "*"
 minimalkv = ">=1.4.2"
 toolz = "*"
@@ -92,46 +92,38 @@ python = "3.12.*"
 python = "3.13.*"
 
 # We only support the four most recent versions of pyarrow
-[feature.pyarrow15_0_2.dependencies]
-pyarrow = "=15.0.2"
-[feature.pyarrow16_1.dependencies]
-pyarrow = "=16.1.0"
-[feature.pyarrow17_0.dependencies]
-pyarrow = "=17.0.0"
 [feature.pyarrow18_1.dependencies]
 pyarrow = "=18.1.0"
 [feature.pyarrow19_1.dependencies]
 pyarrow = "=19.0.1"
 [feature.pyarrow20_0.dependencies]
 pyarrow = "=20.0.0"
+[feature.pyarrow21_0.dependencies]
+pyarrow = "=21.0.0"
 
 
 [environments]
 default = ["test"]
 
-py310-pyarrow15-0-2 = ["py310", "pyarrow15_0_2", "test"]
-py310-pyarrow16-1 = ["py310", "pyarrow16_1", "test"]
-py310-pyarrow17-0 = ["py310", "pyarrow17_0", "test"]
 py310-pyarrow18-1 = ["py310", "pyarrow18_1", "test"]
 py310-pyarrow19-1 = ["py310", "pyarrow19_1", "test"]
 py310-pyarrow20-0 = ["py310", "pyarrow20_0", "test"]
+py310-pyarrow21-0 = ["py310", "pyarrow21_0", "test"]
 
-py311-pyarrow15-0-2 = ["py311", "pyarrow15_0_2", "test"]
-py311-pyarrow16-1 = ["py311", "pyarrow16_1", "test"]
-py311-pyarrow17-0 = ["py311", "pyarrow17_0", "test"]
 py311-pyarrow18-1 = ["py311", "pyarrow18_1", "test"]
 py311-pyarrow19-1 = ["py311", "pyarrow19_1", "test"]
 py311-pyarrow20-0 = ["py311", "pyarrow20_0", "test"]
+py311-pyarrow21-0 = ["py311", "pyarrow21_0", "test"]
 
-py312-pyarrow15-0-2 = ["py312", "pyarrow15_0_2", "test"]
-py312-pyarrow16-1 = ["py312", "pyarrow16_1", "test"]
-py312-pyarrow17-0 = ["py312", "pyarrow17_0", "test"]
 py312-pyarrow18-1 = ["py312", "pyarrow18_1", "test"]
 py312-pyarrow19-1 = ["py312", "pyarrow19_1", "test"]
 py312-pyarrow20-0 = ["py312", "pyarrow20_0", "test"]
+py312-pyarrow21-0 = ["py312", "pyarrow21_0", "test"]
 
 py313-pyarrow18-1 = ["py313", "pyarrow18_1", "test"]
+py313-pyarrow19-1 = ["py313", "pyarrow19_1", "test"]
 py313-pyarrow20-0 = ["py313", "pyarrow20_0", "test"]
+py313-pyarrow21-0 = ["py313", "pyarrow21_0", "test"]
 
 build = ["build"]
 benchmark = ["benchmark", "test"]

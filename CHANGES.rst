@@ -2,6 +2,12 @@
 Changelog
 =========
 
+Next release
+============
+
+* Support for pyarrow 21.0.0
+* Drop support for pyarrow 15.0.2, 16.1.0 and 17.0.0
+
 Plateau 4.5.0 (2025-07-24)
 ==========================
 
