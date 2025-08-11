@@ -13,6 +13,8 @@ import pyarrow.parquet as pq
 from minimalkv import KeyValueStore
 from pyarrow.parquet import ParquetFile
 
+from plateau.core._compat import ARROW_GE_20
+
 from ._generic import (
     ConjunctionType,
     DataFrameSerializer,
@@ -49,10 +51,13 @@ def _empty_table_from_schema(parquet_file):
 
 def _reset_dictionary_columns(table, exclude=None):
     """We need to ensure that the dtype is exactly as requested, see GH227."""
+    from plateau.core.common_metadata import _dict_to_binary
+
     if exclude is None:
         exclude = []
 
     schema = table.schema
+    pandas_metadata = schema.pandas_metadata
     for i in range(len(schema)):
         field = schema[i]
         if field.name in exclude:
@@ -65,7 +70,12 @@ def _reset_dictionary_columns(table, exclude=None):
                 field.metadata,
             )
             schema = schema.remove(i).insert(i, new_field)
-
+            if not ARROW_GE_20:
+                pandas_metadata["columns"][i]["pandas_type"] = "object"
+                pandas_metadata["columns"][i]["numpy_type"] = "str"
+    schema = schema.remove_metadata()
+    md = {b"pandas": _dict_to_binary(pandas_metadata)}
+    schema = schema.with_metadata(md)
     table = table.cast(schema)
     return table
 

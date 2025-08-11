@@ -22,7 +22,7 @@ from packaging import version
 from pandas.api.types import is_datetime64_any_dtype
 
 from plateau.core import naming
-from plateau.core._compat import pandas_infer_string
+from plateau.core._compat import ARROW_GE_20, pandas_infer_string
 from plateau.core.common_metadata import (
     SchemaWrapper,
     make_meta,
@@ -556,6 +556,8 @@ class MetaPartition(Iterable):
                     if PANDAS_LT_2
                     else pd.Series(pd.to_datetime([value])).dt.date
                 )
+            elif not ARROW_GE_20 and pa.types.is_large_string(pa_dtype):
+                index_df_dct[column] = pd.Series([value])
             else:
                 dtype = pa_dtype.to_pandas_dtype()
                 index_df_dct[column] = pd.Series([value], dtype=dtype)
@@ -765,7 +767,14 @@ class MetaPartition(Iterable):
                 continue
 
             pa_dtype = schema.field(primary_key).type
-            dtype = pa_dtype.to_pandas_dtype()
+            if not ARROW_GE_20 and pa.types.is_large_string(pa_dtype):
+                if pd.get_option("future.infer_string"):
+                    dtype = "string[pyarrow_numpy]"
+                else:
+                    dtype = "object"
+                dtype = pd.api.types.pandas_dtype(dtype)
+            else:
+                dtype = pa_dtype.to_pandas_dtype()
             convert_to_date = False
             if date_as_object and pa_dtype in [pa.date32(), pa.date64()]:
                 convert_to_date = True

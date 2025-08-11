@@ -11,6 +11,7 @@ from toolz.itertoolz import partition_all
 
 import plateau.core._time
 from plateau.core import naming
+from plateau.core._compat import ARROW_GE_20
 from plateau.core._mixins import CopyMixin
 from plateau.core.common_metadata import normalize_type
 from plateau.core.docs import default_docs
@@ -138,7 +139,7 @@ class IndexBase(CopyMixin):
     ) -> np.ndarray:
         """Return an array of all observed values."""
         keys = np.array(list(self.index_dct.keys()))
-        labeled_array = pa.array(keys, type=self.dtype)
+        labeled_array = _safe_paarray(keys, self.dtype)
 
         _coerce = {"coerce_temporal_nanoseconds": coerce_temporal_nanoseconds}
         return np.array(
@@ -918,10 +919,17 @@ def _index_dct_to_table(index_dct: IndexDictType, column: str, dtype: pa.DataTyp
         # the np.array dtype will be double which arrow cannot convert to the target type, so use an empty list instead
         labeled_array = pa.array([], type=dtype)
     else:
-        labeled_array = pa.array(keys, type=dtype)
+        labeled_array = _safe_paarray(keys, dtype)
 
     partition_array = pa.array(list(index_dct.values()), type=pa.list_(pa.string()))
 
     return pa.Table.from_arrays(
         [labeled_array, partition_array], names=[column, _PARTITION_COLUMN_NAME]
     )
+
+
+def _safe_paarray(arr: np.ndarray, dtype: pa.DataType) -> pa.Array:
+    if dtype is not None and pa.types.is_large_string(dtype) and not ARROW_GE_20:
+        return pa.array(iter(arr), type=dtype)
+    else:
+        return pa.array(arr, type=dtype)

@@ -1,8 +1,11 @@
 import pandas as pd
+import pyarrow as pa
 import simplejson
 from packaging.version import parse as parse_version
 
 PANDAS_3 = parse_version(pd.__version__).major >= 3
+
+ARROW_GE_20 = parse_version(pa.__version__).major >= 20
 
 
 def pandas_infer_string():
