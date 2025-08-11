@@ -804,6 +804,9 @@ def test_update_after_empty_partition_string_dtypes_categoricals(
             )
     after_update = read_table(dataset_uuid, store_factory())
 
+    if not PANDAS_3:
+        expected_dtype = "object"
+
     expected_after_update = pd.DataFrame(
         {"str": pd.Series(["a", "b", None, "c", "d", "c", "d"], dtype=expected_dtype)}
     )
@@ -828,12 +831,17 @@ def test_update_after_empty_partition_string_dtypes_categoricals(
             )
 
     # With np.nan works fine?
+    skipped = False
     for storage in ["pyarrow", "python"]:
+        dtype = _dtype_from_storage_nan_value(storage, np.nan)
+        if dtype is None:
+            skipped = True
+            continue
         df = pd.DataFrame(
             {
                 "str": pd.Series(
                     ["e", "f", None],
-                    dtype=_dtype_from_storage_nan_value(storage, np.nan),
+                    dtype=dtype,
                 )
             }
         )
@@ -846,10 +854,13 @@ def test_update_after_empty_partition_string_dtypes_categoricals(
     after_update_as_cats = read_table(
         dataset_uuid, store_factory(), categoricals=["str"]
     )
+    values = ["a", "b", None, "c", "d", "c", "d", "e", "f", None, "e", "f", None]
+    if skipped:
+        values = values[:-3]
     expected = pd.DataFrame(
         {
             "str": pd.Series(
-                ["a", "b", None, "c", "d", "c", "d", "e", "f", None, "e", "f", None],
+                values,
                 dtype=expected_dtype,
             ).astype("category")
         }

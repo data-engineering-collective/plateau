@@ -78,6 +78,33 @@ class SchemaWrapper:
                     if index_level_ix >= 0:
                         schema = schema.remove(index_level_ix)
 
+            for cmd in pandas_metadata["columns"]:
+                name = cmd.get("name")
+                if name is None:
+                    continue
+
+                field_name = cmd["field_name"]
+                field_idx = schema.get_field_index(field_name)
+                if field_idx < 0:
+                    continue
+                field = schema[field_idx]
+                if (
+                    pa.types.is_string(field.type)
+                    and cmd["pandas_type"] == "unicode"
+                    and cmd["numpy_type"] == "object"
+                ):
+                    schema = schema.remove(field_idx)
+                    new_field = pa.field(
+                        field.name,
+                        pa.large_string(),
+                        field.nullable,
+                        field.metadata,
+                    )
+                    schema = schema.insert(field_idx, new_field)
+                    cmd["pandas_type"] = "object"
+                    cmd["numpy_type"] = "str"
+                    cmd["metadata"] = None
+
             schema = schema.remove_metadata()
             md = {b"pandas": _dict_to_binary(pandas_metadata)}
             schema = schema.with_metadata(md)
@@ -342,17 +369,8 @@ def normalize_type(
             return pa.large_string(), "object", "str", None
         elif t_np == "string":
             return pa.string(), "unicode", "string", None
-        elif t_np == "object" and t_pd == "unicode":
-            # Old school, pandas 2.X object dtype. Don't normalize to not mess
-            # with pandas 2.x compatibility
-            return t_pa, t_pd, t_np, metadata
-        # e.g. categoricals won't give us the proper numpy type identifiers
-        elif t_pa == pa.string():
-            return pa.string(), "unicode", "string", None
-        elif t_pa == pa.large_string():
-            return pa.large_string(), "object", "str", None
         else:
-            # If all fails, just don't normalize
+            # This should be the ordinary object dtype
             return t_pa, t_pd, t_np, metadata
     else:
         return t_pa, t_pd, t_np, metadata
