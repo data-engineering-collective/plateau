@@ -319,8 +319,7 @@ def normalize_type(
         )
         return pa.list_(t_pa2), f"list[{t_pd2}]", "object", None
     elif pa.types.is_dictionary(t_pa):
-        # downcast to dictionary content, `t_pd` is useless in that case
-        return normalize_type(t_pa.value_type, t_np, t_np, None)
+        return normalize_type(t_pa.value_type, t_pd, t_np, None)
     elif pa.types.is_string(t_pa) or pa.types.is_large_string(t_pa):
         # Pyarrow only supports reading back
         #
@@ -335,7 +334,11 @@ def normalize_type(
 
         # pandas also supports mixed types but those are rare and must be
         # constructed explicitly
-        if t_np == "str":
+        if t_pd == "categorical":
+            # We loose the information of the nullable type since the t_np type
+            # is set to the dtype of the codes but not the categories.
+            return pa.large_string(), "object", "str", None
+        elif t_np == "str":
             return pa.large_string(), "object", "str", None
         elif t_np == "string":
             return pa.string(), "unicode", "string", None
