@@ -36,7 +36,7 @@ import pandas.testing as pdt
 import pytest
 from minimalkv import get_store_from_url
 
-from plateau.core._compat import pandas_infer_string
+from plateau.core._compat import PANDAS_3, pandas_infer_string
 from plateau.io.eager import store_dataframes_as_dataset
 from plateau.io.iter import store_dataframes_as_dataset__iter
 from plateau.io_components.metapartition import SINGLE_TABLE, MetaPartition
@@ -648,8 +648,14 @@ def test_binary_column_metadata(store_factory, bound_load_dataframes):
     assert set(df.columns.map(type)) == {str}
 
 
-def test_extensiondtype_roundtrip(store_factory, bound_load_dataframes):
-    df = pd.DataFrame({"str": pd.Series(["a", "b"], dtype="string")})
+def test_string_type_roundtrip(store_factory, bound_load_dataframes):
+    # Note: we're not actually roundtripping the string type since the loading
+    # type depends on the pandas version. Keeping the loading type aligned with
+    # what is typically initialized by pandas by default is likely the best
+    # option
+    df = pd.DataFrame(
+        {"str": pd.Series(["a", "b"], dtype="str" if PANDAS_3 else "string")}
+    )
 
     store_dataframes_as_dataset(
         dfs=[df], store=store_factory, dataset_uuid="dataset_uuid"

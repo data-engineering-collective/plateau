@@ -321,6 +321,36 @@ def normalize_type(
     elif pa.types.is_dictionary(t_pa):
         # downcast to dictionary content, `t_pd` is useless in that case
         return normalize_type(t_pa.value_type, t_np, t_np, None)
+    elif pa.types.is_string(t_pa) or pa.types.is_large_string(t_pa):
+        # Pyarrow only supports reading back
+        #
+        # pyarrow + np.nan
+        # pa.large_string(), "object", "str", None
+        # or
+        # python + pd.NA
+        # pa.string(), "unicode", "string", None
+        #
+        # unintuitively, the numpy type identifier `t_np` corresponds
+        # to the pandas dtypes `str` and `string`
+
+        # pandas also supports mixed types but those are rare and must be
+        # constructed explicitly
+        if t_np == "str":
+            return pa.large_string(), "object", "str", None
+        elif t_np == "string":
+            return pa.string(), "unicode", "string", None
+        elif t_np == "object" and t_pd == "unicode":
+            # Old school, pandas 2.X object dtype. Don't normalize to not mess
+            # with pandas 2.x compatibility
+            return t_pa, t_pd, t_np, metadata
+        # e.g. categoricals won't give us the proper numpy type identifiers
+        elif t_pa == pa.string():
+            return pa.string(), "unicode", "string", None
+        elif t_pa == pa.large_string():
+            return pa.large_string(), "object", "str", None
+        else:
+            # If all fails, just don't normalize
+            return t_pa, t_pd, t_np, metadata
     else:
         return t_pa, t_pd, t_np, metadata
 
