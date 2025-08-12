@@ -768,7 +768,7 @@ class MetaPartition(Iterable):
 
             pa_dtype = schema.field(primary_key).type
             if not ARROW_GE_20 and pa.types.is_large_string(pa_dtype):
-                if pd.get_option("future.infer_string"):
+                if pandas_infer_string():
                     dtype = "string[pyarrow_numpy]"
                 else:
                     dtype = "object"
