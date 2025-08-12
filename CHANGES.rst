@@ -2,9 +2,12 @@
 Changelog
 =========
 
-Next release
-============
+Plateau 4.6.0 (2025-08-12)
+==========================
 
+* Schema normalization for pandas 3.x `str` dtype. String fields are considered
+  compatible if they are using the same NA value but pandas storage backend is
+  being ignored.
 * Support for pyarrow 21.0.0
 * Drop support for pyarrow 15.0.2, 16.1.0 and 17.0.0
 

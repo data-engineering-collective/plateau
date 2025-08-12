@@ -7,7 +7,6 @@ import pandas.testing as pdt
 import pyarrow as pa
 import pytest
 
-from plateau.core._compat import pandas_infer_string
 from plateau.core.common_metadata import make_meta, store_schema_metadata
 from plateau.core.index import ExplicitSecondaryIndex
 from plateau.core.naming import DEFAULT_METADATA_VERSION
@@ -397,12 +396,12 @@ def test_build_indices():
     loc_index = ExplicitSecondaryIndex(
         "location",
         {"Loc1": ["partition_label"], "Loc2": ["partition_label"]},
-        dtype=pa.large_string() if pandas_infer_string() else None,
+        dtype=pa.large_string(),
     )
     prod_index = ExplicitSecondaryIndex(
         "product",
         {"Product1": ["partition_label"], "Product2": ["partition_label"]},
-        dtype=pa.large_string() if pandas_infer_string() else None,
+        dtype=pa.large_string(),
     )
 
     assert result["location"] == loc_index

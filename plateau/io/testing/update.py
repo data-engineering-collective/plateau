@@ -6,13 +6,19 @@ from functools import partial
 
 import numpy as np
 import pandas as pd
+import pandas.testing as pdt
 import pytest
 
 from plateau.api.dataset import read_dataset_as_ddf
+from plateau.core._compat import PANDAS_3
 from plateau.core.dataset import DatasetMetadata
 from plateau.core.naming import DEFAULT_METADATA_VERSION
 from plateau.core.testing import TIME_TO_FREEZE_ISO
-from plateau.io.eager import read_dataset_as_metapartitions, store_dataframes_as_dataset
+from plateau.io.eager import (
+    read_dataset_as_metapartitions,
+    read_table,
+    store_dataframes_as_dataset,
+)
 from plateau.io.iter import read_dataset_as_dataframes__iterator
 
 
@@ -665,3 +671,198 @@ def test_update_of_dataset_with_non_default_table_name(
     )
     df_expected = pd.concat([df_create, df_update]).reset_index(drop=True)
     pd.testing.assert_frame_equal(df_read, df_expected)
+
+
+def _dtype_from_storage_nan_value(storage_backend, na_value):
+    if PANDAS_3:
+        dtype = pd.StringDtype(storage=storage_backend, na_value=na_value)
+    else:
+        if storage_backend == "pyarrow" and na_value is pd.NA:
+            dtype = "string[pyarrow]"
+        elif storage_backend == "pyarrow" and na_value is np.nan:
+            dtype = "string[pyarrow_numpy]"
+        elif storage_backend == "python" and na_value is np.nan:
+            return None
+        elif storage_backend == "python" and na_value is pd.NA:
+            dtype = "string"
+        else:
+            raise ValueError(f"Unsupported storage backend: {storage_backend}")
+    return dtype
+
+
+@pytest.mark.parametrize("storage_backend", ["pyarrow", "python"])
+@pytest.mark.parametrize("na_value", [np.nan, pd.NA])
+def test_update_after_empty_partition_string_dtypes(
+    store_factory, bound_update_dataset, storage_backend, na_value, backend_identifier
+):
+    import pandas as pd
+
+    with pd.option_context("future.infer_string", True):
+        other_nan_value = {np.nan, pd.NA}
+        other_nan_value.remove(na_value)
+        other_nan_value = other_nan_value.pop()
+        dtype = _dtype_from_storage_nan_value(storage_backend, na_value)
+        if dtype is None:
+            pytest.skip()
+        df = pd.DataFrame({"str": pd.Series(["a", "b", None], dtype=dtype)})
+
+        dataset_uuid = "dataset_uuid"
+        bound_update_dataset(
+            [df.iloc[0:0]],  # empty partition
+            store=store_factory,
+            dataset_uuid=dataset_uuid,
+        )
+        # Schema verification should not fail
+        bound_update_dataset(
+            [df],
+            store=store_factory,
+            dataset_uuid=dataset_uuid,
+        )
+        if na_value is pd.NA:
+            expected_dtype = _dtype_from_storage_nan_value("python", pd.NA)
+        else:
+            expected_dtype = _dtype_from_storage_nan_value("pyarrow", np.nan)
+        # We have to cast to the expected dtype since pyarrow is only reading
+        # the above two data types in. They are ignoring the written storage
+        # backend and are defaulting to python for pd.NA and to pyarrow for
+        # np.nan
+        df["str"] = df["str"].astype(expected_dtype)
+
+        pdt.assert_frame_equal(read_table(dataset_uuid, store_factory()), df)
+        if backend_identifier == "dask.dataframe":
+            # FIXME: dask.dataframe triggers the schema validation error but somehow
+            # the exception is not properly forwarded and the test always fails
+            return
+        for storage in ["pyarrow", "python"]:
+            df = pd.DataFrame(
+                {
+                    "str": pd.Series(
+                        ["c", "d"],
+                        dtype=_dtype_from_storage_nan_value(storage, other_nan_value),
+                    )
+                }
+            )
+            # Should be a ValueError but dask sometimes raises a different exception
+            # type
+            with pytest.raises(ValueError, match="Schemas.*are not compatible.*"):
+                bound_update_dataset(
+                    [df],
+                    store=store_factory,
+                    dataset_uuid=dataset_uuid,
+                )
+
+
+@pytest.mark.parametrize("storage_backend", ["pyarrow", "python"])
+@pytest.mark.parametrize("na_value", [np.nan, pd.NA])
+def test_update_after_empty_partition_string_dtypes_categoricals(
+    store_factory, bound_update_dataset, storage_backend, na_value
+):
+    import pandas as pd
+
+    with pd.option_context("future.infer_string", True):
+        other_nan_value = {np.nan, pd.NA}
+        other_nan_value.remove(na_value)
+        other_nan_value = other_nan_value.pop()
+        dtype = _dtype_from_storage_nan_value(storage_backend, na_value)
+        if dtype is None:
+            pytest.skip()
+        df = pd.DataFrame(
+            {"str": pd.Series(["a", "b", None], dtype=dtype).astype("category")}
+        )
+
+        dataset_uuid = "dataset_uuid"
+        bound_update_dataset(
+            [df.iloc[0:0]],  # empty partition
+            store=store_factory,
+            dataset_uuid=dataset_uuid,
+        )
+        # Schema verification should not fail
+        bound_update_dataset(
+            [df],
+            store=store_factory,
+            dataset_uuid=dataset_uuid,
+        )
+        expected_dtype = _dtype_from_storage_nan_value("pyarrow", np.nan)
+        # We have to cast to the expected dtype since pyarrow is only reading
+        # categoricals with the pyarrow_numpy data type.
+        df["str"] = df["str"].astype(expected_dtype)
+
+        pdt.assert_frame_equal(read_table(dataset_uuid, store_factory()), df)
+        for storage in ["pyarrow", "python"]:
+            df = pd.DataFrame(
+                {
+                    "str": pd.Series(
+                        ["c", "d"],
+                        dtype=_dtype_from_storage_nan_value(storage, other_nan_value),
+                    ).astype("category")
+                }
+            )
+            bound_update_dataset(
+                [df],
+                store=store_factory,
+                dataset_uuid=dataset_uuid,
+            )
+    after_update = read_table(dataset_uuid, store_factory())
+
+    if not PANDAS_3:
+        expected_dtype = "object"
+
+    expected_after_update = pd.DataFrame(
+        {"str": pd.Series(["a", "b", None, "c", "d", "c", "d"], dtype=expected_dtype)}
+    )
+    pdt.assert_frame_equal(after_update, expected_after_update)
+
+    # Storage of categorical dtypes will only happen with np.nan If we try the other na_value we'll get a validation error
+
+    for storage in ["pyarrow", "python"]:
+        df = pd.DataFrame(
+            {
+                "str": pd.Series(
+                    ["e", "f", None],
+                    dtype=_dtype_from_storage_nan_value(storage, pd.NA),
+                )
+            }
+        )
+        with pytest.raises(ValueError, match="Schemas.*are not compatible.*"):
+            bound_update_dataset(
+                [df],
+                store=store_factory,
+                dataset_uuid=dataset_uuid,
+            )
+
+    # With np.nan works fine?
+    skipped = False
+    for storage in ["pyarrow", "python"]:
+        dtype = _dtype_from_storage_nan_value(storage, np.nan)
+        if dtype is None:
+            skipped = True
+            continue
+        df = pd.DataFrame(
+            {
+                "str": pd.Series(
+                    ["e", "f", None],
+                    dtype=dtype,
+                )
+            }
+        )
+        bound_update_dataset(
+            [df],
+            store=store_factory,
+            dataset_uuid=dataset_uuid,
+        )
+
+    after_update_as_cats = read_table(
+        dataset_uuid, store_factory(), categoricals=["str"]
+    )
+    values = ["a", "b", None, "c", "d", "c", "d", "e", "f", None, "e", "f", None]
+    if skipped:
+        values = values[:-3]
+    expected = pd.DataFrame(
+        {
+            "str": pd.Series(
+                values,
+                dtype=expected_dtype,
+            ).astype("category")
+        }
+    )
+    pdt.assert_frame_equal(after_update_as_cats, expected)

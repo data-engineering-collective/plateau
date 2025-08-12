@@ -78,6 +78,33 @@ class SchemaWrapper:
                     if index_level_ix >= 0:
                         schema = schema.remove(index_level_ix)
 
+            for cmd in pandas_metadata["columns"]:
+                name = cmd.get("name")
+                if name is None:
+                    continue
+
+                field_name = cmd["field_name"]
+                field_idx = schema.get_field_index(field_name)
+                if field_idx < 0:
+                    continue
+                field = schema[field_idx]
+                if (
+                    pa.types.is_string(field.type)
+                    and cmd["pandas_type"] == "unicode"
+                    and cmd["numpy_type"] == "object"
+                ):
+                    schema = schema.remove(field_idx)
+                    new_field = pa.field(
+                        field.name,
+                        pa.large_string(),
+                        field.nullable,
+                        field.metadata,
+                    )
+                    schema = schema.insert(field_idx, new_field)
+                    cmd["pandas_type"] = "object"
+                    cmd["numpy_type"] = "str"
+                    cmd["metadata"] = None
+
             schema = schema.remove_metadata()
             md = {b"pandas": _dict_to_binary(pandas_metadata)}
             schema = schema.with_metadata(md)
@@ -319,8 +346,32 @@ def normalize_type(
         )
         return pa.list_(t_pa2), f"list[{t_pd2}]", "object", None
     elif pa.types.is_dictionary(t_pa):
-        # downcast to dictionary content, `t_pd` is useless in that case
-        return normalize_type(t_pa.value_type, t_np, t_np, None)
+        return normalize_type(t_pa.value_type, t_pd, t_np, None)
+    elif pa.types.is_string(t_pa) or pa.types.is_large_string(t_pa):
+        # Pyarrow only supports reading back
+        #
+        # pyarrow + np.nan
+        # pa.large_string(), "object", "str", None
+        # or
+        # python + pd.NA
+        # pa.string(), "unicode", "string", None
+        #
+        # unintuitively, the numpy type identifier `t_np` corresponds
+        # to the pandas dtypes `str` and `string`
+
+        # pandas also supports mixed types but those are rare and must be
+        # constructed explicitly
+        if t_pd == "categorical":
+            # We loose the information of the nullable type since the t_np type
+            # is set to the dtype of the codes but not the categories.
+            return pa.large_string(), "object", "str", None
+        elif t_np == "str":
+            return pa.large_string(), "object", "str", None
+        elif t_np == "string":
+            return pa.string(), "unicode", "string", None
+        else:
+            # This should be the ordinary object dtype
+            return t_pa, t_pd, t_np, metadata
     else:
         return t_pa, t_pd, t_np, metadata
 
