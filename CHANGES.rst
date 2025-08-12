@@ -2,7 +2,7 @@
 Changelog
 =========
 
-Plateau 4.6.0 (2025-08-11)
+Plateau 4.6.0 (2025-08-12)
 ==========================
 
 * Schema normalization for pandas 3.x `str` dtype. String fields are considered
