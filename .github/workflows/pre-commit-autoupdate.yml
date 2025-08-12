@@ -19,7 +19,7 @@ jobs:
         with:
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: Set up pixi
-        uses: prefix-dev/setup-pixi@b1ab8f237b57292b58384631d89ce0b0863766bc # v0.8.13
+        uses: prefix-dev/setup-pixi@fef5c9568ca6c4ff7707bf840ab0692ba3f08293 # v0.9.0
         with:
           environments: default lint
       - name: Update pre-commit hooks and run
