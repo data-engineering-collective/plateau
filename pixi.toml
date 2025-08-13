@@ -42,6 +42,8 @@ distributed = ">=2022.5.1"
 pytz = "*"
 cloudpickle = "*"
 hypothesis = "*"
+jupyterlab = "*"
+
 [feature.test.tasks]
 test = "pytest"
 test-coverage = "pytest --cov=plateau --cov-report=xml --cov-report=term-missing"

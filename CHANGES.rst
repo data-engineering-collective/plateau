@@ -2,6 +2,12 @@
 Changelog
 =========
 
+Plateau 4.6.1 (2025-08-13)
+==========================
+
+* Fix a circular import when importing ``plateau.serialization``
+
+
 Plateau 4.6.0 (2025-08-12)
 ==========================
 
