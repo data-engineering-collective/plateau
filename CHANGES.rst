@@ -3,6 +3,7 @@ Changelog
 =========
 
 Plateau 4.6.2 (2025-08-XX)
+==========================
 
 * Add further validation for predicates to raise errors if operators are misused with non-scalar values
 
