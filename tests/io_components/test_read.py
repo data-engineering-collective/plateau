@@ -25,7 +25,19 @@ def test_dispatch_metapartitions(dataset, store_session):
 
 @pytest.mark.parametrize(
     "predicates,error_msg",
-    [([], "Empty predicates"), ([[]], "Invalid predicates: Conjunction 0 is empty")],
+    [
+        ([], "Empty predicates"),
+        ([[]], "Invalid predicates: Conjunction 0 is empty"),
+        (
+            [[("mycol", "in", None)]],
+            "Invalid predicates: Clause 0 in conjunction 0 with null value and operator 'in'.",
+        ),
+        (
+            [[("mycol", "in", "scalar")]],
+            "operator 'in' must be used with a tuple or list",
+        ),
+        ([[("mycol", "<", [17, 12])]], "operator '<' must be used with a scalar type"),
+    ],
 )
 def test_dispatch_metapartition_undefined_behaviour(
     dataset, store_session, predicates, error_msg
