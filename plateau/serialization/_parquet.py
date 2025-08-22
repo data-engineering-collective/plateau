@@ -582,6 +582,24 @@ def _predicate_accepts(predicate, row_meta, arrow_schema, parquet_reader):
             elif min_value <= x <= max_value:
                 return True
         return False
+    elif op == "not in":
+        # The only way we could exclude a row group was if we knew that all
+        # elements in the row group were listed in the values
+        # The only situations we can tell for sure what the content of the row group is iff
+        # min_value == max_value
+        # or null_count == len
+
+        if min_value == max_value:
+            for v in val:
+                if pd.isnull(v):
+                    if parquet_statistics.null_count > 0:
+                        continue
+                elif v == min_value:
+                    continue
+                break
+            else:
+                return False
+        return True
     else:
         raise NotImplementedError("op not supported")
 
