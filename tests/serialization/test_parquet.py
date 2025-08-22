@@ -413,6 +413,66 @@ def test_predicate_accept_in(store, predicate_value, expected):
     )
 
 
+@pytest.mark.parametrize(
+    ["predicate_value", "expected"],
+    [
+        ([0, 4, 1], True),
+        ([-2, 44], True),
+        ([-3, 0], True),
+        ([-1, 10**4], True),
+        ([2, 3], True),
+        ([-1, 20], True),
+        ([-30, -5, 50, 10], True),
+        ([-30, -5, 50, np.nan], True),
+        ([], True),
+    ],
+)
+def test_predicate_accept_notin(store, predicate_value, expected):
+    df = pd.DataFrame({"A": [0, 4, 13, 29]})  # min = 0, max = 29
+    predicate = ("A", "not in", predicate_value)
+    serialiser = ParquetSerializer(chunk_size=None)
+    key = serialiser.store(store, "prefix", df)
+
+    parquet_file = ParquetFile(store.open(key))
+    row_meta = parquet_file.metadata.row_group(0)
+    arrow_schema = parquet_file.schema.to_arrow_schema()
+    parquet_reader = parquet_file.reader
+    assert (
+        _predicate_accepts(
+            predicate,
+            row_meta=row_meta,
+            arrow_schema=arrow_schema,
+            parquet_reader=parquet_reader,
+        )
+        == expected
+    )
+
+
+@pytest.mark.parametrize(
+    ["predicate_value", "test_data"],
+    [
+        ([0], [0, 0]),
+        ([0, np.nan], [0, 0, np.nan]),
+    ],
+)
+def test_predicate_accept_notin_excludes(store, predicate_value, test_data):
+    df = pd.DataFrame({"A": test_data})  # min = 0, max = 29
+    predicate = ("A", "not in", predicate_value)
+    serialiser = ParquetSerializer(chunk_size=None)
+    key = serialiser.store(store, "prefix", df)
+
+    parquet_file = ParquetFile(store.open(key))
+    row_meta = parquet_file.metadata.row_group(0)
+    arrow_schema = parquet_file.schema.to_arrow_schema()
+    parquet_reader = parquet_file.reader
+    assert not _predicate_accepts(
+        predicate,
+        row_meta=row_meta,
+        arrow_schema=arrow_schema,
+        parquet_reader=parquet_reader,
+    )
+
+
 def test_read_categorical(store):
     df = pd.DataFrame({"col": ["a"]}).astype({"col": "category"})
 

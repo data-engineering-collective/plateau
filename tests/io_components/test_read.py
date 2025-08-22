@@ -36,6 +36,14 @@ def test_dispatch_metapartitions(dataset, store_session):
             [[("mycol", "in", "scalar")]],
             "operator 'in' must be used with a tuple or list",
         ),
+        (
+            [[("mycol", "not in", None)]],
+            "Invalid predicates: Clause 0 in conjunction 0 with null value and operator 'not in'.",
+        ),
+        (
+            [[("mycol", "not in", "scalar")]],
+            "operator 'not in' must be used with a tuple or list",
+        ),
         ([[("mycol", "<", [17, 12])]], "operator '<' must be used with a scalar type"),
     ],
 )

@@ -5,6 +5,7 @@ Changelog
 Plateau 4.6.2 (2025-08-XX)
 ==========================
 
+* Add support for `not in` predicate operation.
 * Add further validation for predicates to raise errors if operators are misused with non-scalar values
 
 

@@ -206,12 +206,13 @@ def check_predicates(predicates: PredicatesType) -> None:
                     f"with null value and operator '{op}'. Only operators supporting null values "
                     "are '==', '!=', 'in' and 'is distinct from'."
                 )
-            if op == "in" and pd.api.types.is_scalar(val):
-                raise ValueError(
-                    f"Invalid predicates in clause {clause_idx} in conjunction {conjunction_idx} "
-                    f"with operator '{op}' must be used with a tuple or list, got {type(val)} instead."
-                )
-            if op != "in" and is_list_like(val):
+            if op in ("in", "not in"):
+                if pd.api.types.is_scalar(val):
+                    raise ValueError(
+                        f"Invalid predicates in clause {clause_idx} in conjunction {conjunction_idx} "
+                        f"with operator '{op}' must be used with a tuple or list, got {type(val)} instead."
+                    )
+            elif is_list_like(val):
                 raise ValueError(
                     f"Invalid predicates in clause {clause_idx} in conjunction {conjunction_idx} "
                     f"with operator '{op}' must be used with a scalar type, got {type(val)} instead."
@@ -515,7 +516,8 @@ def filter_array_like(
             np.logical_and(array_like < value, mask, out=out)
         elif op == ">":
             np.logical_and(array_like > value, mask, out=out)
-        elif op == "in":
+        elif op in ("in", "not in"):
+            inclusive = op == "in"
             value = np.asarray(value)
             nullmask = pd.isnull(value)
             if value.dtype.kind in ("U", "S", "O"):
@@ -548,11 +550,19 @@ def filter_array_like(
             if any(nullmask):
                 matching_idx |= pd.isnull(array_like)
 
-            np.logical_and(
-                matching_idx,
-                mask,
-                out=out,
-            )
+            if inclusive:
+                np.logical_and(
+                    matching_idx,
+                    mask,
+                    out=out,
+                )
+            else:
+                np.logical_and(
+                    ~matching_idx,
+                    mask,
+                    out=out,
+                )
+
         else:
             raise NotImplementedError("op not supported")
 
