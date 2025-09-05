@@ -51,7 +51,7 @@ jobs:
       - name: Pytest
         run: pixi run test-coverage -n auto
       - name: Issue on failure
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         if: ${{ failure() && github.ref == 'refs/heads/main' }}
         with:
           script: |
