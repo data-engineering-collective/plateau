@@ -415,7 +415,7 @@ Version 3.8.1 (2020-03-20)
 Improvements
 ^^^^^^^^^^^^
 
-* Only fix column odering when restoring ``DataFrame`` if the ordering is incorrect.
+* Only fix column ordering when restoring ``DataFrame`` if the ordering is incorrect.
 
 Bug fixes
 ^^^^^^^^^
