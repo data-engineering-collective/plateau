@@ -417,7 +417,7 @@ def test_read_dataset_as_dataframes_dispatch_by_multi_col(
         # This should only dispatch one partition since there is only
         # one file with valid data points
         (["A"], [[("C", ">", 2)]], 1),
-        # We dispatch and restrict to one valie, i.e. one dispatch
+        # We dispatch and restrict to one value, i.e. one dispatch
         (["B"], [[("B", "==", 10)]], 1),
         # The same is true for a non-partition index col
         (["C"], [[("C", "==", 1)]], 1),
