@@ -173,11 +173,11 @@ def assert_frame_almost_equal(df_left, df_right):
         if pd.api.types.is_datetime64_dtype(
             df_left[col].dtype
         ) and pd.api.types.is_object_dtype(df_right[col].dtype):
-            df_right[col] = pd.to_datetime(df_right[col], unit="ns")
+            df_right[col] = pd.to_datetime(df_right[col]).astype(df_left[col].dtype)
         elif pd.api.types.is_object_dtype(
             df_left[col].dtype
         ) and pd.api.types.is_datetime64_dtype(df_right[col].dtype):
-            df_left[col] = pd.to_datetime(df_left[col])
+            df_left[col] = pd.to_datetime(df_left[col]).astype(df_right[col].dtype)
         elif (
             len(df_left) > 0
             and pd.api.types.is_object_dtype(df_left[col].dtype)
@@ -186,8 +186,14 @@ def assert_frame_almost_equal(df_left, df_right):
             if isinstance(df_left[col].iloc[0], datetime.date) or isinstance(
                 df_right[col].iloc[0], datetime.date
             ):
-                df_left[col] = pd.to_datetime(df_left[col], unit="ns")
-                df_right[col] = pd.to_datetime(df_right[col], unit="ns")
+                df_left[col] = pd.to_datetime(df_left[col])
+                df_right[col] = pd.to_datetime(df_right[col])
+        elif pd.api.types.is_datetime64_any_dtype(
+            df_left[col].dtype
+        ) and pd.api.types.is_datetime64_any_dtype(df_right[col].dtype):
+            # Normalize datetime64 resolution (e.g. ns vs s)
+            if df_left[col].dtype != df_right[col].dtype:
+                df_right[col] = df_right[col].astype(df_left[col].dtype)
         elif (
             pd.api.types.is_object_dtype(df_left[col].dtype)
             or pd.api.types.is_string_dtype(df_left[col].dtype)
