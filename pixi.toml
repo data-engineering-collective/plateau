@@ -108,22 +108,22 @@ pandas = ">=2,<3"
 default = ["test"]
 
 py310-pyarrow18-1 = ["py310", "pyarrow18_1", "test", "pandas2"]
-py310-pyarrow19-1 = ["py310", "pyarrow19_1", "test"]
+py310-pyarrow19-1 = ["py310", "pyarrow19_1", "test", "pandas2"]
 py310-pyarrow20-0 = ["py310", "pyarrow20_0", "test"]
 py310-pyarrow21-0 = ["py310", "pyarrow21_0", "test"]
 
-py311-pyarrow18-1 = ["py311", "pyarrow18_1", "test"]
+py311-pyarrow18-1 = ["py311", "pyarrow18_1", "test", "pandas2"]
 py311-pyarrow19-1 = ["py311", "pyarrow19_1", "test", "pandas2"]
 py311-pyarrow20-0 = ["py311", "pyarrow20_0", "test"]
 py311-pyarrow21-0 = ["py311", "pyarrow21_0", "test"]
 
-py312-pyarrow18-1 = ["py312", "pyarrow18_1", "test"]
-py312-pyarrow19-1 = ["py312", "pyarrow19_1", "test"]
+py312-pyarrow18-1 = ["py312", "pyarrow18_1", "test", "pandas2"]
+py312-pyarrow19-1 = ["py312", "pyarrow19_1", "test", "pandas2"]
 py312-pyarrow20-0 = ["py312", "pyarrow20_0", "test", "pandas2"]
 py312-pyarrow21-0 = ["py312", "pyarrow21_0", "test"]
 
-py313-pyarrow18-1 = ["py313", "pyarrow18_1", "test"]
-py313-pyarrow19-1 = ["py313", "pyarrow19_1", "test"]
+py313-pyarrow18-1 = ["py313", "pyarrow18_1", "test", "pandas2"]
+py313-pyarrow19-1 = ["py313", "pyarrow19_1", "test", "pandas2"]
 py313-pyarrow20-0 = ["py313", "pyarrow20_0", "test"]
 py313-pyarrow21-0 = ["py313", "pyarrow21_0", "test"]
 
