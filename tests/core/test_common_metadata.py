@@ -473,47 +473,50 @@ def test_diff_schemas(df_all_types):
  uint32: uint64
 
 """
+    # Pandas 3 adds 'attributes' to schema metadata which shifts line numbers
+    # in the pandas metadata diff by 1
+    _lo = 1 if "attributes" in schema1.internal().pandas_metadata else 0
     expected_pandas_diff = (
         f"""Pandas_metadata:
-@@ -3,12 +3,7 @@
+@@ -{3 + _lo},12 +{3 + _lo},7 @@
 
                       'name': None,
                       'numpy_type': '{"str" if pandas_infer_string() else "object"}',"""
-        + """
-                      'pandas_type': 'unicode'}],
-- 'columns': [{'field_name': 'array_float32',
+        + f"""
+                      'pandas_type': 'unicode'}}],
+- 'columns': [{{'field_name': 'array_float32',
 -              'metadata': None,
 -              'name': 'array_float32',
 -              'numpy_type': 'object',
--              'pandas_type': 'list[float64]'},
--             {'field_name': 'array_float64',
-+ 'columns': [{'field_name': 'array_float64',
+-              'pandas_type': 'list[float64]'}},
+-             {{'field_name': 'array_float64',
++ 'columns': [{{'field_name': 'array_float64',
                'metadata': None,
                'name': 'array_float64',
                'numpy_type': 'object',
-@@ -91,8 +86,8 @@
+@@ -{91 + _lo},8 +{86 + _lo},8 @@
 
-              {'field_name': 'int16',
+              {{'field_name': 'int16',
                'metadata': None,
                'name': 'int16',
 -              'numpy_type': 'int64',
--              'pandas_type': 'int64'},
+-              'pandas_type': 'int64'}},
 +              'numpy_type': 'float64',
-+              'pandas_type': 'float64'},
-              {'field_name': 'int32',
++              'pandas_type': 'float64'}},
+              {{'field_name': 'int32',
                'metadata': None,
                'name': 'int32',
-@@ -108,6 +103,11 @@
+@@ -{108 + _lo},6 +{103 + _lo},11 @@
 
                'name': 'int8',
                'numpy_type': 'int64',
-               'pandas_type': 'int64'},
-+             {'field_name': 'new_col',
+               'pandas_type': 'int64'}},
++             {{'field_name': 'new_col',
 +              'metadata': None,
 +              'name': 'new_col',
 +              'numpy_type': 'bool',
-+              'pandas_type': 'bool'},
-              {'field_name': 'null',
++              'pandas_type': 'bool'}},
+              {{'field_name': 'null',
                'metadata': None,
                'name': 'null',"""
     )

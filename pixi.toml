@@ -1,4 +1,4 @@
-[project]
+[workspace]
 name = "plateau"
 channels = ["conda-forge"]
 platforms = ["osx-arm64", "osx-64", "linux-64", "linux-aarch64", "win-64"]
@@ -8,28 +8,25 @@ postinstall = "pip install --no-build-isolation --no-deps --disable-pip-version-
 
 [dependencies]
 python = ">=3.10"
+attrs = "*"
+click = "*"
 dask = ">=2022.5.1"
 decorator = "*"
+minimalkv = ">=1.4.2"
 msgpack-python = ">=0.5.2"
 numpy = ">1.23,<3"
 pandas = ">=2"
-pyarrow = ">=17, !=19.0.0"
-simplejson = "*"
-minimalkv = ">=1.4.2"
-toolz = "*"
-urlquote = ">=1.1.3"
-zstandard = "*"
-attrs = "*"
-click = "*"
-prompt-toolkit = "*"
-pyyaml = "*"
-
-
-[host-dependencies]
 pip = "*"
+prompt-toolkit = "*"
+pyarrow = ">=17, !=19.0.0"
+pyyaml = "*"
 setuptools = ">=61"
 setuptools-scm = "*"
+simplejson = "*"
+toolz = "*"
+urlquote = ">=1.1.3"
 wheel = "*"
+zstandard = "*"
 
 [feature.test.dependencies]
 pytest = ">=6"
@@ -103,27 +100,30 @@ pyarrow = "=20.0.0"
 [feature.pyarrow21_0.dependencies]
 pyarrow = "=21.0.0"
 
+[feature.pandas2.dependencies]
+pandas = ">=2,<3"
+
 
 [environments]
 default = ["test"]
 
-py310-pyarrow18-1 = ["py310", "pyarrow18_1", "test"]
-py310-pyarrow19-1 = ["py310", "pyarrow19_1", "test"]
+py310-pyarrow18-1 = ["py310", "pyarrow18_1", "test", "pandas2"]
+py310-pyarrow19-1 = ["py310", "pyarrow19_1", "test", "pandas2"]
 py310-pyarrow20-0 = ["py310", "pyarrow20_0", "test"]
 py310-pyarrow21-0 = ["py310", "pyarrow21_0", "test"]
 
-py311-pyarrow18-1 = ["py311", "pyarrow18_1", "test"]
-py311-pyarrow19-1 = ["py311", "pyarrow19_1", "test"]
+py311-pyarrow18-1 = ["py311", "pyarrow18_1", "test", "pandas2"]
+py311-pyarrow19-1 = ["py311", "pyarrow19_1", "test", "pandas2"]
 py311-pyarrow20-0 = ["py311", "pyarrow20_0", "test"]
 py311-pyarrow21-0 = ["py311", "pyarrow21_0", "test"]
 
-py312-pyarrow18-1 = ["py312", "pyarrow18_1", "test"]
-py312-pyarrow19-1 = ["py312", "pyarrow19_1", "test"]
-py312-pyarrow20-0 = ["py312", "pyarrow20_0", "test"]
+py312-pyarrow18-1 = ["py312", "pyarrow18_1", "test", "pandas2"]
+py312-pyarrow19-1 = ["py312", "pyarrow19_1", "test", "pandas2"]
+py312-pyarrow20-0 = ["py312", "pyarrow20_0", "test", "pandas2"]
 py312-pyarrow21-0 = ["py312", "pyarrow21_0", "test"]
 
-py313-pyarrow18-1 = ["py313", "pyarrow18_1", "test"]
-py313-pyarrow19-1 = ["py313", "pyarrow19_1", "test"]
+py313-pyarrow18-1 = ["py313", "pyarrow18_1", "test", "pandas2"]
+py313-pyarrow19-1 = ["py313", "pyarrow19_1", "test", "pandas2"]
 py313-pyarrow20-0 = ["py313", "pyarrow20_0", "test"]
 py313-pyarrow21-0 = ["py313", "pyarrow21_0", "test"]
 
