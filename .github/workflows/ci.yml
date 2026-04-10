@@ -79,7 +79,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           name: pytest-${{ matrix.environment }}
       - name: Issue on failure
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         if: ${{ failure() && github.ref == 'refs/heads/main' }}
         with:
           script: |
