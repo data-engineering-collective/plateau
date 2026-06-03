@@ -320,7 +320,7 @@ def normalize_type(
     - all list value types will be normalized (e.g. ``list[int16]`` to ``list[int64]``, ``list[list[uint8]]`` to
       ``list[list[uint64]]``)
     - all dict value types will be normalized (e.g. ``dictionary<values=float32, indices=int16, ordered=0>`` to
-      ``float64``)
+      ``float64``); the ``ordered`` flag is preserved in the returned metadata.
 
     Parameters
     ----------
@@ -346,7 +346,14 @@ def normalize_type(
         )
         return pa.list_(t_pa2), f"list[{t_pd2}]", "object", None
     elif pa.types.is_dictionary(t_pa):
-        return normalize_type(t_pa.value_type, t_pd, t_np, None)
+        # Strip the dictionary type itself (we always materialise categoricals
+        # at read time based on the user's `categoricals` argument) but keep
+        # the ``ordered`` flag in the per-column pandas metadata so downstream
+        # readers can reconstruct an ordered ``CategoricalDtype``.
+        t_pa2, t_pd2, t_np2, _metadata = normalize_type(
+            t_pa.value_type, t_pd, t_np, None
+        )
+        return t_pa2, t_pd2, t_np2, {"ordered": bool(t_pa.ordered)}
     elif pa.types.is_string(t_pa) or pa.types.is_large_string(t_pa):
         # Pyarrow only supports reading back
         #
