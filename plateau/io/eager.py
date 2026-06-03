@@ -261,16 +261,28 @@ def read_table(
         factory=ds_factory,
     )
 
+    # require meta 4 otherwise, can't construct types/columns
     empty_df = empty_dataframe_from_schema(
         schema=ds_factory.schema,
         columns=columns,
     )
     if categoricals:
         empty_df = empty_df.astype(dict.fromkeys(categoricals, "category"))
-    dfs = list(partitions) + [empty_df]
-    # require meta 4 otherwise, can't construct types/columns
-    if categoricals:
+
+    dfs = list(partitions)
+    if categoricals and dfs:
         dfs = align_categories(dfs, categoricals)
+        # Match the empty placeholder's categorical dtypes to the aligned
+        # partitions so concat keeps the partitions' (possibly ordered)
+        # categorical type rather than downcasting to object.
+        aligned_cat_dtypes = {
+            col: dfs[0][col].dtype
+            for col in categoricals
+            if isinstance(dfs[0][col].dtype, pd.CategoricalDtype)
+        }
+        if aligned_cat_dtypes:
+            empty_df = empty_df.astype(aligned_cat_dtypes)
+    dfs.append(empty_df)
     df = pd.concat(dfs, ignore_index=True, sort=False)
 
     # ensure column order

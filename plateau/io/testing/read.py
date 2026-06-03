@@ -686,3 +686,43 @@ def test_non_default_table_name_roundtrip(store_factory, bound_load_dataframes):
         result_dfs = result
     result_df = pd.concat(result_dfs).reset_index(drop=True)
     pdt.assert_frame_equal(df, result_df)
+
+
+def _assert_ordered_categorical_roundtrip(store_factory, bound_load_dataframes):
+    ordered_dtype = pd.CategoricalDtype(
+        categories=["low", "medium", "high"], ordered=True
+    )
+    df_0 = pd.DataFrame(
+        {
+            "id": [0, 1],
+            "priority": pd.Categorical(["low", "high"], dtype=ordered_dtype),
+        }
+    )
+    df_1 = pd.DataFrame(
+        {
+            "id": [2, 3],
+            "priority": pd.Categorical(["medium", "low"], dtype=ordered_dtype),
+        }
+    )
+    store_dataframes_as_dataset(
+        dfs=[df_0, df_1], store=store_factory, dataset_uuid="dataset_uuid"
+    )
+
+    result = bound_load_dataframes(
+        dataset_uuid="dataset_uuid",
+        store=store_factory,
+        categoricals=["priority"],
+    )
+
+    probe = result[0]
+    if isinstance(probe, MetaPartition):
+        result_dfs = [mp.data for mp in result]
+    else:
+        result_dfs = result
+    result_df = pd.concat(result_dfs).sort_values("id").reset_index(drop=True)
+    expected_df = pd.concat([df_0, df_1]).reset_index(drop=True)
+    pdt.assert_frame_equal(result_df, expected_df)
+
+
+def test_ordered_categorical_roundtrip(store_factory, bound_load_dataframes):
+    _assert_ordered_categorical_roundtrip(store_factory, bound_load_dataframes)

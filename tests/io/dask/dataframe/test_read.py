@@ -301,6 +301,22 @@ def test_dask_index_on_non_string_raises(store_factory):
         )
 
 
+@pytest.mark.xfail(
+    strict=True,
+    reason=(
+        "read_dataset_as_ddf does not yet propagate ordered=True through the "
+        "dask meta. align_categories now preserves the flag, but the dask "
+        "frontend builds its meta independently."
+    ),
+)
+def test_ordered_categorical_roundtrip(store_factory):  # noqa: F811
+    from plateau.io.testing.read import _assert_ordered_categorical_roundtrip
+
+    _assert_ordered_categorical_roundtrip(
+        store_factory=store_factory, bound_load_dataframes=_read_as_ddf
+    )
+
+
 def test_dask_dispatch_by_raises_if_index_on_not_none(store_factory):
     dataset_uuid = "dataset_uuid"
     colA = "ColumnA"

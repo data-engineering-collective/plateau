@@ -2,7 +2,12 @@
 Changelog
 =========
 
-Plateau 4.6.2 (2025-08-XX)
+Plateau 4.7.0 (2026-06-XX)
+==========================
+
+* ``align_categories`` now preserves ``ordered=True`` when all partitions share an identical ordered category sequence; otherwise it warns and falls back to an unordered categorical.
+
+Plateau 4.6.2 (2025-09-22)
 ==========================
 
 * Add support for `not in` predicate operation.
