@@ -172,3 +172,35 @@ def test_read_or_predicates(store_factory, partition_on):
 
     pd.testing.assert_frame_equal(df1, df2)
     pd.testing.assert_frame_equal(expected, df2)
+
+
+def test_read_table_ordered_categorical_disagreeing_partitions_warns(store_factory):
+    # Partitions with disagreeing ordered category sequences cannot be
+    # unambiguously aligned; read_table warns and falls back to an unordered
+    # categorical rather than refusing to load (which would force a full
+    # rewrite of the dataset).
+    df_0 = pd.DataFrame(
+        {
+            "id": [0],
+            "priority": pd.Categorical(["a"], categories=["a", "b"], ordered=True),
+        }
+    )
+    df_1 = pd.DataFrame(
+        {
+            "id": [1],
+            "priority": pd.Categorical(["b"], categories=["b", "a"], ordered=True),
+        }
+    )
+    store_dataframes_as_dataset(
+        dfs=[df_0, df_1], store=store_factory, dataset_uuid="dataset_uuid"
+    )
+
+    with pytest.warns(UserWarning, match="differing category sequences"):
+        df = read_table(
+            dataset_uuid="dataset_uuid",
+            store=store_factory,
+            categoricals=["priority"],
+        )
+
+    assert df["priority"].dtype.name == "category"
+    assert not df["priority"].cat.ordered

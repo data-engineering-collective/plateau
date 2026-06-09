@@ -216,6 +216,97 @@ def test_align_categories_with_missings():
     pdt.assert_frame_equal(out[1], expected_1)
 
 
+def test_align_categories_preserves_ordered():
+    # All partitions share an identical ordered dtype: result is ordered.
+    ordered_dtype = pd.CategoricalDtype(
+        categories=["low", "medium", "high"], ordered=True
+    )
+    df_0 = pd.DataFrame(
+        {"priority": pd.Categorical(["low", "high"], dtype=ordered_dtype)}
+    )
+    df_1 = pd.DataFrame(
+        {"priority": pd.Categorical(["medium", "low"], dtype=ordered_dtype)}
+    )
+
+    out = align_categories([df_0, df_1], ["priority"])
+
+    for df in out:
+        assert df["priority"].dtype == ordered_dtype
+
+
+def test_align_categories_unordered_stays_unordered():
+    df_0 = pd.DataFrame({"col": pd.Categorical(["a", "b"])})
+    df_1 = pd.DataFrame({"col": pd.Categorical(["b", "c"])})
+
+    out = align_categories([df_0, df_1], ["col"])
+
+    for df in out:
+        assert not df["col"].cat.ordered
+
+
+def test_align_categories_warns_on_mixed_ordered_and_unordered():
+    df_ordered = pd.DataFrame(
+        {
+            "priority": pd.Categorical(
+                ["low", "high"],
+                categories=["low", "medium", "high"],
+                ordered=True,
+            )
+        }
+    )
+    df_unordered = pd.DataFrame({"priority": pd.Categorical(["medium"])})
+
+    with pytest.warns(UserWarning, match="mixes ordered and unordered"):
+        out = align_categories([df_ordered, df_unordered], ["priority"])
+
+    for df in out:
+        assert not df["priority"].cat.ordered
+
+
+def test_align_categories_warns_on_differing_ordered_sequences():
+    # Same category set, different ordering — fall back to unordered with a
+    # warning rather than refusing to load.
+    df_0 = pd.DataFrame(
+        {"col": pd.Categorical(["a"], categories=["a", "b"], ordered=True)}
+    )
+    df_1 = pd.DataFrame(
+        {"col": pd.Categorical(["b"], categories=["b", "a"], ordered=True)}
+    )
+
+    with pytest.warns(UserWarning, match="differing category sequences"):
+        out = align_categories([df_0, df_1], ["col"])
+
+    for df in out:
+        assert not df["col"].cat.ordered
+
+
+def test_align_categories_warns_on_extending_ordered_categories():
+    # A prefix relationship also triggers a fallback; users typically hit this
+    # when a dataset's categories were extended over time.
+    df_0 = pd.DataFrame(
+        {
+            "priority": pd.Categorical(
+                ["low"], categories=["low", "medium", "high"], ordered=True
+            )
+        }
+    )
+    df_1 = pd.DataFrame(
+        {
+            "priority": pd.Categorical(
+                ["urgent"],
+                categories=["low", "medium", "high", "urgent"],
+                ordered=True,
+            )
+        }
+    )
+
+    with pytest.warns(UserWarning, match="differing category sequences"):
+        out = align_categories([df_0, df_1], ["priority"])
+
+    for df in out:
+        assert not df["priority"].cat.ordered
+
+
 def test_sort_categorical():
     values = ["f", "a", "b", "z", "e"]
     categories = ["e", "z", "b", "a", "f"]

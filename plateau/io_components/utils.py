@@ -3,6 +3,7 @@
 import collections
 import inspect
 import logging
+import warnings
 from collections.abc import Iterable
 from typing import Literal, cast, overload
 
@@ -318,6 +319,8 @@ def align_categories(dfs, categoricals):
         position_largest_df = None
         categories = set()
         largest_df_categories = set()
+        ordered_sequences: list[tuple] = []
+        unordered_seen = False
         for ix, df in enumerate(dfs):
             ser = df[column]
             if not isinstance(ser.dtype, pd.CategoricalDtype):
@@ -329,6 +332,10 @@ def align_categories(dfs, categoricals):
                 )
             else:
                 cats = ser.cat.categories
+                if ser.cat.ordered:
+                    ordered_sequences.append(tuple(cats))
+                else:
+                    unordered_seen = True
                 length = len(df)
                 if position_largest_df is None or length > position_largest_df[0]:
                     position_largest_df = (length, ix)
@@ -336,12 +343,39 @@ def align_categories(dfs, categoricals):
                     largest_df_categories = cats
             categories.update(cats)
 
+        unique_ordered_sequences = set(ordered_sequences)
+        all_ordered_agree = bool(
+            ordered_sequences
+            and not unordered_seen
+            and len(unique_ordered_sequences) == 1
+        )
+        if ordered_sequences and not all_ordered_agree:
+            # Refusing to align would force a full rewrite of the dataset,
+            # which is impractical for large datasets that have evolved over
+            # time. Fall back to an unordered categorical and warn so the
+            # downgrade is visible.
+            if unordered_seen:
+                detail = "mixes ordered and unordered partitions"
+            else:
+                detail = (
+                    f"has ordered partitions with differing category "
+                    f"sequences ({sorted(unique_ordered_sequences)})"
+                )
+            warnings.warn(
+                f"Column {column!r} {detail}; falling back to an "
+                "unordered categorical.",
+                UserWarning,
+                stacklevel=2,
+            )
+
         # use the categories of the largest DF as a baseline to avoid having
         # to rewrite its codes. Append the remainder and sort it for reproducibility
         categories_lst = list(largest_df_categories) + sorted(
             set(categories) - set(largest_df_categories)
         )
-        cat_dtype = pd.api.types.CategoricalDtype(categories_lst, ordered=False)
+        cat_dtype = pd.api.types.CategoricalDtype(
+            categories_lst, ordered=all_ordered_agree
+        )
         col_dtype[column] = cat_dtype
 
     return_dfs = []
