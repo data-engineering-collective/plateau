@@ -5,6 +5,7 @@ import dask
 import dask.dataframe as dd
 import numpy as np
 import pandas as pd
+import pyarrow as pa
 import pytest
 from dask.dataframe.utils import assert_eq as assert_dask_eq
 from packaging import version
@@ -44,7 +45,8 @@ def _read_as_ddf(
         table=table,
         **kwargs,
     )
-    if categoricals:
+    # The asserts below only apply to the canonical P/L test fixture.
+    if categoricals and "P" in ddf._meta.columns:
         assert ddf._meta.dtypes["P"] == pd.api.types.CategoricalDtype(
             categories=["__UNKNOWN_CATEGORIES__"], ordered=False
         )
@@ -65,7 +67,10 @@ def _read_as_ddf(
     def extract_dataframe(ix):
         df = ddf.iloc[[ix]].copy()
         for col in df.columns:
-            if isinstance(df[col].dtype, pd.CategoricalDtype):
+            if (
+                isinstance(df[col].dtype, pd.CategoricalDtype)
+                and not df[col].cat.ordered
+            ):
                 df[col] = df[col].cat.remove_unused_categories()
         return df.reset_index(drop=True)
 
@@ -301,14 +306,6 @@ def test_dask_index_on_non_string_raises(store_factory):
         )
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "read_dataset_as_ddf does not yet propagate ordered=True through the "
-        "dask meta. align_categories now preserves the flag, but the dask "
-        "frontend builds its meta independently."
-    ),
-)
 def test_ordered_categorical_roundtrip(store_factory):  # noqa: F811
     from plateau.io.testing.read import _assert_ordered_categorical_roundtrip
 
@@ -336,3 +333,29 @@ def test_dask_dispatch_by_raises_if_index_on_not_none(store_factory):
             dask_index_on=colA,
             dispatch_by=[colA],
         )
+
+
+@pytest.mark.parametrize(
+    "df, expected",
+    [
+        (
+            pd.DataFrame({"p": pd.Categorical(["a"], ordered=True)}),
+            {"p"},
+        ),
+        (
+            pd.DataFrame({"p": pd.Categorical(["a"], ordered=False)}),
+            set(),
+        ),
+        (
+            # Schema without pandas metadata: nothing recorded as ordered.
+            pa.schema([pa.field("p", pa.string())]),
+            set(),
+        ),
+    ],
+)
+def test_ordered_categorical_columns(df, expected):
+    from plateau.core.common_metadata import make_meta
+    from plateau.io.dask.dataframe import _ordered_categorical_columns
+
+    schema = make_meta(df, origin="test") if isinstance(df, pd.DataFrame) else df
+    assert _ordered_categorical_columns(schema, ["p"]) == expected
