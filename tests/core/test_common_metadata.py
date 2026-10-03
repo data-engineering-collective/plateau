@@ -143,6 +143,27 @@ def test_strip_categories():
     assert not pa.types.is_dictionary(meta[0].type)
 
 
+@pytest.mark.parametrize("ordered", [True, False])
+def test_make_meta_records_ordered_flag(ordered):
+    # The dictionary type itself is stripped, but the per-column pandas
+    # metadata retains the ordered flag so downstream readers can reconstruct
+    # an ordered ``CategoricalDtype``.
+    input_df = pd.DataFrame(
+        {
+            "priority": pd.Categorical(
+                ["low", "high"],
+                categories=["low", "medium", "high"],
+                ordered=ordered,
+            )
+        }
+    )
+    meta = make_meta(input_df, origin="input_df")
+
+    columns = meta.pandas_metadata["columns"]
+    (priority_meta,) = (c for c in columns if c.get("name") == "priority")
+    assert priority_meta["metadata"] == {"ordered": ordered}
+
+
 def test_reorder(df_all_types):
     df2 = df_all_types.copy()
     df2 = df2.reindex(reversed(df_all_types.columns), axis=1)

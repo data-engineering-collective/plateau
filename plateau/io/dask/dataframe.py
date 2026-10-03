@@ -179,7 +179,15 @@ def _get_dask_meta_for_dataset(ds_factory, columns, categoricals, dates_as_objec
     )
 
     if categoricals:
-        meta = meta.astype(dict.fromkeys(categoricals, "category"))
+        # Datasets written before ordered metadata was tracked have no
+        # `ordered` flag in their pandas metadata and load as unordered.
+        ordered_columns = _ordered_categorical_columns(table_schema, categoricals)
+        meta = meta.astype(
+            {
+                c: pd.CategoricalDtype([], ordered=c in ordered_columns)
+                for c in categoricals
+            }
+        )
         meta = dd.utils.clear_known_categories(meta, categoricals)
 
     categoricals_from_index = _maybe_get_categoricals_from_index(
@@ -188,6 +196,28 @@ def _get_dask_meta_for_dataset(ds_factory, columns, categoricals, dates_as_objec
     if categoricals_from_index:
         meta = meta.astype(categoricals_from_index)
     return meta
+
+
+def _ordered_categorical_columns(schema, categoricals):
+    """Return the subset of ``categoricals`` recorded as ``ordered=True`` in
+    the dataset's pandas schema metadata.
+
+    Datasets written by plateau versions that did not record this metadata
+    fall through and are loaded as unordered categoricals.
+    """
+    pandas_metadata = schema.pandas_metadata
+    if not pandas_metadata:
+        return set()
+    requested = set(categoricals)
+    ordered = set()
+    for cmd in pandas_metadata["columns"]:
+        name = cmd.get("name")
+        if name not in requested:
+            continue
+        col_meta = cmd.get("metadata") or {}
+        if col_meta.get("ordered"):
+            ordered.add(name)
+    return ordered
 
 
 def _shuffle_docs(func):
